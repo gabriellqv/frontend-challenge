@@ -3,9 +3,34 @@ import { HttpResponse, http } from 'msw'
 import type { LoginRequest, RegisterRequest, Session } from '@/shared/contracts'
 
 import { type UserRecord, getDb, hashPassword, persist } from '../db'
-import { errorResponse, getAuthenticatedUser, getToken } from '../utils'
+import { errorResponse, getAuthenticatedUser, getToken, getVisitorId } from '../utils'
 
 export const SESSION_TTL_MS = 60 * 60 * 1000 // 1h (cenários podem encurtar)
+
+/** Preserva os itens do carrinho do visitante ao autenticar (merge no login). */
+function mergeVisitorCart(request: Request, userToken: string): void {
+  const visitorId = getVisitorId(request)
+  if (!visitorId) return
+
+  const db = getDb()
+  const visitorKey = `visitor:${visitorId}`
+  const visitorCart = db.carts[visitorKey]
+  if (!visitorCart || visitorCart.items.length === 0) return
+
+  const userKey = `user:${userToken}`
+  const userCart = db.carts[userKey] ?? { items: [], version: 0 }
+  for (const item of visitorCart.items) {
+    const existing = userCart.items.find(
+      (i) => i.nftId === item.nftId && i.editionId === item.editionId,
+    )
+    if (existing) existing.quantity += item.quantity
+    else userCart.items.push(item)
+  }
+  userCart.version += 1
+  db.carts[userKey] = userCart
+  delete db.carts[visitorKey]
+  persist()
+}
 
 function buildSession(user: UserRecord): Session {
   const token = crypto.randomUUID()
@@ -53,7 +78,9 @@ export const authHandlers = [
         email: 'E-mail ou senha incorretos',
       })
     }
-    return HttpResponse.json(buildSession(user))
+    const session = buildSession(user)
+    mergeVisitorCart(request, session.token)
+    return HttpResponse.json(session)
   }),
 
   http.get('/api/auth/session', ({ request }) => {

@@ -1,9 +1,11 @@
 import { useRef } from 'react'
 
+import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 
 import { LogIn, Menu, Search, ShoppingCart, X } from 'lucide-react'
 
+import { sessionQueryOptions, useLogout } from '@/features/auth/api'
 import { DEFAULT_NFT_LIST_QUERY } from '@/shared/contracts'
 import { cn } from '@/shared/lib/cn'
 
@@ -47,6 +49,9 @@ interface HeaderProps {
 export function Header({ cartItemCount = 0 }: HeaderProps) {
   const menuDialogRef = useRef<HTMLDialogElement>(null)
   const menuTriggerRef = useRef<HTMLButtonElement>(null)
+  const session = useQuery(sessionQueryOptions())
+  const logout = useLogout()
+  const user = session.data?.user
 
   const cartLabel = cartItemCount === 1 ? 'Carrinho, 1 item' : `Carrinho, ${cartItemCount} itens`
 
@@ -135,16 +140,33 @@ export function Header({ cartItemCount = 0 }: HeaderProps) {
             )}
           </Link>
 
-          <Link
-            to="/login"
-            className={cn(
-              'hidden items-center gap-1.5 rounded-[5px] bg-primary px-3 py-1.5 text-sm font-bold text-ink shadow-button transition-colors hover:bg-highlight sm:inline-flex',
-              focusRing,
-            )}
-          >
-            <LogIn aria-hidden="true" className="size-4" />
-            Entrar
-          </Link>
+          {user ? (
+            <div className="hidden items-center gap-2 sm:flex">
+              <span className="max-w-32 truncate text-sm text-canvas">{user.name}</span>
+              <button
+                type="button"
+                onClick={() => logout.mutate()}
+                className={cn(
+                  'rounded-[5px] border border-surface-dark px-3 py-1.5 text-sm text-canvas transition-colors hover:border-error/60 hover:text-error',
+                  focusRing,
+                )}
+              >
+                Sair
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              search={{}}
+              className={cn(
+                'hidden items-center gap-1.5 rounded-[5px] bg-primary px-3 py-1.5 text-sm font-bold text-ink shadow-button transition-colors hover:bg-highlight sm:inline-flex',
+                focusRing,
+              )}
+            >
+              <LogIn aria-hidden="true" className="size-4" />
+              Entrar
+            </Link>
+          )}
 
           <button
             ref={menuTriggerRef}
@@ -226,16 +248,30 @@ export function Header({ cartItemCount = 0 }: HeaderProps) {
             </ul>
           </nav>
 
-          <Link
-            to="/login"
-            className={cn(
-              'mt-auto inline-flex items-center justify-center gap-2 rounded-[5px] bg-primary px-4 py-2.5 text-sm font-bold text-ink shadow-button transition-colors hover:bg-highlight',
-              focusRing,
-            )}
-          >
-            <LogIn aria-hidden="true" className="size-4" />
-            Entrar
-          </Link>
+          {user ? (
+            <button
+              type="button"
+              onClick={() => logout.mutate()}
+              className={cn(
+                'mt-auto inline-flex items-center justify-center gap-2 rounded-[5px] border border-surface-dark px-4 py-2.5 text-sm text-canvas',
+                focusRing,
+              )}
+            >
+              Sair
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              search={{}}
+              className={cn(
+                'mt-auto inline-flex items-center justify-center gap-2 rounded-[5px] bg-primary px-4 py-2.5 text-sm font-bold text-ink shadow-button transition-colors hover:bg-highlight',
+                focusRing,
+              )}
+            >
+              <LogIn aria-hidden="true" className="size-4" />
+              Entrar
+            </Link>
+          )}
         </div>
       </dialog>
     </header>
