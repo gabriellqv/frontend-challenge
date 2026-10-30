@@ -25,7 +25,6 @@ export const orderHandlers = [
       return HttpResponse.json(db.orders[existingOrderId])
     }
 
-    // Monta o snapshot dos itens, revalidando disponibilidade.
     const items: Order['items'] = []
     for (const it of body.items) {
       const nft = db.nfts.find((n) => n.id === it.nftId)
@@ -44,7 +43,6 @@ export const orderHandlers = [
       })
     }
 
-    // Revalida cupom e recalcula totais.
     let totals
     try {
       totals = computeTotals(items, body.couponCode)

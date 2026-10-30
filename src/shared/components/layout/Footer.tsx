@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 
+import { DEFAULT_NFT_LIST_QUERY } from '@/shared/contracts'
 import { cn } from '@/shared/lib/cn'
 
 /** Destinos institucionais ainda inexistentes: listados como "em breve". */
@@ -26,6 +27,7 @@ export function Footer() {
       <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 px-4 py-8 sm:px-6 md:flex-row md:items-center md:justify-between xl:px-0">
         <Link
           to="/"
+          search={DEFAULT_NFT_LIST_QUERY}
           className={cn(
             'self-start rounded-[3px] font-mono text-sm font-bold tracking-widest text-primary',
             focusRing,
@@ -40,6 +42,7 @@ export function Footer() {
             <li>
               <Link
                 to="/"
+                search={DEFAULT_NFT_LIST_QUERY}
                 className={cn('rounded-[3px] transition-colors hover:text-primary', focusRing)}
               >
                 Mercado

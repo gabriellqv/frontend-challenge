@@ -59,3 +59,6 @@ export const nftPageSchema = z.object({
   pagination: paginationSchema,
 })
 export type NftPage = z.infer<typeof nftPageSchema>
+
+/** Parâmetros padrão da listagem (usados em links para "/"). */
+export const DEFAULT_NFT_LIST_QUERY: NftListQuery = nftListQuerySchema.parse({})

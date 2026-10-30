@@ -4,6 +4,7 @@ import { Link } from '@tanstack/react-router'
 
 import { LogIn, Menu, Search, ShoppingCart, X } from 'lucide-react'
 
+import { DEFAULT_NFT_LIST_QUERY } from '@/shared/contracts'
 import { cn } from '@/shared/lib/cn'
 
 /** Seções planejadas, mas fora do escopo do desafio: renderizadas como "em breve". */
@@ -67,6 +68,7 @@ export function Header({ cartItemCount = 0 }: HeaderProps) {
       <div className="mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6 xl:px-0">
         <Link
           to="/"
+          search={DEFAULT_NFT_LIST_QUERY}
           className={cn(
             'rounded-[3px] font-mono text-base font-bold tracking-widest text-primary',
             focusRing,
@@ -79,12 +81,17 @@ export function Header({ cartItemCount = 0 }: HeaderProps) {
         <nav aria-label="Principal" className="hidden md:block">
           <ul className="flex items-center gap-8">
             <li>
-              <Link to="/" activeOptions={{ exact: true }} className={navLinkClass}>
+              <Link
+                to="/"
+                search={DEFAULT_NFT_LIST_QUERY}
+                activeOptions={{ exact: true }}
+                className={navLinkClass}
+              >
                 Início
               </Link>
             </li>
             <li>
-              <Link to="/" className={navLinkClass}>
+              <Link to="/" search={DEFAULT_NFT_LIST_QUERY} className={navLinkClass}>
                 Mercado
               </Link>
             </li>
@@ -116,8 +123,7 @@ export function Header({ cartItemCount = 0 }: HeaderProps) {
             <Search aria-hidden="true" className="size-5" />
           </button>
 
-          {/* Rotas de carrinho/login ainda não existem no router tipado; trocar por `Link` quando existirem. */}
-          <a href="/carrinho" aria-label={cartLabel} className={iconButtonClass}>
+          <Link to="/carrinho" aria-label={cartLabel} className={iconButtonClass}>
             <ShoppingCart aria-hidden="true" className="size-5" />
             {cartItemCount > 0 && (
               <span
@@ -127,10 +133,10 @@ export function Header({ cartItemCount = 0 }: HeaderProps) {
                 {cartItemCount > 99 ? '99+' : cartItemCount}
               </span>
             )}
-          </a>
+          </Link>
 
-          <a
-            href="/login"
+          <Link
+            to="/login"
             className={cn(
               'hidden items-center gap-1.5 rounded-[5px] bg-primary px-3 py-1.5 text-sm font-bold text-ink shadow-button transition-colors hover:bg-highlight sm:inline-flex',
               focusRing,
@@ -138,7 +144,7 @@ export function Header({ cartItemCount = 0 }: HeaderProps) {
           >
             <LogIn aria-hidden="true" className="size-4" />
             Entrar
-          </a>
+          </Link>
 
           <button
             ref={menuTriggerRef}
@@ -185,6 +191,7 @@ export function Header({ cartItemCount = 0 }: HeaderProps) {
               <li>
                 <Link
                   to="/"
+                  search={DEFAULT_NFT_LIST_QUERY}
                   activeOptions={{ exact: true }}
                   onClick={closeMenu}
                   className={cn(navLinkClass, 'w-full')}
@@ -193,7 +200,12 @@ export function Header({ cartItemCount = 0 }: HeaderProps) {
                 </Link>
               </li>
               <li>
-                <Link to="/" onClick={closeMenu} className={cn(navLinkClass, 'w-full')}>
+                <Link
+                  to="/"
+                  search={DEFAULT_NFT_LIST_QUERY}
+                  onClick={closeMenu}
+                  className={cn(navLinkClass, 'w-full')}
+                >
                   Mercado
                 </Link>
               </li>
@@ -214,8 +226,8 @@ export function Header({ cartItemCount = 0 }: HeaderProps) {
             </ul>
           </nav>
 
-          <a
-            href="/login"
+          <Link
+            to="/login"
             className={cn(
               'mt-auto inline-flex items-center justify-center gap-2 rounded-[5px] bg-primary px-4 py-2.5 text-sm font-bold text-ink shadow-button transition-colors hover:bg-highlight',
               focusRing,
@@ -223,7 +235,7 @@ export function Header({ cartItemCount = 0 }: HeaderProps) {
           >
             <LogIn aria-hidden="true" className="size-4" />
             Entrar
-          </a>
+          </Link>
         </div>
       </dialog>
     </header>
