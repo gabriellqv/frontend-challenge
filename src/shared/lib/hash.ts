@@ -3,7 +3,7 @@
  * @returns um UUID v4 no formato string.
  */
 export function createIdempotencyKey(): string {
-  return crypto.randomUUID();
+  return crypto.randomUUID()
 }
 
 /**
@@ -12,6 +12,6 @@ export function createIdempotencyKey(): string {
  * @returns o id no formato `<prefix>_<uuid>` ou apenas `<uuid>` quando sem prefixo.
  */
 export function stableId(prefix?: string): string {
-  const uuid = crypto.randomUUID();
-  return prefix ? `${prefix}_${uuid}` : uuid;
+  const uuid = crypto.randomUUID()
+  return prefix ? `${prefix}_${uuid}` : uuid
 }

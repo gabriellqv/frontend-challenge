@@ -1,4 +1,4 @@
-import Big from 'big.js';
+import Big from 'big.js'
 
 /**
  * Soma dois valores monetários em ETH representados como string decimal.
@@ -7,7 +7,7 @@ import Big from 'big.js';
  * @returns a soma de `a` e `b` como string.
  */
 export function add(a: string, b: string): string {
-  return new Big(a).add(b).toString();
+  return new Big(a).add(b).toString()
 }
 
 /**
@@ -17,7 +17,7 @@ export function add(a: string, b: string): string {
  * @returns a diferença `a - b` como string.
  */
 export function sub(a: string, b: string): string {
-  return new Big(a).minus(b).toString();
+  return new Big(a).minus(b).toString()
 }
 
 /**
@@ -27,7 +27,7 @@ export function sub(a: string, b: string): string {
  * @returns o produto `a * b` como string.
  */
 export function mul(a: string, b: string): string {
-  return new Big(a).times(b).toString();
+  return new Big(a).times(b).toString()
 }
 
 /**
@@ -37,7 +37,7 @@ export function mul(a: string, b: string): string {
  * @returns o quociente `a / b` como string.
  */
 export function div(a: string, b: string): string {
-  return new Big(a).div(b).toString();
+  return new Big(a).div(b).toString()
 }
 
 /**
@@ -47,7 +47,7 @@ export function div(a: string, b: string): string {
  * @returns -1 se `a < b`, 0 se `a === b`, 1 se `a > b`.
  */
 export function compare(a: string, b: string): number {
-  return new Big(a).cmp(b);
+  return new Big(a).cmp(b)
 }
 
 /**
@@ -56,7 +56,7 @@ export function compare(a: string, b: string): number {
  * @returns `true` se `value` for igual a zero.
  */
 export function isZero(value: string): boolean {
-  return new Big(value).eq(0);
+  return new Big(value).eq(0)
 }
 
 /**
@@ -66,15 +66,15 @@ export function isZero(value: string): boolean {
  * @returns o valor formatado (ex.: "1.190000" vira "1.19").
  */
 export function formatEth(value: string): string {
-  const big = new Big(value);
-  const isNegative = big.lt(0);
-  const [intPart = '0', decPart = ''] = big.abs().toString().split('.');
+  const big = new Big(value)
+  const isNegative = big.lt(0)
+  const [intPart = '0', decPart = ''] = big.abs().toString().split('.')
 
-  const decimals = decPart.slice(0, 6).replace(/0+$/, '');
+  const decimals = decPart.slice(0, 6).replace(/0+$/, '')
 
   if (decimals.length === 0) {
-    return isNegative ? `-${intPart}` : intPart;
+    return isNegative ? `-${intPart}` : intPart
   }
 
-  return `${isNegative ? '-' : ''}${intPart}.${decimals}`;
+  return `${isNegative ? '-' : ''}${intPart}.${decimals}`
 }

@@ -4,7 +4,7 @@
  * @returns um array `[0, 1, ..., n - 1]`.
  */
 export function range(n: number): number[] {
-  return Array.from({ length: n }, (_, index) => index);
+  return Array.from({ length: n }, (_, index) => index)
 }
 
 /**
@@ -13,5 +13,5 @@ export function range(n: number): number[] {
  * @returns um novo array sem duplicatas.
  */
 export function unique<T>(items: T[]): T[] {
-  return [...new Set(items)];
+  return [...new Set(items)]
 }

@@ -4,6 +4,7 @@ dist/
 build/
 coverage/
 public/mockServiceWorker.js
+src/routeTree.gen.ts
 
 # Artefatos locais de design
 design/

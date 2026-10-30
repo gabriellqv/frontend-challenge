@@ -1,6 +1,6 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
-import { ethSchema, idSchema } from './common';
+import { ethSchema, idSchema } from './common'
 
 export const cartItemSchema = z.object({
   id: idSchema,
@@ -11,25 +11,25 @@ export const cartItemSchema = z.object({
   /** Preço unitário em ETH (string decimal) no momento da adição. */
   priceEth: ethSchema,
   available: z.number().int().min(0),
-});
-export type CartItem = z.infer<typeof cartItemSchema>;
+})
+export type CartItem = z.infer<typeof cartItemSchema>
 
 export const cartSchema = z.object({
   items: z.array(cartItemSchema),
   version: z.number().int().min(0),
-});
-export type Cart = z.infer<typeof cartSchema>;
+})
+export type Cart = z.infer<typeof cartSchema>
 
-export const couponTypeSchema = z.enum(['percent', 'fixed']);
-export type CouponType = z.infer<typeof couponTypeSchema>;
+export const couponTypeSchema = z.enum(['percent', 'fixed'])
+export type CouponType = z.infer<typeof couponTypeSchema>
 
 export const couponSchema = z.object({
   code: z.string(),
   type: couponTypeSchema,
   /** percent em string decimal (ex.: "10" = 10%) ou valor fixo em ETH. */
   value: ethSchema,
-});
-export type Coupon = z.infer<typeof couponSchema>;
+})
+export type Coupon = z.infer<typeof couponSchema>
 
 /** Resumo de valores calculado pela API (referência para finalizar o pedido). */
 export const cartSummarySchema = z.object({
@@ -37,8 +37,8 @@ export const cartSummarySchema = z.object({
   discountEth: ethSchema,
   networkFeeEth: ethSchema,
   totalEth: ethSchema,
-});
-export type CartSummary = z.infer<typeof cartSummarySchema>;
+})
+export type CartSummary = z.infer<typeof cartSummarySchema>
 
 export const quoteRequestSchema = z.object({
   items: z.array(
@@ -49,22 +49,22 @@ export const quoteRequestSchema = z.object({
     }),
   ),
   couponCode: z.string().optional(),
-});
-export type QuoteRequest = z.infer<typeof quoteRequestSchema>;
+})
+export type QuoteRequest = z.infer<typeof quoteRequestSchema>
 
 export const quoteSchema = cartSummarySchema.extend({
   version: z.number().int().min(0),
-});
-export type Quote = z.infer<typeof quoteSchema>;
+})
+export type Quote = z.infer<typeof quoteSchema>
 
 export const addCartItemRequestSchema = z.object({
   nftId: idSchema,
   editionId: idSchema,
   quantity: z.number().int().min(1),
-});
-export type AddCartItemRequest = z.infer<typeof addCartItemRequestSchema>;
+})
+export type AddCartItemRequest = z.infer<typeof addCartItemRequestSchema>
 
 export const updateCartItemRequestSchema = z.object({
   quantity: z.number().int().min(1),
-});
-export type UpdateCartItemRequest = z.infer<typeof updateCartItemRequestSchema>;
+})
+export type UpdateCartItemRequest = z.infer<typeof updateCartItemRequestSchema>

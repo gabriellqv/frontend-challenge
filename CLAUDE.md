@@ -35,7 +35,13 @@ Playwright · Lighthouse. Extra: zod, react-hook-form, big.js, sonner,
 
 - Um componente React por arquivo; hooks em arquivos próprios.
 - Nomes descritivos (`isMobile`, `cartTotal`), nunca genéricos (`data`, `handle`).
-- Poucos comentários — só o "porquê", não o "o quê".
+- **Comentários profissionais:** API pública (função/hook/tipo/componente
+  compartilhado) leva TSDoc (`@param`, `@returns`, `@example`) conciso. Só
+  comente o **porquê** — nunca o "o quê" (o código já diz). Zero comentário que
+  repete o código.
+- **Sem gambiarra:** proibido `@ts-ignore`, `as any`, `as unknown` sem narrowing,
+  `// eslint-disable` sem justificativa, ou workaround "para fazer passar". Se o
+  TS reclamar, corrija a tipagem.
 - Cores/espacamento via classes do tema (`bg-primary`, `text-ink`), nunca hex solto.
 - Mobile-first: estilo base mobile, sobrescreve desktop com breakpoints Tailwind.
 - Tags semânticas (`button`, `a`, `input`, `label`, `h1–h3`, `nav`, `main`…).

@@ -1,4 +1,4 @@
-import type { NftListQuery } from '@/shared/contracts';
+import type { NftListQuery } from '@/shared/contracts'
 
 /**
  * Fábrica de chaves do TanStack Query. Isolamento por ownerKey acontece nas
@@ -32,4 +32,4 @@ export const queryKeys = {
   session: {
     all: ['session'] as const,
   },
-} as const;
+} as const

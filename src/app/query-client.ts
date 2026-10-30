@@ -1,6 +1,6 @@
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/react-query'
 
-import { ApiError } from '@/shared/api/http-client';
+import { ApiError } from '@/shared/api/http-client'
 
 /**
  * Política de cache (documentada em docs/02-DECISOES-TECNICAS.md §5):
@@ -15,12 +15,12 @@ export const queryClient = new QueryClient({
       staleTime: 15_000,
       refetchOnWindowFocus: true,
       retry: (failureCount, error) => {
-        if (error instanceof ApiError && error.status >= 400 && error.status < 500) return false;
-        return failureCount < 2;
+        if (error instanceof ApiError && error.status >= 400 && error.status < 500) return false
+        return failureCount < 2
       },
     },
     mutations: {
       retry: false,
     },
   },
-});
+})

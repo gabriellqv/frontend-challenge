@@ -1,26 +1,19 @@
-import { StrictMode } from 'react';
+import { isMocksEnabled } from './app/env'
+import './index.css'
 
-import { QueryClientProvider } from '@tanstack/react-query';
-import { RouterProvider, createRouter } from '@tanstack/react-router';
-
-import { createRoot } from 'react-dom/client';
-
-import { queryClient } from './app/query-client';
-import './index.css';
-import { routeTree } from './routeTree.gen';
-
-const router = createRouter({ routeTree });
-
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router;
+async function bootstrap() {
+  // Mocks antes de importar a aplicação: garante que o WebSocket já esteja
+  // patcheado antes de o socket.io-client ser carregado.
+  if (isMocksEnabled) {
+    const { worker } = await import('./mocks/browser')
+    await worker.start({ onUnhandledRequest: 'bypass' })
+    const { applyUrlControls, exposeControl } = await import('./mocks/scenarios')
+    applyUrlControls()
+    exposeControl()
   }
+
+  const { mount } = await import('./app/mount')
+  mount()
 }
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
-  </StrictMode>,
-);
+void bootstrap()

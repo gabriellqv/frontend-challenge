@@ -1,9 +1,9 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
-import { ethSchema, idSchema, isoDateSchema } from './common';
+import { ethSchema, idSchema, isoDateSchema } from './common'
 
-export const orderStatusSchema = z.enum(['pending', 'confirmed', 'declined']);
-export type OrderStatus = z.infer<typeof orderStatusSchema>;
+export const orderStatusSchema = z.enum(['pending', 'confirmed', 'declined'])
+export type OrderStatus = z.infer<typeof orderStatusSchema>
 
 /** Item do pedido — snapshot imutável no momento da criação (recibo). */
 export const orderItemSnapshotSchema = z.object({
@@ -12,8 +12,8 @@ export const orderItemSnapshotSchema = z.object({
   name: z.string(),
   quantity: z.number().int().min(1),
   priceEth: ethSchema,
-});
-export type OrderItemSnapshot = z.infer<typeof orderItemSnapshotSchema>;
+})
+export type OrderItemSnapshot = z.infer<typeof orderItemSnapshotSchema>
 
 export const orderSchema = z.object({
   id: idSchema,
@@ -26,8 +26,8 @@ export const orderSchema = z.object({
   transactionRef: z.string().nullable(),
   version: z.number().int().min(0),
   createdAt: isoDateSchema,
-});
-export type Order = z.infer<typeof orderSchema>;
+})
+export type Order = z.infer<typeof orderSchema>
 
 /**
  * Criação de pedido. `Idempotency-Key` é obrigatória no header HTTP.
@@ -44,5 +44,5 @@ export const createOrderRequestSchema = z.object({
   couponCode: z.string().optional(),
   walletAddress: z.string(),
   network: z.string(),
-});
-export type CreateOrderRequest = z.infer<typeof createOrderRequestSchema>;
+})
+export type CreateOrderRequest = z.infer<typeof createOrderRequestSchema>
