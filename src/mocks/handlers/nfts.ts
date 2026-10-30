@@ -1,12 +1,17 @@
-import { HttpResponse, http } from 'msw'
+import { HttpResponse, delay, http } from 'msw'
 
 import { nftListQuerySchema } from '@/shared/contracts'
 
 import { getDb } from '../db'
+import { getLatencyMs, isOffline } from '../scenarios'
 import { errorResponse } from '../utils'
 
 export const nftHandlers = [
-  http.get('/api/nfts', ({ request }) => {
+  http.get('/api/nfts', async ({ request }) => {
+    if (isOffline()) return HttpResponse.error()
+    const latency = getLatencyMs()
+    if (latency > 0) await delay(latency)
+
     const url = new URL(request.url)
     const query = nftListQuerySchema.parse({
       q: url.searchParams.get('q') ?? undefined,

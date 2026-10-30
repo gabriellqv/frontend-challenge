@@ -99,7 +99,14 @@ function HomePage() {
                 role="alert"
                 className="rounded-[16px] border border-error/40 bg-error/10 p-6 text-sm"
               >
-                Não foi possível carregar o catálogo. Tente novamente.
+                <p>Não foi possível carregar o catálogo.</p>
+                <button
+                  type="button"
+                  onClick={() => void catalog.refetch()}
+                  className="mt-3 rounded-[5px] bg-primary px-3 py-1.5 text-sm font-bold text-ink"
+                >
+                  Tentar novamente
+                </button>
               </div>
             ) : catalog.data && catalog.data.items.length === 0 ? (
               <div

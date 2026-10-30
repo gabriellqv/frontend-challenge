@@ -5,6 +5,7 @@ import type { CreateOrderRequest, Order } from '@/shared/contracts'
 import { getDb, persist } from '../db'
 import { QuoteError, computeTotals } from '../pricing'
 import { emitOrderUpdated } from '../realtime'
+import { isPaymentDeclined } from '../scenarios'
 import { errorResponse, getAuthenticatedUser } from '../utils'
 
 /**
@@ -16,7 +17,7 @@ function scheduleOrderResolution(orderId: string): void {
     const db = getDb()
     const order = db.orders[orderId]
     if (!order || order.status !== 'pending') return
-    order.status = 'confirmed'
+    order.status = isPaymentDeclined() ? 'declined' : 'confirmed'
     order.version += 1
     order.transactionRef = `0x${crypto.randomUUID().replace(/-/g, '')}`
     persist()
