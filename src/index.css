@@ -1,0 +1,70 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/roboto-mono';
+
+/* ============================================================
+ * Design tokens da marca Kurio.
+ * ============================================================ */
+@theme {
+  /* ---- Cores ---- */
+  --color-amber: #e3a44e;
+  --color-background-elevated: #fbfbfb;
+  --color-black: #000000;
+  --color-error: #ed1b2e;
+  --color-foreground: #f5f1eb;
+  --color-gray-light: #ededed;
+  --color-ink: #140d0a;
+  --color-primary: #d28a4c;
+  --color-secondary: #b39463;
+  --color-success: #00a66c;
+  --color-surface-card: #241612;
+  --color-surface-dark: #38220f;
+  --color-surface-raised: #2f1d15;
+  --color-white: #ffffff;
+  --color-blue: #4175df;
+  --color-facebook: #3b5999;
+  --color-google-blue: #4086f4;
+  --color-google-green: #59c36a;
+  --color-google-yellow: #ffda2d;
+  --color-indigo: #283593;
+  --color-light-blue: #03a9f4;
+  --color-orange: #ff641a;
+  --color-accent: #e89b55;
+  --color-coral: #f0805f;
+
+  /* ---- Tipografia ---- */
+  --font-sans: 'Roboto Mono Variable', 'Roboto Mono', ui-monospace, monospace;
+  --font-mono: 'Roboto Mono Variable', 'Roboto Mono', ui-monospace, monospace;
+
+  /* ---- Sombras ---- */
+  --shadow-glow: 0 0 20px 0 rgba(10, 6, 4, 0.45);
+  --shadow-button: 0 4px 12px -2px rgba(20, 13, 10, 0.15);
+  --shadow-button-lg: 0 6.6px 19.8px -3.3px rgba(20, 13, 10, 0.15);
+  --shadow-card: 0 6px 20px 0 rgba(10, 6, 4, 0.45);
+  --shadow-wallet: 0 20px 20px 0 rgba(10, 6, 4, 0.45);
+  --shadow-tab-up: 0 -10px 30px 0 rgba(10, 6, 4, 0.45);
+  --shadow-option: 0 0 40px 0 rgba(10, 6, 4, 0.45);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-foreground);
+    color: var(--color-ink);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

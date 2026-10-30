@@ -1,0 +1,18 @@
+# Dependências e build
+node_modules/
+dist/
+build/
+coverage/
+public/mockServiceWorker.js
+
+# Artefatos locais de design
+design/
+
+# Documentação local de planejamento (não rastreada)
+docs/
+
+# README original do enunciado (substituído no F10)
+README.md
+
+# Husky
+.husky/_/
