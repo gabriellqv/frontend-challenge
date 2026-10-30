@@ -21,7 +21,7 @@ export function SkipToContent({ targetId = 'conteudo' }: SkipToContentProps) {
   return (
     <a
       href={`#${targetId}`}
-      className="sr-only rounded-[5px] bg-primary px-4 py-2 text-sm font-bold text-ink shadow-button focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:outline-2 focus:outline-offset-2 focus:outline-foreground"
+      className="sr-only rounded-[5px] bg-primary px-4 py-2 text-sm font-bold text-ink shadow-button focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:outline-2 focus:outline-offset-2 focus:outline-canvas"
     >
       Pular para o conteúdo
     </a>

@@ -40,5 +40,13 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'warn',
     },
   },
+  {
+    // Primitivos do shadcn/ui exportam variantes (ex.: buttonVariants) por design;
+    // o fast refresh não se aplica a esses arquivos de biblioteca.
+    files: ['src/shared/ui/**/*.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
   prettier,
 )

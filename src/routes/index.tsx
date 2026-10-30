@@ -22,7 +22,7 @@ function HomePage() {
   }, [])
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-foreground text-ink">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background text-ink">
       <p className="font-mono text-lg text-primary">Kurio — Início</p>
       <div data-testid="realtime-status" className="font-mono text-sm">
         {status}

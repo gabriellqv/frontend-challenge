@@ -10,7 +10,7 @@ export const Route = createRootRoute({
 
 function Root() {
   return (
-    <div className="flex min-h-screen flex-col bg-foreground text-ink">
+    <div className="flex min-h-screen flex-col bg-background text-ink">
       <SkipToContent />
       <Header />
       <main id="conteudo" tabIndex={-1} className="flex-1">

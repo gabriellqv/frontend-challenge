@@ -17,3 +17,6 @@ README.md
 
 # Husky
 .husky/_/
+
+# Claude Code (config local)
+.claude/

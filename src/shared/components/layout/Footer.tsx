@@ -22,7 +22,7 @@ const focusRing =
  */
 export function Footer() {
   return (
-    <footer className="border-t border-surface-dark bg-ink text-foreground">
+    <footer className="border-t border-surface-dark bg-ink text-canvas">
       <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 px-4 py-8 sm:px-6 md:flex-row md:items-center md:justify-between xl:px-0">
         <Link
           to="/"

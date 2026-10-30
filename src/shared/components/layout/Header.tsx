@@ -13,7 +13,7 @@ const focusRing =
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
 
 const navLinkClass = cn(
-  'inline-flex items-center border-b-2 border-transparent py-3 text-sm text-foreground transition-colors hover:text-primary',
+  'inline-flex items-center border-b-2 border-transparent py-3 text-sm text-canvas transition-colors hover:text-primary',
   'data-[status=active]:border-primary data-[status=active]:font-bold data-[status=active]:text-primary',
   focusRing,
 )
@@ -24,7 +24,7 @@ const comingSoonLinkClass = cn(
 )
 
 const iconButtonClass = cn(
-  'relative inline-flex size-10 items-center justify-center rounded-[5px] text-foreground transition-colors hover:text-primary',
+  'relative inline-flex size-10 items-center justify-center rounded-[5px] text-canvas transition-colors hover:text-primary',
   focusRing,
 )
 
@@ -63,7 +63,7 @@ export function Header({ cartItemCount = 0 }: HeaderProps) {
   }
 
   return (
-    <header className="border-b border-surface-dark bg-ink text-foreground">
+    <header className="border-b border-surface-dark bg-ink text-canvas">
       <div className="mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6 xl:px-0">
         <Link
           to="/"
@@ -132,7 +132,7 @@ export function Header({ cartItemCount = 0 }: HeaderProps) {
           <a
             href="/login"
             className={cn(
-              'hidden items-center gap-1.5 rounded-[5px] bg-primary px-3 py-1.5 text-sm font-bold text-ink shadow-button transition-colors hover:bg-accent sm:inline-flex',
+              'hidden items-center gap-1.5 rounded-[5px] bg-primary px-3 py-1.5 text-sm font-bold text-ink shadow-button transition-colors hover:bg-highlight sm:inline-flex',
               focusRing,
             )}
           >
@@ -163,7 +163,7 @@ export function Header({ cartItemCount = 0 }: HeaderProps) {
           // Clique no backdrop chega com o próprio dialog como alvo.
           if (event.target === event.currentTarget) closeMenu()
         }}
-        className="m-0 ml-auto h-dvh max-h-none w-[min(20rem,85vw)] max-w-none bg-surface-card p-0 text-foreground shadow-option backdrop:bg-ink/70 md:hidden"
+        className="m-0 ml-auto h-dvh max-h-none w-[min(20rem,85vw)] max-w-none bg-surface-card p-0 text-canvas shadow-option backdrop:bg-ink/70 md:hidden"
       >
         <div className="flex h-full flex-col gap-6 p-4">
           <div className="flex items-center justify-between">
@@ -217,7 +217,7 @@ export function Header({ cartItemCount = 0 }: HeaderProps) {
           <a
             href="/login"
             className={cn(
-              'mt-auto inline-flex items-center justify-center gap-2 rounded-[5px] bg-primary px-4 py-2.5 text-sm font-bold text-ink shadow-button transition-colors hover:bg-accent',
+              'mt-auto inline-flex items-center justify-center gap-2 rounded-[5px] bg-primary px-4 py-2.5 text-sm font-bold text-ink shadow-button transition-colors hover:bg-highlight',
               focusRing,
             )}
           >

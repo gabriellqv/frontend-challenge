@@ -42,3 +42,6 @@ lighthouse/
 
 # Husky
 .husky/_/
+
+# Claude Code (config local)
+.claude/settings.local.json
