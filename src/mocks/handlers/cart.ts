@@ -59,6 +59,7 @@ export const cartHandlers = [
     if (existing) {
       existing.quantity = newQuantity
       existing.name = resolved.nft.name
+      existing.imageUrl = resolved.nft.imageUrl
       existing.priceEth = resolved.nft.priceEth
       existing.available = resolved.edition.available
     } else {
@@ -67,6 +68,7 @@ export const cartHandlers = [
         nftId: resolved.nft.id,
         editionId: resolved.edition.id,
         name: resolved.nft.name,
+        imageUrl: resolved.nft.imageUrl,
         quantity: body.quantity,
         priceEth: resolved.nft.priceEth,
         available: resolved.edition.available,

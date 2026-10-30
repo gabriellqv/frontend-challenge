@@ -5,6 +5,7 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 
 import { Heart } from 'lucide-react'
 
+import { useAddToCart } from '@/features/cart/api'
 import { nftQueryOptions } from '@/features/catalog/api'
 import { favoritesQueryOptions, useToggleFavorite } from '@/features/favorites/api'
 import { NftDetailSkeleton } from '@/shared/components/skeletons/NftDetailSkeleton'
@@ -18,9 +19,11 @@ export const Route = createFileRoute('/nft/$nftId')({
 
 function NftDetailPage() {
   const { nftId } = Route.useParams()
+  const navigate = Route.useNavigate()
   const nftQuery = useQuery(nftQueryOptions(nftId))
   const favorites = useQuery(favoritesQueryOptions())
   const toggleFavorite = useToggleFavorite()
+  const addToCart = useAddToCart()
 
   const [selectedEditionId, setSelectedEditionId] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(1)
@@ -163,19 +166,20 @@ function NftDetailPage() {
               {isSoldOut ? 'Esgotado' : `${available} disponíveis · subtotal ${subtotalEth} ETH`}
             </p>
 
-            <Link
-              to="/carrinho"
-              aria-disabled={isSoldOut}
-              onClick={(event) => {
-                if (isSoldOut) event.preventDefault()
+            <button
+              type="button"
+              disabled={isSoldOut || !edition}
+              onClick={() => {
+                if (!edition) return
+                addToCart.mutate(
+                  { nftId: nft.id, editionId: edition.id, quantity },
+                  { onSuccess: () => navigate({ to: '/carrinho' }) },
+                )
               }}
-              className={cn(
-                'mt-4 inline-flex w-full justify-center rounded-[5px] bg-primary px-4 py-2.5 text-sm font-bold text-ink',
-                isSoldOut && 'pointer-events-none opacity-50',
-              )}
+              className="mt-4 inline-flex w-full justify-center rounded-[5px] bg-primary px-4 py-2.5 text-sm font-bold text-ink disabled:cursor-not-allowed disabled:opacity-50"
             >
               Comprar
-            </Link>
+            </button>
           </div>
         </div>
       </div>
