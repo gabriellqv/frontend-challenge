@@ -4,7 +4,25 @@ import type { CreateOrderRequest, Order } from '@/shared/contracts'
 
 import { getDb, persist } from '../db'
 import { QuoteError, computeTotals } from '../pricing'
+import { emitOrderUpdated } from '../realtime'
 import { errorResponse, getAuthenticatedUser } from '../utils'
+
+/**
+ * Simula o processamento do pagamento: o pedido nasce pendente e é confirmado
+ * após um intervalo, emitindo `order.updated` para o cliente.
+ */
+function scheduleOrderResolution(orderId: string): void {
+  setTimeout(() => {
+    const db = getDb()
+    const order = db.orders[orderId]
+    if (!order || order.status !== 'pending') return
+    order.status = 'confirmed'
+    order.version += 1
+    order.transactionRef = `0x${crypto.randomUUID().replace(/-/g, '')}`
+    persist()
+    emitOrderUpdated(order.id, order.status, order.version)
+  }, 2000)
+}
 
 export const orderHandlers = [
   http.post('/api/orders', async ({ request }) => {
@@ -64,6 +82,7 @@ export const orderHandlers = [
     db.orders[order.id] = order
     db.idempotency[idempotencyKey] = order.id
     persist()
+    scheduleOrderResolution(order.id)
 
     return HttpResponse.json(order, { status: 201 })
   }),

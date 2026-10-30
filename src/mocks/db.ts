@@ -1,6 +1,6 @@
 import type { Cart, Nft, Order, Wallet } from '@/shared/contracts'
 
-import { createNfts, createUserRecords } from './fixtures'
+import { createNfts, createUserRecords, seedWallets } from './fixtures'
 
 const DB_KEY = 'kurio:mock-db'
 
@@ -55,7 +55,7 @@ function seed(): Db {
     favorites: {},
     carts: {},
     orders: {},
-    wallets: {},
+    wallets: seedWallets(),
     sessions: {},
     idempotency: {},
   }
