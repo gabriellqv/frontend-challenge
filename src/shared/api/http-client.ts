@@ -93,3 +93,14 @@ export async function postJson<T>(
   const res = await httpClient.post(path, body, config)
   return schema.parse(res.data)
 }
+
+/** PATCH tipado: valida a resposta contra o schema zod. */
+export async function patchJson<T>(
+  schema: ZodType<T>,
+  path: string,
+  body?: unknown,
+  config?: AxiosRequestConfig,
+): Promise<T> {
+  const res = await httpClient.patch(path, body, config)
+  return schema.parse(res.data)
+}

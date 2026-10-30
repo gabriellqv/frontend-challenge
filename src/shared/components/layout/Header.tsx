@@ -141,8 +141,25 @@ export function Header({ cartItemCount = 0 }: HeaderProps) {
           </Link>
 
           {user ? (
-            <div className="hidden items-center gap-2 sm:flex">
-              <span className="max-w-32 truncate text-sm text-canvas">{user.name}</span>
+            <div className="hidden items-center gap-3 sm:flex">
+              <Link
+                to="/carteiras"
+                className={cn(
+                  'text-sm text-canvas transition-colors hover:text-primary',
+                  focusRing,
+                )}
+              >
+                Carteiras
+              </Link>
+              <Link
+                to="/perfil"
+                className={cn(
+                  'max-w-32 truncate text-sm text-canvas transition-colors hover:text-primary',
+                  focusRing,
+                )}
+              >
+                {user.name}
+              </Link>
               <button
                 type="button"
                 onClick={() => logout.mutate()}
