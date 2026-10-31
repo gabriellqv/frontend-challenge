@@ -31,6 +31,10 @@ export function MobileTabBar() {
     pathname === '/login' ||
     pathname === '/cadastro'
 
+  if (pathname.startsWith('/nft/')) {
+    return null
+  }
+
   return (
     <nav
       aria-label="Navegação móvel"
