@@ -86,7 +86,10 @@ export function Header({ cartItemCount }: HeaderProps) {
     <header
       className={cn(
         'bg-background text-foreground pt-6',
-        (pathname === '/' || pathname.startsWith('/nft/') || pathname === '/carrinho') &&
+        (pathname === '/' ||
+          pathname.startsWith('/nft/') ||
+          pathname === '/carrinho' ||
+          pathname === '/pagamento') &&
           'hidden md:block',
       )}
     >
