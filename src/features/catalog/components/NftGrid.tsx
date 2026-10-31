@@ -13,26 +13,60 @@ interface NftGridProps {
 }
 
 /**
- * Grade responsiva do catálogo: uma coluna no mobile, duas em `sm` e três em
- * `lg`, mantendo o mesmo ritmo vertical do {@link NftGrid} de skeletons.
+ * Grade responsiva do catálogo:
+ * - Mobile: layout escalonado em 2 colunas (Column L e Column R com 32px de offset)
+ * - Desktop: 2 colunas em sm e 3 colunas em lg conforme Figma
  *
  * @param props - {@link NftGridProps}
  * @returns Lista de cards de NFT.
- * @example
- * <NftGrid nfts={page.items} favoriteIds={favoriteIds} onToggleFavorite={toggle} />
  */
 export function NftGrid({ nfts, favoriteIds, onToggleFavorite }: NftGridProps) {
+  const leftColumnNfts = nfts.filter((_, idx) => idx % 2 === 0)
+  const rightColumnNfts = nfts.filter((_, idx) => idx % 2 === 1)
+
   return (
-    <ul className="grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-6 lg:w-[842px] lg:grid-cols-3 lg:gap-x-[34px] lg:gap-y-[72px]">
-      {nfts.map((nft) => (
-        <li key={nft.id} className="flex justify-center">
-          <NftCard
-            nft={nft}
-            isFavorite={favoriteIds.has(nft.id)}
-            onToggleFavorite={onToggleFavorite}
-          />
-        </li>
-      ))}
-    </ul>
+    <>
+      {/* Mobile Staggered 2-Column Grid (Figma Mobile / Início) */}
+      <div className="grid w-full max-w-[366px] grid-cols-2 gap-4 sm:hidden">
+        {/* Column L (P-1, P-3, ...) */}
+        <div className="flex w-full flex-col gap-6">
+          {leftColumnNfts.map((nft) => (
+            <NftCard
+              key={nft.id}
+              nft={nft}
+              isFavorite={favoriteIds.has(nft.id)}
+              onToggleFavorite={onToggleFavorite}
+              mobile
+            />
+          ))}
+        </div>
+
+        {/* Column R (P-2, P-4, ... com offset de 32px) */}
+        <div className="flex w-full flex-col gap-6 pt-8">
+          {rightColumnNfts.map((nft) => (
+            <NftCard
+              key={nft.id}
+              nft={nft}
+              isFavorite={favoriteIds.has(nft.id)}
+              onToggleFavorite={onToggleFavorite}
+              mobile
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop Grid */}
+      <ul className="hidden sm:grid sm:grid-cols-2 sm:gap-6 lg:w-[842px] lg:grid-cols-3 lg:gap-x-[34px] lg:gap-y-[72px]">
+        {nfts.map((nft) => (
+          <li key={nft.id} className="flex justify-center">
+            <NftCard
+              nft={nft}
+              isFavorite={favoriteIds.has(nft.id)}
+              onToggleFavorite={onToggleFavorite}
+            />
+          </li>
+        ))}
+      </ul>
+    </>
   )
 }

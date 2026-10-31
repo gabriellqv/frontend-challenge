@@ -83,7 +83,9 @@ export function Header({ cartItemCount }: HeaderProps) {
   }
 
   return (
-    <header className="bg-background text-foreground pt-6">
+    <header
+      className={cn('bg-background text-foreground pt-6', pathname === '/' && 'hidden md:block')}
+    >
       <div
         className={cn(
           'mx-auto flex h-[45px] w-full max-w-[1200px] items-start justify-between px-4 sm:px-6 xl:px-0',
