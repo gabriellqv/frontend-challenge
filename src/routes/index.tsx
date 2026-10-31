@@ -135,32 +135,43 @@ function HomePage() {
           role="dialog"
           aria-modal="true"
           aria-label="Filtros de coleções e redes"
-          className="fixed inset-0 z-50 flex flex-col overflow-y-auto overscroll-contain bg-[#140D0A]/95 p-6 backdrop-blur-md md:hidden"
+          className="fixed inset-0 z-50 flex flex-col justify-between overflow-y-auto overscroll-contain bg-[#140D0A]/95 p-6 backdrop-blur-md md:hidden"
         >
-          <div className="flex items-center justify-between border-b border-[#3F2319] pb-4">
-            <h3 className="font-mono text-lg font-bold text-[#F5F1EB]">Filtros</h3>
+          <div>
+            <div className="flex items-center justify-between border-b border-[#3F2319] pb-4">
+              <h3 className="font-mono text-lg font-bold text-[#F5F1EB]">Filtros</h3>
+              <button
+                type="button"
+                onClick={() => setIsMobileFiltersOpen(false)}
+                className="flex size-8 cursor-pointer items-center justify-center rounded-full bg-[#241612] text-[#F5F1EB]"
+                aria-label="Fechar filtros"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+            <div className="py-4">
+              <FilterSidebar
+                hideBanner
+                namePrefix="mobile"
+                value={{
+                  collection: search.collection,
+                  network: search.network,
+                  priceMin: search.priceMin,
+                  priceMax: search.priceMax,
+                }}
+                onChange={(patch) => updateSearch(patch)}
+              />
+            </div>
+          </div>
+
+          <div className="sticky bottom-0 -mx-6 -mb-6 mt-6 border-t border-[#3F2319] bg-[#140D0A]/95 p-4 backdrop-blur-md">
             <button
               type="button"
               onClick={() => setIsMobileFiltersOpen(false)}
-              className="flex size-8 cursor-pointer items-center justify-center rounded-full bg-[#241612] text-[#F5F1EB]"
-              aria-label="Fechar filtros"
+              className="flex h-[45px] w-full cursor-pointer items-center justify-center rounded-[6px] bg-primary font-mono text-[16px] font-bold text-ink shadow-button transition-colors hover:bg-highlight"
             >
-              <X className="size-5" />
+              Ver resultados
             </button>
-          </div>
-          <div className="py-4">
-            <FilterSidebar
-              value={{
-                collection: search.collection,
-                network: search.network,
-                priceMin: search.priceMin,
-                priceMax: search.priceMax,
-              }}
-              onChange={(patch) => {
-                updateSearch(patch)
-                setIsMobileFiltersOpen(false)
-              }}
-            />
           </div>
         </div>
       )}
@@ -179,6 +190,7 @@ function HomePage() {
           {/* Desktop Filter Sidebar */}
           <div className="hidden lg:block">
             <FilterSidebar
+              namePrefix="desktop"
               value={{
                 collection: search.collection,
                 network: search.network,

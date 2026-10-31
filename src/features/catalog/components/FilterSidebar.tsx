@@ -57,6 +57,10 @@ export interface FilterSidebarProps {
   value: FilterValues
   /** Aplica um subconjunto de filtros; a página deve voltar para 1. */
   onChange: (patch: Partial<FilterValues>) => void
+  /** Oculta o banner promocional inferior (útil no modal de filtros mobile). */
+  hideBanner?: boolean
+  /** Prefixo opcional para os inputs de rádio para evitar conflito de grupo no DOM. */
+  namePrefix?: string
 }
 
 /**
@@ -68,7 +72,12 @@ export interface FilterSidebarProps {
  * @param props - {@link FilterSidebarProps}
  * @returns Coluna lateral completa de 310px.
  */
-export function FilterSidebar({ value, onChange }: FilterSidebarProps) {
+export function FilterSidebar({
+  value,
+  onChange,
+  hideBanner = false,
+  namePrefix,
+}: FilterSidebarProps) {
   const [prevPriceProps, setPrevPriceProps] = useState({
     priceMin: value.priceMin,
     priceMax: value.priceMax,
@@ -246,7 +255,7 @@ export function FilterSidebar({ value, onChange }: FilterSidebarProps) {
                   >
                     <input
                       type="radio"
-                      name="collection"
+                      name={namePrefix ? `${namePrefix}-collection` : 'collection'}
                       value={item.value}
                       aria-label={item.value === 'Kurio Apes' ? 'Kurio Apes' : item.name}
                       checked={isSelected}
@@ -393,7 +402,7 @@ export function FilterSidebar({ value, onChange }: FilterSidebarProps) {
                   >
                     <input
                       type="radio"
-                      name="network"
+                      name={namePrefix ? `${namePrefix}-network` : 'network'}
                       value={net.value}
                       checked={isSelected}
                       onChange={() => handleNetworkClick(net.value)}
@@ -421,59 +430,61 @@ export function FilterSidebar({ value, onChange }: FilterSidebarProps) {
       </div>
 
       {/* Featured NFT Banner: 310px x 470px */}
-      <div
-        className="relative flex h-[470px] w-full flex-col items-center pt-6 pb-1 lg:w-[310px]"
-        style={{
-          background:
-            'linear-gradient(180deg, rgba(210, 138, 76, 0.1) 0%, rgba(210, 138, 76, 0.03) 100%)',
-        }}
-      >
-        <div className="flex h-[448px] w-full flex-col gap-4 px-0">
-          <div className="flex h-[64px] w-full flex-col items-center gap-4">
-            <h3 className="h-8 w-full text-center font-mono text-[24px] leading-8 font-bold text-highlight">
-              NFT EM DESTAQUE
-            </h3>
-            <p className="h-4 w-full text-center font-mono text-[22px] leading-4 font-bold text-foreground">
-              OFERTA LIMITADA
-            </p>
-          </div>
+      {!hideBanner && (
+        <div
+          className="relative flex h-[470px] w-full flex-col items-center pt-6 pb-1 lg:w-[310px]"
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(210, 138, 76, 0.1) 0%, rgba(210, 138, 76, 0.03) 100%)',
+          }}
+        >
+          <div className="flex h-[448px] w-full flex-col gap-4 px-0">
+            <div className="flex h-[64px] w-full flex-col items-center gap-4">
+              <h3 className="h-8 w-full text-center font-mono text-[24px] leading-8 font-bold text-highlight">
+                NFT EM DESTAQUE
+              </h3>
+              <p className="h-4 w-full text-center font-mono text-[22px] leading-4 font-bold text-foreground">
+                OFERTA LIMITADA
+              </p>
+            </div>
 
-          <div className="relative mx-auto h-[368px] w-full overflow-hidden rounded-[22px]">
-            <img
-              src="/images/NFT-Artwork-18.png"
-              alt="NFT em destaque: Oferta Limitada"
-              width={310}
-              height={368}
-              className="h-[368px] w-full rounded-[22px] object-cover"
-            />
+            <div className="relative mx-auto h-[368px] w-full overflow-hidden rounded-[22px]">
+              <img
+                src="/images/NFT-Artwork-18.png"
+                alt="NFT em destaque: Oferta Limitada"
+                width={310}
+                height={368}
+                className="h-[368px] w-full rounded-[22px] object-cover"
+              />
 
-            {/* Decorative Floating Elements from Figma */}
-            {/* Rectangle 30: 22px x 22px, left 16px, top 299px */}
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute top-[299px] left-[16px] size-[22px] rounded-[7px] border border-primary/40 opacity-20"
-            />
-            {/* Rectangle 31: 45px x 45px, left 248px, top 343px */}
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute top-[343px] left-[248px] size-[45px] rounded-[29px]"
-              style={{
-                background:
-                  'linear-gradient(145.46deg, rgba(210, 138, 76, 0.3) -46.09%, rgba(210, 138, 76, 0) 103.28%)',
-              }}
-            />
-            {/* Rectangle 32: 15px x 15px, left 38px, top 105px */}
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute top-[105px] left-[38px] size-[15px] rounded-[29px]"
-              style={{
-                background:
-                  'linear-gradient(145.46deg, rgba(210, 138, 76, 0.3) -46.09%, rgba(210, 138, 76, 0) 103.28%)',
-              }}
-            />
+              {/* Decorative Floating Elements from Figma */}
+              {/* Rectangle 30: 22px x 22px, left 16px, top 299px */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute top-[299px] left-[16px] size-[22px] rounded-[7px] border border-primary/40 opacity-20"
+              />
+              {/* Rectangle 31: 45px x 45px, left 248px, top 343px */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute top-[343px] left-[248px] size-[45px] rounded-[29px]"
+                style={{
+                  background:
+                    'linear-gradient(145.46deg, rgba(210, 138, 76, 0.3) -46.09%, rgba(210, 138, 76, 0) 103.28%)',
+                }}
+              />
+              {/* Rectangle 32: 15px x 15px, left 38px, top 105px */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute top-[105px] left-[38px] size-[15px] rounded-[29px]"
+                style={{
+                  background:
+                    'linear-gradient(145.46deg, rgba(210, 138, 76, 0.3) -46.09%, rgba(210, 138, 76, 0) 103.28%)',
+                }}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </aside>
   )
 }
