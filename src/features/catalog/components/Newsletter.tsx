@@ -1,12 +1,65 @@
-/**
- * Bloco de Destaques e Newsletter com os pilares W, C, D e formulário "Antecipe-se ao próximo lançamento".
- * Conforme extraído do Figma.
- */
+import { type FormEvent, useState } from 'react'
+
+import { toast } from 'sonner'
+
+import { useSubscribeNewsletter } from '@/features/newsletter/api'
+import { ApiError } from '@/shared/api/http-client'
+import { cn } from '@/shared/lib/cn'
+
 /**
  * Bloco Frame 122: Medalhões W, C, D e formulário "Antecipe-se ao próximo lançamento".
  * Conforme extraído do Figma.
  */
 export function Newsletter() {
+  const [email, setEmail] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+
+  const subscribeMutation = useSubscribeNewsletter()
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    setSuccess(null)
+    const trimmed = email.trim()
+
+    if (!trimmed) {
+      const err = 'Por favor, digite seu e-mail para assinar a newsletter.'
+      setError(err)
+      toast.error(err)
+      return
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(trimmed)) {
+      const err = 'Insira um endereço de e-mail válido (exemplo: usuario@dominio.com).'
+      setError(err)
+      toast.error(err)
+      return
+    }
+
+    setError(null)
+    subscribeMutation.mutate(
+      { email: trimmed },
+      {
+        onSuccess: (data) => {
+          const successMsg =
+            data.message || 'E-mail cadastrado com sucesso! Você receberá os próximos lançamentos.'
+          setSuccess(successMsg)
+          setEmail('')
+          toast.success(successMsg)
+        },
+        onError: (err) => {
+          const msg =
+            err instanceof ApiError
+              ? err.message
+              : 'Não foi possível cadastrar seu e-mail no momento. Tente novamente mais tarde.'
+          setError(msg)
+          toast.error(msg)
+        },
+      },
+    )
+  }
+
   return (
     <section
       aria-label="Segurança e Novidades"
@@ -74,29 +127,68 @@ export function Newsletter() {
         {/* Coluna Newsletter (Frame 99: 357px x 202px, px: 16px) */}
         <div className="flex flex-col items-start gap-[12px] lg:h-[202px] lg:w-[357px] lg:px-[16px]">
           {/* Frame 102: 325px x 88px, gap: 16px */}
-          <div className="flex flex-col items-start gap-[16px] lg:h-[88px] lg:w-[325px]">
+          <div className="flex flex-col items-start gap-[12px] lg:min-h-[88px] lg:w-[325px]">
             <h3 className="whitespace-pre-line font-mono text-[18px] leading-[16px] font-bold text-foreground">
               Antecipe-se ao próximo{'\n'}lançamento
             </h3>
             {/* Frame 101 / Frame 98: 325px x 40px */}
             <form
-              className="flex h-[40px] w-full max-w-[325px] flex-row items-center justify-between rounded-[6px] bg-surface-dark pl-[12px] shadow-[0px_0px_20px_rgba(10,6,4,0.45)]"
-              onSubmit={(event) => event.preventDefault()}
+              className={cn(
+                'flex h-[40px] w-full max-w-[325px] flex-row items-center justify-between rounded-[6px] bg-surface-dark pl-[12px] shadow-[0px_0px_20px_rgba(10,6,4,0.45)] transition-colors',
+                error && 'border border-error/70 ring-1 ring-error/50',
+                success && 'border border-primary/70 ring-1 ring-primary/50',
+              )}
+              onSubmit={handleSubmit}
+              noValidate
             >
               <input
                 type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                  if (error) setError(null)
+                  if (success) setSuccess(null)
+                }}
+                disabled={subscribeMutation.isPending}
                 placeholder="digite seu e-mail..."
                 aria-label="Assinar newsletter"
-                className="min-w-0 flex-1 bg-transparent font-mono text-[14px] leading-[16px] font-normal text-foreground placeholder:text-sand focus:outline-none"
+                aria-invalid={Boolean(error)}
+                aria-describedby={
+                  error ? 'newsletter-error' : success ? 'newsletter-success' : undefined
+                }
+                className="min-w-0 flex-1 bg-transparent font-mono text-[14px] leading-[16px] font-normal text-foreground placeholder:text-sand focus:outline-none disabled:opacity-50"
               />
               {/* Frame 97: Botão Enviar (85px x 40px) */}
               <button
                 type="submit"
-                className="flex h-[40px] w-[85px] shrink-0 cursor-pointer flex-row items-center justify-center gap-[10px] rounded-r-[6px] bg-primary px-[4px] font-mono text-[18px] leading-[16px] font-bold text-ink transition-colors hover:bg-highlight focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                disabled={subscribeMutation.isPending}
+                className="flex h-[40px] w-[85px] shrink-0 cursor-pointer flex-row items-center justify-center gap-[10px] rounded-r-[6px] bg-primary px-[4px] font-mono text-[18px] leading-[16px] font-bold text-ink transition-colors hover:bg-highlight focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Enviar
+                {subscribeMutation.isPending ? '...' : 'Enviar'}
               </button>
             </form>
+
+            {/* Inline Error Message */}
+            {error && (
+              <p
+                id="newsletter-error"
+                role="alert"
+                className="w-full max-w-[325px] font-mono text-[12px] leading-4 text-error"
+              >
+                {error}
+              </p>
+            )}
+
+            {/* Inline Success Message */}
+            {success && (
+              <p
+                id="newsletter-success"
+                role="status"
+                className="w-full max-w-[325px] font-mono text-[12px] leading-4 text-primary"
+              >
+                {success}
+              </p>
+            )}
           </div>
           <p className="w-[325px] font-mono text-[13px] leading-[22px] font-normal text-text-secondary">
             Receba lançamentos selecionados, histórias de criadores e novidades do mercado.

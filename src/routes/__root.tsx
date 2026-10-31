@@ -5,6 +5,7 @@ import { Header } from '@/shared/components/layout/Header'
 import { MobileTabBar } from '@/shared/components/layout/MobileTabBar'
 import { SkipToContent } from '@/shared/components/layout/SkipToContent'
 import { cn } from '@/shared/lib/cn'
+import { Toaster } from '@/shared/ui/sonner'
 
 export const Route = createRootRoute({
   component: Root,
@@ -43,6 +44,7 @@ function Root() {
       </main>
       <Footer />
       <MobileTabBar />
+      <Toaster />
     </div>
   )
 }
