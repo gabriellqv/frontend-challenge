@@ -36,7 +36,7 @@ function Root() {
         tabIndex={-1}
         className={cn(
           'flex-1 flex flex-col',
-          !isNoTabBar && 'pb-20 md:pb-0',
+          !isNoTabBar && 'pb-28 md:pb-0',
           isNftDetail && 'max-md:h-full max-md:pb-0',
         )}
       >

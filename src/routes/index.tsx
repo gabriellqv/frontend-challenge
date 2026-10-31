@@ -57,7 +57,7 @@ function HomePage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-6 pt-10 sm:px-6 md:gap-[96px] md:px-0 md:pt-0">
+    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-6 pt-10 pb-8 sm:px-6 md:gap-[96px] md:px-0 md:pt-0 md:pb-0">
       {/* Mobile Search Bar: 366px x 45px (Figma Mobile / Início) */}
       <div className="mx-auto flex w-full max-w-[366px] items-center gap-2 md:hidden">
         {/* Frame 404: Search Input */}
@@ -300,10 +300,12 @@ function HomePage() {
             </div>
 
             {catalog.data && catalog.data.pagination.totalPages > 1 ? (
-              <Pagination
-                pagination={catalog.data.pagination}
-                onChange={(page) => updateSearch({ page })}
-              />
+              <div className="flex w-full justify-center pt-2 pb-6 md:py-0 lg:justify-end">
+                <Pagination
+                  pagination={catalog.data.pagination}
+                  onChange={(page) => updateSearch({ page })}
+                />
+              </div>
             ) : null}
           </div>
         </div>
