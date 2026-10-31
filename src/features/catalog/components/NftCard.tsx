@@ -36,7 +36,7 @@ export function NftCard({ nft, isFavorite, onToggleFavorite }: NftCardProps) {
     : `Adicionar ${nft.name} aos favoritos`
 
   return (
-    <article className="relative h-full w-full lg:max-w-[258px]">
+    <article className="relative flex w-full flex-col gap-3 lg:w-[258px]">
       <button
         type="button"
         aria-pressed={isFavorite}
@@ -47,41 +47,44 @@ export function NftCard({ nft, isFavorite, onToggleFavorite }: NftCardProps) {
           onToggleFavorite(nft.id, !isFavorite)
         }}
         className={cn(
-          'absolute top-5 right-5 z-10 inline-flex size-9 items-center justify-center rounded-[5px] bg-ink/70 text-canvas transition-colors hover:bg-ink hover:text-primary',
+          'group/fav absolute top-3 right-3 z-10 inline-flex size-9 cursor-pointer items-center justify-center rounded-[5px] bg-ink shadow-sm',
           focusRing,
         )}
       >
         <Heart
           aria-hidden="true"
-          className={cn('size-5', isFavorite ? 'fill-primary text-primary' : 'fill-transparent')}
+          className={cn(
+            'size-5 transition-colors duration-150',
+            isFavorite
+              ? 'fill-primary text-primary'
+              : 'fill-transparent text-canvas group-hover/fav:text-primary',
+          )}
         />
       </button>
 
       <Link
         to="/nft/$nftId"
         params={{ nftId: nft.id }}
-        className={cn(
-          'flex h-full flex-col gap-3 rounded-[16px] border border-surface-dark bg-surface-card p-3 text-canvas shadow-card transition-colors hover:border-primary/60',
-          focusRing,
-        )}
+        className={cn('group flex flex-col gap-3 text-canvas cursor-pointer', focusRing)}
       >
-        <img
-          src={nft.imageUrl}
-          alt={`Arte do NFT ${nft.name}`}
-          loading="lazy"
-          decoding="async"
-          className="aspect-square w-full rounded-xl object-cover"
-        />
+        {/* Rectangle 6: 258px x 300px, background: #241612 */}
+        <div className="flex h-[300px] w-full items-center justify-center bg-card lg:w-[258px]">
+          <img
+            src={nft.imageUrl}
+            alt={`Arte do NFT ${nft.name}`}
+            loading="lazy"
+            decoding="async"
+            className="size-[250px] rounded-[15px] object-cover"
+          />
+        </div>
 
-        <div className="flex flex-1 flex-col gap-1 px-1">
-          <h3 className="text-base leading-tight font-bold">{nft.name}</h3>
-          <p className="text-sm text-text-secondary">{nft.collection}</p>
-
-          <p className="mt-auto flex flex-wrap items-baseline gap-x-1 pt-2">
-            <span className="text-xs text-text-secondary">Preço</span>
-            <span className="text-lg leading-none font-bold text-primary">
-              {formatEth(nft.priceEth)} ETH
-            </span>
+        {/* Title & Price */}
+        <div className="flex flex-col gap-1 w-full">
+          <h3 className="truncate font-mono text-[16px] leading-4 font-normal text-foreground transition-colors group-hover:text-highlight">
+            {nft.name}
+          </h3>
+          <p className="font-mono text-[18px] leading-4 font-bold text-highlight">
+            {formatEth(nft.priceEth)} ETH
           </p>
         </div>
       </Link>

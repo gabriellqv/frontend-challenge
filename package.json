@@ -17,7 +17,7 @@
     "test:unit:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:report": "playwright show-report",
-    "lighthouse": "npm run build && lhci autorun",
+    "lighthouse": "npm run build && CHROME_PATH=${CHROME_PATH:-$(node -e 'console.log(require(\"playwright\").chromium.executablePath())')} lhci autorun",
     "prepare": "husky"
   },
   "dependencies": {

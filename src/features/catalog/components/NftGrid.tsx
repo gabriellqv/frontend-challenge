@@ -23,9 +23,9 @@ interface NftGridProps {
  */
 export function NftGrid({ nfts, favoriteIds, onToggleFavorite }: NftGridProps) {
   return (
-    <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <ul className="grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-6 lg:w-[842px] lg:grid-cols-3 lg:gap-x-[34px] lg:gap-y-[72px]">
       {nfts.map((nft) => (
-        <li key={nft.id} className="flex">
+        <li key={nft.id} className="flex justify-center">
           <NftCard
             nft={nft}
             isFavorite={favoriteIds.has(nft.id)}

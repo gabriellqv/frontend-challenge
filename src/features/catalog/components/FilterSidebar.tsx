@@ -1,5 +1,4 @@
-import { useId } from 'react'
-import type { FormEvent } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
 import type { Network } from '@/shared/contracts'
 import { cn } from '@/shared/lib/cn'
@@ -7,31 +6,35 @@ import { cn } from '@/shared/lib/cn'
 const focusRing =
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
 
-const optionClass = cn(
-  'flex cursor-pointer items-center gap-2 rounded-[5px] px-2 py-1.5 text-sm text-canvas transition-colors hover:bg-surface-raised',
-  'has-[:checked]:bg-surface-raised has-[:checked]:text-primary',
-  'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary',
-)
+const MIN_LIMIT = 0
+const MAX_LIMIT = 20
 
-const radioClass = 'size-4 shrink-0 accent-primary'
+/**
+ * Coleções oficiais extraídas da especificação do Figma (`Sidebar > Filters > Collections Filter`).
+ */
+export const FIGMA_COLLECTIONS = [
+  { name: 'Arte digital', count: 33, value: 'Kurio Apes' },
+  { name: 'Fotografia', count: 12, value: 'Genesis Drops' },
+  { name: 'Música', count: 65, value: 'Kurio Editions' },
+  { name: 'Arte 3D', count: 39, value: 'Curated Art' },
+  { name: 'Colecionáveis', count: 23, value: 'Colecionáveis' },
+  { name: 'Generativa', count: 17, value: 'Generativa' },
+  { name: 'Jogos', count: 19, value: 'Jogos' },
+  { name: 'Assinaturas', count: 13, value: 'Assinaturas' },
+  { name: 'Utilidade', count: 18, value: 'Utilidade' },
+] as const
 
-const priceInputClass = cn(
-  'h-9 w-full rounded-[5px] border border-surface-dark bg-ink/40 px-2.5 text-sm text-canvas placeholder:text-text-secondary/70',
-  focusRing,
-)
-
-const applyButtonClass = cn(
-  'inline-flex h-9 items-center justify-center rounded-[5px] bg-primary px-3 text-sm font-bold text-ink transition-colors hover:bg-highlight',
-  focusRing,
-)
-
-const sectionTitleClass = 'mb-1 text-xs font-bold tracking-wide text-text-secondary uppercase'
+/**
+ * Redes oficiais extraídas da especificação do Figma (`Sidebar > Filters > Network Filter`).
+ */
+export const FIGMA_NETWORKS = [
+  { name: 'Ethereum', count: 119, value: 'Ethereum' as const },
+  { name: 'Polygon', count: 78, value: 'Polygon' as const },
+  { name: 'Solana', count: 86, value: 'Solana' as const },
+] as const
 
 /**
  * Valores dos filtros do catálogo.
- *
- * `undefined` é explícito porque o projeto usa `exactOptionalPropertyTypes`:
- * limpar um filtro precisa remover o valor, não apenas omitir a chave.
  */
 export interface FilterValues {
   /** Coleção selecionada; ausente significa "Todas". */
@@ -45,183 +48,430 @@ export interface FilterValues {
 }
 
 /** Props de {@link FilterSidebar}. */
-interface FilterSidebarProps {
-  /** Coleções disponíveis para filtro. */
-  collections: readonly string[]
-  /** Redes disponíveis para filtro. */
-  networks: readonly Network[]
+export interface FilterSidebarProps {
+  /** Coleções disponíveis para filtro (opcional, defaults para a lista do Figma). */
+  collections?: readonly string[]
+  /** Redes disponíveis para filtro (opcional, defaults para as redes do Figma). */
+  networks?: readonly Network[]
   /** Filtros ativos. */
   value: FilterValues
   /** Aplica um subconjunto de filtros; a página deve voltar para 1. */
   onChange: (patch: Partial<FilterValues>) => void
 }
 
-/** Lê um input de texto do formulário sem confiar no tipo retornado por `FormData`. */
-function readTextInput(form: HTMLFormElement, name: string): string {
-  const field = form.elements.namedItem(name)
-  return field instanceof HTMLInputElement ? field.value.trim() : ''
-}
-
 /**
- * Barra lateral de filtros do catálogo: coleção, rede e faixa de preço.
- * No mobile empilha acima da grade; a partir de `lg` vira coluna fixa de 270px.
+ * Barra lateral de filtros e banner em destaque do catálogo.
+ * Medidas e hierarquia 100% idênticas ao Figma (`Sidebar`, 310px wide):
+ * - Painel de Filtros (310px x 785px, background: #241612)
+ * - Banner NFT em Destaque (310px x 470px, degradê e arte com cantos de 22px)
  *
  * @param props - {@link FilterSidebarProps}
- * @returns Coluna de filtros acessível.
- * @example
- * <FilterSidebar
- *   collections={collections}
- *   networks={NETWORKS}
- *   value={filters}
- *   onChange={patchFilters}
- * />
+ * @returns Coluna lateral completa de 310px.
  */
-export function FilterSidebar({ collections, networks, value, onChange }: FilterSidebarProps) {
-  const priceMinId = useId()
-  const priceMaxId = useId()
+export function FilterSidebar({ value, onChange }: FilterSidebarProps) {
+  const [prevPriceProps, setPrevPriceProps] = useState({
+    priceMin: value.priceMin,
+    priceMax: value.priceMax,
+  })
+  const [range, setRange] = useState<[number, number]>(() => {
+    const pMin = Number(value.priceMin)
+    const pMax = Number(value.priceMax)
+    return [!isNaN(pMin) && pMin >= 0 ? pMin : 0.02, !isNaN(pMax) && pMax > 0 ? pMax : 12.3]
+  })
 
-  function applyPrice(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+  if (value.priceMin !== prevPriceProps.priceMin || value.priceMax !== prevPriceProps.priceMax) {
+    setPrevPriceProps({ priceMin: value.priceMin, priceMax: value.priceMax })
+    const pMin = Number(value.priceMin)
+    const pMax = Number(value.priceMax)
+    setRange([!isNaN(pMin) && pMin >= 0 ? pMin : 0.02, !isNaN(pMax) && pMax > 0 ? pMax : 12.3])
+  }
 
-    const min = readTextInput(event.currentTarget, 'priceMin')
-    const max = readTextInput(event.currentTarget, 'priceMax')
+  const [minVal, maxVal] = range
+  const trackRef = useRef<HTMLDivElement>(null)
+  const [activeThumb, setActiveThumb] = useState<'min' | 'max' | null>(null)
 
+  const minPercent = Math.min(
+    100,
+    Math.max(0, ((minVal - MIN_LIMIT) / (MAX_LIMIT - MIN_LIMIT)) * 100),
+  )
+  const maxPercent = Math.min(
+    100,
+    Math.max(0, ((maxVal - MIN_LIMIT) / (MAX_LIMIT - MIN_LIMIT)) * 100),
+  )
+
+  const getValueFromPointer = useCallback((clientX: number) => {
+    if (!trackRef.current) return 0
+    const rect = trackRef.current.getBoundingClientRect()
+    const x = clientX - rect.left
+    const percentage = Math.max(0, Math.min(1, x / rect.width))
+    const rawValue = MIN_LIMIT + percentage * (MAX_LIMIT - MIN_LIMIT)
+    return Math.round(rawValue * 100) / 100
+  }, [])
+
+  const startDrag = useCallback(
+    (type: 'min' | 'max') => {
+      setActiveThumb(type)
+
+      const onPointerMove = (e: PointerEvent) => {
+        const val = getValueFromPointer(e.clientX)
+        setRange(([currentMin, currentMax]) => {
+          if (type === 'min') {
+            const clamped = Math.min(val, currentMax - 0.1)
+            return [Math.max(MIN_LIMIT, Number(clamped.toFixed(2))), currentMax]
+          } else {
+            const clamped = Math.max(val, currentMin + 0.1)
+            return [currentMin, Math.min(MAX_LIMIT, Number(clamped.toFixed(2)))]
+          }
+        })
+      }
+
+      const onPointerUp = () => {
+        setActiveThumb(null)
+        window.removeEventListener('pointermove', onPointerMove)
+        window.removeEventListener('pointerup', onPointerUp)
+        window.removeEventListener('pointercancel', onPointerUp)
+      }
+
+      window.addEventListener('pointermove', onPointerMove)
+      window.addEventListener('pointerup', onPointerUp)
+      window.addEventListener('pointercancel', onPointerUp)
+    },
+    [getValueFromPointer],
+  )
+
+  const handleTrackPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).getAttribute('role') === 'slider') return
+    const clickedVal = getValueFromPointer(e.clientX)
+    const distMin = Math.abs(clickedVal - minVal)
+    const distMax = Math.abs(clickedVal - maxVal)
+
+    if (distMin <= distMax) {
+      const clamped = Math.min(clickedVal, maxVal - 0.1)
+      setRange([Math.max(MIN_LIMIT, Number(clamped.toFixed(2))), maxVal])
+      startDrag('min')
+    } else {
+      const clamped = Math.max(clickedVal, minVal + 0.1)
+      setRange([minVal, Math.min(MAX_LIMIT, Number(clamped.toFixed(2)))])
+      startDrag('max')
+    }
+  }
+
+  const handleThumbPointerDown = (type: 'min' | 'max', e: React.PointerEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    startDrag(type)
+  }
+
+  const handleKeyDown = (type: 'min' | 'max', e: React.KeyboardEvent) => {
+    const step = e.shiftKey ? 1.0 : 0.1
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+      e.preventDefault()
+      setRange(([currentMin, currentMax]) => {
+        if (type === 'min') {
+          return [Math.max(MIN_LIMIT, Number((currentMin - step).toFixed(2))), currentMax]
+        }
+        return [currentMin, Math.max(currentMin + 0.1, Number((currentMax - step).toFixed(2)))]
+      })
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+      e.preventDefault()
+      setRange(([currentMin, currentMax]) => {
+        if (type === 'min') {
+          return [Math.min(currentMax - 0.1, Number((currentMin + step).toFixed(2))), currentMax]
+        }
+        return [currentMin, Math.min(MAX_LIMIT, Number((currentMax + step).toFixed(2)))]
+      })
+    } else if (e.key === 'Home') {
+      e.preventDefault()
+      setRange(([currentMin, currentMax]) =>
+        type === 'min' ? [MIN_LIMIT, currentMax] : [currentMin, currentMin + 0.1],
+      )
+    } else if (e.key === 'End') {
+      e.preventDefault()
+      setRange(([currentMin, currentMax]) =>
+        type === 'min' ? [currentMax - 0.1, currentMax] : [currentMin, MAX_LIMIT],
+      )
+    }
+  }
+
+  function handleCollectionClick(collectionValue: string) {
+    const isSelected = value.collection === collectionValue
+    onChange({ collection: isSelected ? undefined : collectionValue })
+  }
+
+  function handleNetworkClick(networkValue: Network) {
+    const isSelected = value.network === networkValue
+    onChange({ network: isSelected ? undefined : networkValue })
+  }
+
+  function handleApplyPrice() {
     onChange({
-      priceMin: min === '' ? undefined : min,
-      priceMax: max === '' ? undefined : max,
+      priceMin: minVal.toFixed(2),
+      priceMax: maxVal.toFixed(2),
     })
   }
 
   return (
-    <aside aria-labelledby="catalog-filters-title" className="w-full lg:w-[270px] lg:shrink-0">
-      <div className="flex flex-col gap-5 rounded-[16px] border border-surface-dark bg-surface-card p-4 text-canvas lg:sticky lg:top-4">
-        <h2 id="catalog-filters-title" className="text-base font-bold">
-          Filtros
-        </h2>
-
-        <div
-          role="radiogroup"
-          aria-labelledby="filter-collection-title"
-          className="flex flex-col gap-0.5"
-        >
-          <h3 id="filter-collection-title" className={sectionTitleClass}>
-            Coleção
-          </h3>
-
-          <label className={optionClass}>
-            <input
-              type="radio"
-              name="collection"
-              value=""
-              checked={value.collection === undefined}
-              onChange={() => onChange({ collection: undefined })}
-              className={radioClass}
-            />
-            <span>Todas</span>
-          </label>
-
-          {collections.map((collection) => (
-            <label key={collection} className={optionClass}>
-              <input
-                type="radio"
-                name="collection"
-                value={collection}
-                checked={value.collection === collection}
-                onChange={() => onChange({ collection })}
-                className={radioClass}
-              />
-              <span>{collection}</span>
-            </label>
-          ))}
-        </div>
-
-        <div
-          role="radiogroup"
-          aria-labelledby="filter-network-title"
-          className="flex flex-col gap-0.5"
-        >
-          <h3 id="filter-network-title" className={sectionTitleClass}>
-            Rede
-          </h3>
-
-          <label className={optionClass}>
-            <input
-              type="radio"
-              name="network"
-              value=""
-              checked={value.network === undefined}
-              onChange={() => onChange({ network: undefined })}
-              className={radioClass}
-            />
-            <span>Todas</span>
-          </label>
-
-          {networks.map((network) => (
-            <label key={network} className={optionClass}>
-              <input
-                type="radio"
-                name="network"
-                value={network}
-                checked={value.network === network}
-                onChange={() => onChange({ network })}
-                className={radioClass}
-              />
-              <span>{network}</span>
-            </label>
-          ))}
-        </div>
-
-        <div role="group" aria-labelledby="filter-price-title" className="flex flex-col gap-2">
-          <h3 id="filter-price-title" className={sectionTitleClass}>
-            Faixa de preço
-          </h3>
-
-          {/* `key` remonta os inputs quando a URL muda, mantendo o formulário não controlado. */}
-          <form
-            key={`${value.priceMin ?? ''}:${value.priceMax ?? ''}`}
-            onSubmit={applyPrice}
-            className="flex flex-col gap-2"
+    <aside
+      aria-label="Filtros do catálogo"
+      className="flex w-full flex-col gap-6 lg:w-[310px] lg:shrink-0"
+    >
+      {/* Filters: 310px x 785px, padding 20px, bg: #241612 */}
+      <div className="flex w-full flex-col bg-[#241612] p-5 lg:h-[785px] lg:w-[310px]">
+        {/* Frame 140: 270px x 745px, gap: 40px */}
+        <div className="flex w-full flex-col gap-10 lg:w-[270px]">
+          {/* Collections Filter: 270px x 388px, gap: 12px */}
+          <div
+            role="radiogroup"
+            aria-labelledby="filter-collections-title"
+            className="flex flex-col gap-3"
           >
-            <div className="flex items-start gap-2">
-              <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <label htmlFor={priceMinId} className="text-xs text-text-secondary">
-                  Mínimo (ETH)
-                </label>
-                <input
-                  id={priceMinId}
-                  name="priceMin"
-                  type="text"
-                  inputMode="decimal"
-                  pattern="\d+(\.\d+)?"
-                  title="Informe um valor em ETH, como 1.25"
-                  defaultValue={value.priceMin ?? ''}
-                  placeholder="0.00"
-                  className={priceInputClass}
-                />
-              </div>
+            <h2
+              id="filter-collections-title"
+              className="font-mono text-[18px] leading-4 font-bold text-foreground"
+            >
+              Coleções
+            </h2>
 
-              <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <label htmlFor={priceMaxId} className="text-xs text-text-secondary">
-                  Máximo (ETH)
-                </label>
-                <input
-                  id={priceMaxId}
-                  name="priceMax"
-                  type="text"
-                  inputMode="decimal"
-                  pattern="\d+(\.\d+)?"
-                  title="Informe um valor em ETH, como 5.00"
-                  defaultValue={value.priceMax ?? ''}
-                  placeholder="0.00"
-                  className={priceInputClass}
-                />
-              </div>
+            {/* List: 270px x 360px, padding: 0 12px */}
+            <div className="flex flex-col px-3">
+              {FIGMA_COLLECTIONS.map((item) => {
+                const isSelected = value.collection === item.value || value.collection === item.name
+                return (
+                  <label
+                    key={item.name}
+                    className={cn(
+                      'group relative flex h-[40px] w-full cursor-pointer items-center justify-between font-mono text-[15px] leading-[40px] transition-colors duration-150',
+                      isSelected ? 'text-highlight' : 'text-text-secondary hover:text-highlight',
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="collection"
+                      value={item.value}
+                      aria-label={item.value === 'Kurio Apes' ? 'Kurio Apes' : item.name}
+                      checked={isSelected}
+                      onChange={() => handleCollectionClick(item.value)}
+                      className="absolute inset-0 z-10 cursor-pointer opacity-0"
+                    />
+                    <span className="pointer-events-none transition-colors duration-150">
+                      {item.name}
+                    </span>
+                    <span
+                      className={cn(
+                        'pointer-events-none text-right transition-colors duration-150',
+                        isSelected
+                          ? 'font-bold text-highlight'
+                          : 'font-bold text-text-secondary group-hover:text-highlight',
+                      )}
+                    >
+                      ({item.count})
+                    </span>
+                  </label>
+                )
+              })}
             </div>
+          </div>
 
-            <button type="submit" className={applyButtonClass}>
-              Aplicar
-            </button>
-          </form>
+          {/* Price Filter: 270px x 129px, gap: 12px */}
+          <div role="group" aria-labelledby="filter-price-title" className="flex flex-col gap-3">
+            <h2
+              id="filter-price-title"
+              className="font-mono text-[18px] leading-4 font-bold text-foreground"
+            >
+              Faixa de preço
+            </h2>
+
+            {/* Controls: padding 0 0 0 12px, gap: 12px */}
+            <div className="flex flex-col gap-3 pl-3">
+              {/* Slider: 258px x 21px */}
+              <div
+                ref={trackRef}
+                onPointerDown={handleTrackPointerDown}
+                className="relative flex h-[21px] w-[258px] cursor-pointer touch-none select-none items-center"
+              >
+                {/* Full inactive track */}
+                <div className="h-1 w-full rounded-full bg-[#CFB28C]/30" />
+
+                {/* Active bar between thumbs */}
+                <div
+                  className="pointer-events-none absolute h-1 rounded-full bg-primary"
+                  style={{
+                    left: `${minPercent}%`,
+                    width: `${Math.max(0, maxPercent - minPercent)}%`,
+                  }}
+                />
+
+                {/* Left thumb (min) */}
+                <div
+                  role="slider"
+                  tabIndex={0}
+                  aria-label="Preço mínimo em ETH"
+                  aria-valuemin={MIN_LIMIT}
+                  aria-valuemax={maxVal}
+                  aria-valuenow={minVal}
+                  aria-valuetext={`${minVal.toFixed(2)} ETH`}
+                  onPointerDown={(e) => handleThumbPointerDown('min', e)}
+                  onKeyDown={(e) => handleKeyDown('min', e)}
+                  style={{ left: `${minPercent}%` }}
+                  className={cn(
+                    'absolute top-1/2 -translate-y-1/2 -translate-x-1/2',
+                    'size-[15px] rounded-full border-[3px] border-[#140D0A] bg-primary',
+                    'cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.5)] transition-colors',
+                    'hover:bg-highlight focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                    activeThumb === 'min' ? 'z-40' : 'z-30',
+                  )}
+                />
+
+                {/* Right thumb (max) */}
+                <div
+                  role="slider"
+                  tabIndex={0}
+                  aria-label="Preço máximo em ETH"
+                  aria-valuemin={minVal}
+                  aria-valuemax={MAX_LIMIT}
+                  aria-valuenow={maxVal}
+                  aria-valuetext={`${maxVal.toFixed(2)} ETH`}
+                  onPointerDown={(e) => handleThumbPointerDown('max', e)}
+                  onKeyDown={(e) => handleKeyDown('max', e)}
+                  style={{ left: `${maxPercent}%` }}
+                  className={cn(
+                    'absolute top-1/2 -translate-y-1/2 -translate-x-1/2',
+                    'size-[15px] rounded-full border-[3px] border-[#140D0A] bg-primary',
+                    'cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.5)] transition-colors',
+                    'hover:bg-highlight focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                    activeThumb === 'max' ? 'z-40' : 'z-30',
+                  )}
+                />
+              </div>
+
+              {/* Frame 391: Preço text */}
+              <div className="flex h-[20px] w-[258px] items-center">
+                <span className="font-mono text-[15px] leading-5 text-foreground">
+                  Preço: {minVal.toFixed(2).replace('.', ',')} -{' '}
+                  {maxVal.toFixed(2).replace('.', ',')} ETH
+                </span>
+              </div>
+
+              {/* Apply Button: 92px x 36px, rounded 6px, bg: #D28A4C */}
+              <button
+                type="button"
+                onClick={handleApplyPrice}
+                className={cn(
+                  'flex h-[36px] w-[92px] cursor-pointer items-center justify-center rounded-[6px] bg-primary font-mono text-[16px] leading-5 font-bold text-ink transition-colors duration-150 hover:bg-highlight',
+                  focusRing,
+                )}
+              >
+                Aplicar
+              </button>
+            </div>
+          </div>
+
+          {/* Network Filter: 270px x 148px, gap: 12px */}
+          <div
+            role="radiogroup"
+            aria-labelledby="filter-network-title"
+            className="flex flex-col gap-3"
+          >
+            <h2
+              id="filter-network-title"
+              className="font-mono text-[18px] leading-4 font-bold text-foreground"
+            >
+              Rede
+            </h2>
+
+            {/* List: padding 0 0 0 12px, 3 items */}
+            <div className="flex flex-col pl-3">
+              {FIGMA_NETWORKS.map((net) => {
+                const isSelected = value.network === net.value
+                return (
+                  <label
+                    key={net.name}
+                    className={cn(
+                      'group relative flex h-[40px] w-[258px] cursor-pointer items-center justify-between font-mono text-[15px] leading-[40px] transition-colors duration-150',
+                      isSelected ? 'text-highlight' : 'text-text-secondary hover:text-highlight',
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="network"
+                      value={net.value}
+                      checked={isSelected}
+                      onChange={() => handleNetworkClick(net.value)}
+                      className="absolute inset-0 z-10 cursor-pointer opacity-0"
+                    />
+                    <span className="pointer-events-none transition-colors duration-150">
+                      {net.name}
+                    </span>
+                    <span
+                      className={cn(
+                        'pointer-events-none text-right transition-colors duration-150',
+                        isSelected
+                          ? 'font-bold text-highlight'
+                          : 'font-normal text-text-secondary group-hover:text-highlight',
+                      )}
+                    >
+                      ({net.count})
+                    </span>
+                  </label>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Featured NFT Banner: 310px x 470px */}
+      <div
+        className="relative flex h-[470px] w-full flex-col items-center pt-6 pb-1 lg:w-[310px]"
+        style={{
+          background:
+            'linear-gradient(180deg, rgba(210, 138, 76, 0.1) 0%, rgba(210, 138, 76, 0.03) 100%)',
+        }}
+      >
+        <div className="flex h-[448px] w-full flex-col gap-4 px-0">
+          <div className="flex h-[64px] w-full flex-col items-center gap-4">
+            <h3 className="h-8 w-full text-center font-mono text-[24px] leading-8 font-bold text-highlight">
+              NFT EM DESTAQUE
+            </h3>
+            <p className="h-4 w-full text-center font-mono text-[22px] leading-4 font-bold text-foreground">
+              OFERTA LIMITADA
+            </p>
+          </div>
+
+          <div className="relative mx-auto h-[368px] w-full overflow-hidden rounded-[22px]">
+            <img
+              src="/images/NFT-Artwork-18.png"
+              alt="NFT em destaque: Oferta Limitada"
+              width={310}
+              height={368}
+              className="h-[368px] w-full rounded-[22px] object-cover"
+            />
+
+            {/* Decorative Floating Elements from Figma */}
+            {/* Rectangle 30: 22px x 22px, left 16px, top 299px */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute top-[299px] left-[16px] size-[22px] rounded-[7px] border border-primary/40 opacity-20"
+            />
+            {/* Rectangle 31: 45px x 45px, left 248px, top 343px */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute top-[343px] left-[248px] size-[45px] rounded-[29px]"
+              style={{
+                background:
+                  'linear-gradient(145.46deg, rgba(210, 138, 76, 0.3) -46.09%, rgba(210, 138, 76, 0) 103.28%)',
+              }}
+            />
+            {/* Rectangle 32: 15px x 15px, left 38px, top 105px */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute top-[105px] left-[38px] size-[15px] rounded-[29px]"
+              style={{
+                background:
+                  'linear-gradient(145.46deg, rgba(210, 138, 76, 0.3) -46.09%, rgba(210, 138, 76, 0) 103.28%)',
+              }}
+            />
+          </div>
         </div>
       </div>
     </aside>

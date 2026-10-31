@@ -50,7 +50,7 @@ export const nftListQuerySchema = z.object({
   priceMax: ethSchema.optional(),
   sort: nftSortSchema.optional(),
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(12),
+  pageSize: z.coerce.number().int().min(1).max(100).default(9),
 })
 export type NftListQuery = z.infer<typeof nftListQuerySchema>
 

@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { getJson, httpClient } from '@/shared/api/http-client'
 import { queryKeys } from '@/shared/api/query-keys'
 import { favoriteSchema } from '@/shared/contracts'
-import { getOwnerKey, getToken } from '@/shared/session'
+import { getOwnerKey } from '@/shared/session'
 
 export const favoritesResponseSchema = z.object({ items: z.array(favoriteSchema) })
 export type FavoritesResponse = z.infer<typeof favoritesResponseSchema>
@@ -20,7 +20,6 @@ export function favoritesQueryOptions() {
   return queryOptions({
     queryKey: queryKeys.favorites.all(getOwnerKey()),
     queryFn: () => getJson(favoritesResponseSchema, '/favorites'),
-    enabled: Boolean(getToken()),
   })
 }
 

@@ -13,16 +13,38 @@ export const nftHandlers = [
     if (latency > 0) await delay(latency)
 
     const url = new URL(request.url)
-    const query = nftListQuerySchema.parse({
-      q: url.searchParams.get('q') ?? undefined,
-      collection: url.searchParams.get('collection') ?? undefined,
-      network: url.searchParams.get('network') ?? undefined,
-      priceMin: url.searchParams.get('priceMin') ?? undefined,
-      priceMax: url.searchParams.get('priceMax') ?? undefined,
-      sort: url.searchParams.get('sort') ?? undefined,
-      page: url.searchParams.get('page') ?? undefined,
-      pageSize: url.searchParams.get('pageSize') ?? undefined,
-    })
+
+    const cleanParam = (v: string | null) => {
+      if (!v) return undefined
+      const s = v.replace(/^"|"$/g, '').trim()
+      if (s === '' || s === 'undefined' || s === 'null') return undefined
+      return s
+    }
+
+    const rawQuery = {
+      q: cleanParam(url.searchParams.get('q')),
+      collection: cleanParam(url.searchParams.get('collection')),
+      network: cleanParam(url.searchParams.get('network')),
+      priceMin: cleanParam(url.searchParams.get('priceMin')),
+      priceMax: cleanParam(url.searchParams.get('priceMax')),
+      sort: cleanParam(url.searchParams.get('sort')),
+      page: cleanParam(url.searchParams.get('page')),
+      pageSize: cleanParam(url.searchParams.get('pageSize')),
+    }
+
+    const parsedQuery = nftListQuerySchema.safeParse(rawQuery)
+    const query = parsedQuery.success
+      ? parsedQuery.data
+      : {
+          q: typeof rawQuery.q === 'string' ? rawQuery.q : undefined,
+          collection: typeof rawQuery.collection === 'string' ? rawQuery.collection : undefined,
+          network: undefined,
+          priceMin: undefined,
+          priceMax: undefined,
+          sort: undefined,
+          page: 1,
+          pageSize: 9,
+        }
 
     let items = getDb().nfts.slice()
 
@@ -32,7 +54,18 @@ export const nftHandlers = [
         (n) => n.name.toLowerCase().includes(q) || n.collection.toLowerCase().includes(q),
       )
     }
-    if (query.collection) items = items.filter((n) => n.collection === query.collection)
+    if (query.collection) {
+      const c = query.collection.toLowerCase()
+      items = items.filter(
+        (n) =>
+          n.collection.toLowerCase() === c ||
+          (c === 'arte digital' && n.collection === 'Kurio Apes') ||
+          (c === 'fotografia' && n.collection === 'Genesis Drops') ||
+          (c === 'música' && n.collection === 'Kurio Editions') ||
+          (c === 'musica' && n.collection === 'Kurio Editions') ||
+          (c === 'arte 3d' && n.collection === 'Curated Art'),
+      )
+    }
     if (query.network) items = items.filter((n) => n.network === query.network)
     if (query.priceMin) items = items.filter((n) => Number(n.priceEth) >= Number(query.priceMin))
     if (query.priceMax) items = items.filter((n) => Number(n.priceEth) <= Number(query.priceMax))

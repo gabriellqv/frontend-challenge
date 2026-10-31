@@ -21,23 +21,14 @@ interface NftCardSkeletonProps {
  */
 export function NftCardSkeleton({ className }: NftCardSkeletonProps) {
   return (
-    <div
-      aria-hidden="true"
-      className={cn(
-        'flex w-full flex-col gap-3 rounded-2xl bg-surface-card p-3 shadow-card',
-        className,
-      )}
-    >
-      <Shimmer className="aspect-square w-full rounded-xl" />
-
-      <div className="flex flex-col gap-2 px-1">
-        <Shimmer className="h-5 w-3/4 rounded-[4px]" />
-        <Shimmer className="h-4 w-1/2 rounded-[4px]" />
+    <div aria-hidden="true" className={cn('flex w-full flex-col gap-3 lg:w-[258px]', className)}>
+      <div className="flex h-[300px] w-full items-center justify-center bg-card lg:w-[258px]">
+        <Shimmer className="size-[250px] rounded-[15px]" />
       </div>
 
-      <div className="flex items-center justify-between gap-3 px-1 pb-1">
-        <Shimmer className="h-5 w-24 rounded-[4px]" />
-        <Shimmer className="size-9 rounded-[5px]" />
+      <div className="flex flex-col gap-1 w-full">
+        <Shimmer className="h-4 w-3/4 rounded-[4px]" />
+        <Shimmer className="h-4 w-1/3 rounded-[4px]" />
       </div>
     </div>
   )

@@ -26,7 +26,10 @@ export function CatalogSkeleton({ itemCount = 6, className }: CatalogSkeletonPro
       <span className="sr-only">Carregando catálogo…</span>
       <ul
         aria-hidden="true"
-        className={cn('grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3', className)}
+        className={cn(
+          'grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-6 lg:w-[842px] lg:grid-cols-3 lg:gap-x-[34px] lg:gap-y-[72px]',
+          className,
+        )}
       >
         {Array.from({ length: itemCount }, (_, index) => (
           <li key={index}>

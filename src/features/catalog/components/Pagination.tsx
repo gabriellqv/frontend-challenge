@@ -6,13 +6,8 @@ type PageToken = number | 'ellipsis-start' | 'ellipsis-end'
 const focusRing =
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
 
-const navButtonClass = cn(
-  'inline-flex h-9 items-center justify-center rounded-[5px] border border-surface-dark px-3 text-sm text-canvas transition-colors hover:bg-surface-raised disabled:cursor-not-allowed disabled:opacity-40',
-  focusRing,
-)
-
-const pageButtonClass = cn(
-  'inline-flex size-9 items-center justify-center rounded-[5px] border border-surface-dark text-sm text-canvas transition-colors hover:bg-surface-raised disabled:cursor-not-allowed disabled:opacity-40',
+const buttonBaseClass = cn(
+  'inline-flex size-[35px] cursor-pointer items-center justify-center rounded-[4px] font-mono text-[18px] leading-4 transition-colors duration-150',
   focusRing,
 )
 
@@ -53,13 +48,10 @@ interface PaginationProps {
 }
 
 /**
- * Controles de paginação do catálogo. Mostra no máximo sete posições, desabilita
- * os botões nas bordas e marca a página atual com `aria-current`.
+ * Controles de paginação do catálogo conforme Figma (`Pagination`, 207px wide, gap: 8px).
  *
  * @param props - {@link PaginationProps}
  * @returns Navegação de páginas, ou `null` quando não há páginas.
- * @example
- * <Pagination pagination={page.pagination} onChange={(page) => updatePage(page)} />
  */
 export function Pagination({ pagination, onChange }: PaginationProps) {
   const { page, totalPages } = pagination
@@ -69,20 +61,34 @@ export function Pagination({ pagination, onChange }: PaginationProps) {
   const tokens = getPageTokens(page, totalPages)
 
   return (
-    <nav
-      aria-label="Paginação do catálogo"
-      className="flex flex-wrap items-center justify-center gap-2"
-    >
-      <button
-        type="button"
-        onClick={() => onChange(page - 1)}
-        disabled={page <= 1}
-        className={navButtonClass}
-      >
-        Anterior
-      </button>
+    <nav aria-label="Paginação do catálogo" className="flex flex-row items-center gap-2">
+      {page > 1 && (
+        <button
+          type="button"
+          onClick={() => onChange(page - 1)}
+          aria-label="Anterior"
+          title="Anterior"
+          className={cn(
+            buttonBaseClass,
+            'border border-[#3F2319] text-foreground hover:border-primary hover:text-highlight hover:bg-[#3F2319]/30',
+          )}
+        >
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 18 18"
+            className="size-[18px] shrink-0"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M11 4.5l-4.5 4.5 4.5 4.5" />
+          </svg>
+        </button>
+      )}
 
-      <ol className="flex flex-wrap items-center gap-1">
+      <ol className="flex flex-row items-center gap-2">
         {tokens.map((token) =>
           typeof token === 'number' ? (
             <li key={token}>
@@ -92,15 +98,21 @@ export function Pagination({ pagination, onChange }: PaginationProps) {
                 aria-current={token === page ? 'page' : undefined}
                 aria-label={`Página ${token}`}
                 className={cn(
-                  pageButtonClass,
-                  token === page && 'border-primary bg-primary font-bold text-ink hover:bg-primary',
+                  buttonBaseClass,
+                  token === page
+                    ? 'bg-primary font-bold text-ink hover:bg-highlight'
+                    : 'border border-[#3F2319] font-normal text-foreground hover:border-primary hover:text-highlight hover:bg-[#3F2319]/30',
                 )}
               >
                 {token}
               </button>
             </li>
           ) : (
-            <li key={token} aria-hidden="true" className="px-1 text-sm text-text-secondary">
+            <li
+              key={token}
+              aria-hidden="true"
+              className="px-1 font-mono text-[14px] text-text-secondary"
+            >
               …
             </li>
           ),
@@ -111,9 +123,26 @@ export function Pagination({ pagination, onChange }: PaginationProps) {
         type="button"
         onClick={() => onChange(page + 1)}
         disabled={page >= totalPages}
-        className={navButtonClass}
+        aria-label="Próxima"
+        title="Próxima"
+        className={cn(
+          buttonBaseClass,
+          'border border-[#3F2319] text-foreground hover:border-primary hover:text-highlight hover:bg-[#3F2319]/30',
+          'disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#3F2319] disabled:hover:text-foreground disabled:hover:bg-transparent',
+        )}
       >
-        Próxima
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 18 18"
+          className="size-[18px] shrink-0"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M7 4.5l4.5 4.5L7 13.5" />
+        </svg>
       </button>
 
       <span className="sr-only" aria-live="polite">

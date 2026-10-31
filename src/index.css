@@ -34,8 +34,8 @@
   --color-brand-orange: #ff641a;
 
   /* ---- shadcn/ui: tokens semânticos (mapeados para Kurio) ---- */
-  --color-background: #f5f1eb;
-  --color-foreground: #140d0a;
+  --color-background: #140d0a;
+  --color-foreground: #f5f1eb;
   --color-card: #241612;
   --color-card-foreground: #f5f1eb;
   --color-popover: #2f1d15;
@@ -88,6 +88,31 @@
     border-color: var(--color-border);
   }
 
+  button,
+  [role='button'],
+  [role='slider'],
+  [role='tab'],
+  [role='radio'],
+  [role='switch'],
+  summary,
+  select,
+  input[type='button'],
+  input[type='submit'],
+  input[type='reset'],
+  input[type='radio'],
+  input[type='checkbox'] {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role='button'][aria-disabled='true'],
+  [aria-disabled='true'],
+  button[disabled],
+  input:disabled,
+  select:disabled {
+    cursor: not-allowed;
+  }
+
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -109,4 +134,49 @@
       scroll-behavior: auto !important;
     }
   }
+}
+
+/* Dual Range Slider Styles */
+.dual-range-input::-webkit-slider-thumb {
+  pointer-events: auto;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background-color: #d28a4c;
+  border: 3px solid #140d0a;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  transition: transform 0.1s ease;
+}
+
+.dual-range-input::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.dual-range-input::-moz-range-thumb {
+  pointer-events: auto;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background-color: #d28a4c;
+  border: 3px solid #140d0a;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  transition: transform 0.1s ease;
+}
+
+.dual-range-input::-moz-range-thumb:hover {
+  transform: scale(1.15);
+}
+
+.dual-range-input::-webkit-slider-runnable-track {
+  background: transparent;
+  border: none;
+}
+
+.dual-range-input::-moz-range-track {
+  background: transparent;
+  border: none;
 }

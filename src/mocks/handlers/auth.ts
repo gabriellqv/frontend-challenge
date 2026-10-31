@@ -32,6 +32,25 @@ function mergeVisitorCart(request: Request, userToken: string): void {
   persist()
 }
 
+/** Preserva os favoritos do visitante ao autenticar (merge no login). */
+function mergeVisitorFavorites(request: Request, userId: string): void {
+  const visitorId = getVisitorId(request)
+  if (!visitorId) return
+
+  const db = getDb()
+  const visitorKey = `visitor:${visitorId}`
+  const visitorFavorites = db.favorites[visitorKey]
+  if (!visitorFavorites || visitorFavorites.length === 0) return
+
+  const userFavorites = db.favorites[userId] ?? []
+  for (const nftId of visitorFavorites) {
+    if (!userFavorites.includes(nftId)) userFavorites.push(nftId)
+  }
+  db.favorites[userId] = userFavorites
+  delete db.favorites[visitorKey]
+  persist()
+}
+
 function buildSession(user: UserRecord): Session {
   const token = crypto.randomUUID()
   const expiresAt = new Date(Date.now() + SESSION_TTL_MS).toISOString()
@@ -64,6 +83,7 @@ export const authHandlers = [
     }
     db.users.push(user)
     persist()
+    mergeVisitorFavorites(request, user.id)
     return HttpResponse.json(buildSession(user), { status: 201 })
   }),
 
@@ -80,6 +100,7 @@ export const authHandlers = [
     }
     const session = buildSession(user)
     mergeVisitorCart(request, session.token)
+    mergeVisitorFavorites(request, user.id)
     return HttpResponse.json(session)
   }),
 

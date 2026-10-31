@@ -80,6 +80,17 @@ export async function getJson<T>(
   config?: AxiosRequestConfig,
 ): Promise<T> {
   const res = await httpClient.get(path, config)
+  if (
+    typeof res.data === 'string' &&
+    (res.data.includes('<!doctype html>') || res.data.includes('<html'))
+  ) {
+    throw new ApiError({
+      status: 503,
+      code: 'NETWORK_ERROR',
+      message: 'Serviço temporariamente indisponível. Tente novamente.',
+      retryable: true,
+    })
+  }
   return schema.parse(res.data)
 }
 

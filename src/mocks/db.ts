@@ -64,7 +64,37 @@ function seed(): Db {
 function load(): Db {
   try {
     const raw = localStorage.getItem(DB_KEY)
-    if (raw) return JSON.parse(raw) as Db
+    if (raw) {
+      const parsed = JSON.parse(raw) as Db
+      if (
+        parsed &&
+        Array.isArray(parsed.nfts) &&
+        parsed.nfts.length > 0 &&
+        typeof parsed.nfts[0]?.priceEth === 'string' &&
+        typeof parsed.nfts[0]?.imageUrl === 'string'
+      ) {
+        const imageFixes: Record<string, string> = {
+          'nft-1': '/images/Frame-136.png',
+          'nft-19': '/images/NFT-Artwork-18.png',
+          'nft-20': '/images/NFT-Artwork-18.png',
+          'nft-21': '/images/NFT-Artwork-05.png',
+          'nft-22': '/images/NFT-Artwork-09.png',
+          'nft-23': '/images/NFT-Artwork-09.png',
+        }
+        let changed = false
+        for (const [id, url] of Object.entries(imageFixes)) {
+          const item = parsed.nfts.find((n) => n.id === id)
+          if (item && item.imageUrl !== url) {
+            item.imageUrl = url
+            changed = true
+          }
+        }
+        if (changed) {
+          persistRaw(parsed)
+        }
+        return parsed
+      }
+    }
   } catch {
     /* ignora e re-seeda */
   }
