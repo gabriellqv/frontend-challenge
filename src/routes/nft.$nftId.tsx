@@ -378,7 +378,11 @@ function NftDetailPage() {
                 disabled={isSoldOut}
                 onClick={() => {
                   addToCart.mutate(
-                    { nftId: nft.id, quantity, editionId: selectedEditionId },
+                    {
+                      nftId: nft.id,
+                      quantity,
+                      editionId: edition?.id ?? selectedEditionId,
+                    },
                     {
                       onSuccess: () => {
                         navigate({ to: '/carrinho' })
@@ -402,7 +406,7 @@ function NftDetailPage() {
                   addToCart.mutate({
                     nftId: nft.id,
                     quantity,
-                    editionId: selectedEditionId,
+                    editionId: edition?.id ?? selectedEditionId,
                   })
                 }}
                 aria-label="Adicionar ao carrinho"
