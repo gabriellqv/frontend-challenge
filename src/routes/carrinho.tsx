@@ -62,6 +62,7 @@ function CartPage() {
   const [couponInput, setCouponInput] = useState('')
   const [appliedCoupon, setAppliedCoupon] = useState<string | undefined>(undefined)
   const [activeDot, setActiveDot] = useState(1)
+  const [isDeleteMode, setIsDeleteMode] = useState(false)
 
   const items = cartQuery.data?.items ?? []
   const quoteRequest = {
@@ -496,27 +497,46 @@ function CartPage() {
       </div>
 
       {/* Mobile / Carrinho de NFTs (Figma mobile: 414px, #140D0A) */}
-      <div className="flex w-full flex-col bg-[#140D0A] pt-8 md:hidden">
-        {/* Screen Header: Back Button + Title "Carrinho de NFTs" */}
+      <div className="flex min-h-[100dvh] w-full flex-1 flex-col justify-between bg-[#140D0A] pt-8 md:hidden">
+        {/* Screen Header: Back Button + Title "Carrinho de NFTs" + Modo de Excluir */}
         <div className="flex w-full flex-col items-center px-7">
-          <div className="relative flex h-[44px] w-full max-w-[358px] items-center justify-center">
+          <div className="relative flex h-[44px] w-full max-w-[358px] items-center justify-between">
             <button
               type="button"
               onClick={() => window.history.back()}
               aria-label="Voltar"
-              className="absolute left-0 top-1 flex size-[35px] cursor-pointer items-center justify-center rounded-full border border-[#3F2319] bg-[#2F1D15] transition-colors hover:border-[#B39463]"
+              className="flex size-[35px] cursor-pointer items-center justify-center rounded-full border border-[#3F2319] bg-[#2F1D15] transition-colors hover:border-[#B39463]"
             >
               <ArrowLeft className="size-4 text-[#B39463]" strokeWidth={2} />
             </button>
 
-            <h1 className="font-mono text-[20px] font-bold leading-4 text-[#F5F1EB]">
+            <h1 className="font-mono text-[19px] font-bold leading-4 text-[#F5F1EB]">
               Carrinho de NFTs
             </h1>
+
+            {items.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => setIsDeleteMode(!isDeleteMode)}
+                aria-label={isDeleteMode ? 'Concluir modo de exclusão' : 'Ativar modo de exclusão'}
+                className={cn(
+                  'flex h-[32px] cursor-pointer items-center gap-1.5 rounded-full border px-3 font-mono text-[13px] font-medium transition-all active:scale-95',
+                  isDeleteMode
+                    ? 'border-[#D28A4C] bg-[#D28A4C] font-bold text-[#140D0A] shadow-md'
+                    : 'border-[#3F2319] bg-[#2F1D15] text-[#CFB28C] hover:border-[#D28A4C]/60 hover:text-[#E89B55]',
+                )}
+              >
+                <Trash2 className="size-3.5" />
+                <span>{isDeleteMode ? 'Pronto' : 'Excluir'}</span>
+              </button>
+            ) : (
+              <div className="w-[35px]" />
+            )}
           </div>
         </div>
 
         {items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center px-7 py-16 text-center">
+          <div className="flex flex-1 flex-col items-center justify-center px-7 py-16 text-center">
             <h2 className="font-mono text-xl font-bold text-[#F5F1EB]">Seu carrinho está vazio</h2>
             <p className="mt-2 font-mono text-sm text-[#CFB28C]">
               Explore o catálogo e adicione colecionáveis digitais exclusivos.
@@ -531,139 +551,150 @@ function CartPage() {
           </div>
         ) : (
           <>
-            {/* Cart Items List */}
-            <div className="mt-3 flex w-full flex-col items-center px-7">
-              <div className="flex w-full max-w-[358px] flex-col gap-5">
-                {items.map((item, index) => {
-                  const itemTotalEth = mul(item.priceEth, item.quantity.toString())
-                  const imgSrc = getItemImage(item)
-                  const editionText = getItemEdition(item)
-                  const isTrashVariant =
-                    item.name.includes('Ivory Baron') ||
-                    (items.length > 2 && index === 2) ||
-                    item.quantity >= Math.max(1, item.available)
-
-                  return (
-                    <div
-                      key={item.id}
-                      className="relative flex h-[100px] w-full max-w-[358px] overflow-hidden rounded-[14px] bg-[#241612] shadow-[0px_6px_20px_rgba(10,6,4,0.45)]"
+            {/* Top Items Section */}
+            <div className="flex w-full flex-col items-center">
+              {/* Informative banner when in Delete Mode */}
+              {isDeleteMode && (
+                <div className="mt-3 flex w-full flex-col items-center px-7">
+                  <div className="flex w-full max-w-[358px] items-center justify-between rounded-[10px] border border-[#D28A4C]/40 bg-[#241612] px-3.5 py-2">
+                    <span className="font-mono text-[13px] text-[#CFB28C]">
+                      Modo de exclusão ativo
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        items.forEach((item) => removeItem.mutate(item.id))
+                        setIsDeleteMode(false)
+                      }}
+                      className="cursor-pointer font-mono text-[13px] font-bold text-[#E89B55] underline hover:text-[#F5F1EB]"
                     >
-                      {/* Thumbnail: 100x100px, rounded-l-[14px] */}
-                      <div className="relative size-[100px] shrink-0 overflow-hidden rounded-l-[14px]">
-                        <img src={imgSrc} alt={item.name} className="size-full object-cover" />
-                      </div>
+                      Limpar tudo
+                    </button>
+                  </div>
+                </div>
+              )}
 
-                      {/* Info: Title, Edition, Price */}
-                      <div className="flex flex-1 flex-col justify-between py-[13px] pl-3 pr-2 font-mono">
-                        <div className="flex flex-col gap-1">
-                          <Link
-                            to="/nft/$nftId"
-                            params={{ nftId: item.nftId }}
-                            className="truncate text-[15px] font-bold leading-4 text-[#F5F1EB] hover:text-[#E89B55]"
-                          >
-                            {item.name}
-                          </Link>
-                          <span className="text-[14px] font-normal leading-4 text-[#CFB28C]">
-                            {editionText}
-                          </span>
+              {/* Cart Items List */}
+              <div className="mt-3 flex w-full flex-col items-center px-7">
+                <div className="flex w-full max-w-[358px] flex-col gap-4">
+                  {items.map((item) => {
+                    const itemTotalEth = mul(item.priceEth, item.quantity.toString())
+                    const imgSrc = getItemImage(item)
+                    const editionText = getItemEdition(item)
+
+                    return (
+                      <div
+                        key={item.id}
+                        className={cn(
+                          'relative flex h-[104px] w-full max-w-[358px] overflow-hidden rounded-[14px] bg-[#241612] shadow-[0px_6px_20px_rgba(10,6,4,0.45)] transition-all',
+                          isDeleteMode && 'border border-[#D28A4C]/60',
+                        )}
+                      >
+                        {/* Thumbnail: 104x104px, rounded-l-[14px] */}
+                        <div className="relative size-[104px] shrink-0 overflow-hidden rounded-l-[14px]">
+                          <img src={imgSrc} alt={item.name} className="size-full object-cover" />
                         </div>
-                        <div className="text-[18px] font-bold leading-4 text-[#E89B55]">
-                          {formatEth(itemTotalEth)} ETH
+
+                        {/* Info: Title, Edition, Price */}
+                        <div className="flex flex-1 flex-col justify-between py-[12px] pl-3 pr-2.5 font-mono">
+                          <div className="flex flex-col gap-1 pr-8">
+                            <Link
+                              to="/nft/$nftId"
+                              params={{ nftId: item.nftId }}
+                              className="truncate text-[15px] font-bold leading-4 text-[#F5F1EB] hover:text-[#E89B55]"
+                            >
+                              {item.name}
+                            </Link>
+                            <span className="text-[13px] font-normal leading-4 text-[#CFB28C]">
+                              {editionText}
+                            </span>
+                          </div>
+                          <div className="text-[17px] font-bold leading-4 text-[#E89B55]">
+                            {formatEth(itemTotalEth)} ETH
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Right: Controls (Minus, Qty, Plus or Trash) */}
-                      <div className="absolute right-[16px] top-[38px] flex h-[24px] items-center gap-2">
-                        {/* Minus button */}
-                        <button
-                          type="button"
-                          aria-label={`Diminuir quantidade de ${item.name}`}
-                          onClick={() => {
-                            if (item.quantity > 1) {
-                              updateItem.mutate({ itemId: item.id, quantity: item.quantity - 1 })
-                            } else {
-                              removeItem.mutate(item.id)
-                            }
-                          }}
-                          className={cn(
-                            'flex size-6 cursor-pointer items-center justify-center rounded-full border border-[#3F2319] bg-[#2F1D15] transition-colors',
-                            item.quantity <= 1 ? 'border-[#3F2319]' : 'hover:border-[#CFB28C]',
-                          )}
-                        >
-                          <span
-                            className={cn(
-                              'h-0 w-[9px] rounded-full border',
-                              item.quantity <= 1 ? 'border-[#55321F]' : 'border-[#F5F1EB]',
-                            )}
-                          />
-                        </button>
-
-                        {/* Quantity number */}
-                        <span className="min-w-[12px] text-center font-mono text-[16px] font-normal leading-[22px] text-[#F5F1EB]">
-                          {item.quantity}
-                        </span>
-
-                        {/* Plus button OR Trash button */}
-                        {isTrashVariant ? (
+                        {/* Action Area: Delete Mode vs Normal Mode */}
+                        {isDeleteMode ? (
                           <button
                             type="button"
-                            aria-label={`Remover ${item.name} do carrinho`}
+                            aria-label={`Excluir ${item.name} do carrinho`}
                             onClick={() => removeItem.mutate(item.id)}
-                            className="flex size-6 cursor-pointer items-center justify-center transition-transform hover:scale-110"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 flex h-[34px] cursor-pointer items-center gap-1.5 rounded-full border border-[#D28A4C] bg-[#2F1D15] px-3 font-mono text-[13px] font-bold text-[#E89B55] shadow-sm transition-all hover:bg-[#D28A4C] hover:text-[#140D0A] active:scale-95"
                           >
-                            <svg
-                              width="17"
-                              height="19"
-                              viewBox="0 0 17 19"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                              aria-hidden="true"
-                            >
-                              <path
-                                d="M13.8 5.5L13.1 14.5C13 15.6 12 16.5 10.9 16.5H6.1C5 16.5 4 15.6 3.9 14.5L3.2 5.5"
-                                stroke="#D28A4C"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M2 5.5H15"
-                                stroke="#D28A4C"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                              />
-                              <path
-                                d="M6.5 2.5H10.5C11 2.5 11.5 2.9 11.5 3.5V5.5H5.5V3.5C5.5 2.9 6 2.5 6.5 2.5Z"
-                                stroke="#D28A4C"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
+                            <Trash2 className="size-4" />
+                            <span>Excluir</span>
                           </button>
                         ) : (
-                          <button
-                            type="button"
-                            aria-label={`Aumentar quantidade de ${item.name}`}
-                            disabled={item.quantity >= Math.max(1, item.available)}
-                            onClick={() => {
-                              const next = Math.min(Math.max(1, item.available), item.quantity + 1)
-                              updateItem.mutate({ itemId: item.id, quantity: next })
-                            }}
-                            className="flex size-6 cursor-pointer items-center justify-center rounded-full border border-[#3F2319] bg-[#2F1D15] font-mono text-[16px] text-[#F5F1EB] transition-colors hover:border-[#CFB28C] disabled:cursor-not-allowed disabled:opacity-50"
-                          >
-                            <Plus className="size-3.5 stroke-[2] text-[#F5F1EB]" />
-                          </button>
+                          <>
+                            {/* Top-Right Trash Button with dedicated space */}
+                            <button
+                              type="button"
+                              aria-label={`Remover ${item.name} do carrinho`}
+                              onClick={() => removeItem.mutate(item.id)}
+                              className="absolute right-3 top-2.5 flex size-7 cursor-pointer items-center justify-center rounded-full border border-[#3F2319] bg-[#2F1D15] text-[#CFB28C] transition-colors hover:border-[#D28A4C] hover:text-[#E89B55] active:scale-95"
+                            >
+                              <Trash2 className="size-3.5" />
+                            </button>
+
+                            {/* Bottom-Right Stepper */}
+                            <div className="absolute right-3 bottom-2.5 flex h-[24px] items-center gap-2">
+                              {/* Minus button */}
+                              <button
+                                type="button"
+                                aria-label={`Diminuir quantidade de ${item.name}`}
+                                onClick={() => {
+                                  if (item.quantity > 1) {
+                                    updateItem.mutate({
+                                      itemId: item.id,
+                                      quantity: item.quantity - 1,
+                                    })
+                                  } else {
+                                    removeItem.mutate(item.id)
+                                  }
+                                }}
+                                className="flex size-6 cursor-pointer items-center justify-center rounded-full border border-[#3F2319] bg-[#2F1D15] transition-colors hover:border-[#CFB28C]"
+                              >
+                                {item.quantity <= 1 ? (
+                                  <Trash2 className="size-3 text-[#CFB28C]" />
+                                ) : (
+                                  <Minus className="size-3 text-[#F5F1EB]" />
+                                )}
+                              </button>
+
+                              {/* Quantity number */}
+                              <span className="min-w-[12px] text-center font-mono text-[15px] font-medium leading-[20px] text-[#F5F1EB]">
+                                {item.quantity}
+                              </span>
+
+                              {/* Plus button */}
+                              <button
+                                type="button"
+                                aria-label={`Aumentar quantidade de ${item.name}`}
+                                disabled={item.quantity >= Math.max(1, item.available)}
+                                onClick={() => {
+                                  const next = Math.min(
+                                    Math.max(1, item.available),
+                                    item.quantity + 1,
+                                  )
+                                  updateItem.mutate({ itemId: item.id, quantity: next })
+                                }}
+                                className="flex size-6 cursor-pointer items-center justify-center rounded-full border border-[#3F2319] bg-[#2F1D15] transition-colors hover:border-[#CFB28C] disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                <Plus className="size-3 text-[#F5F1EB]" />
+                              </button>
+                            </div>
+                          </>
                         )}
                       </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
+                </div>
               </div>
             </div>
 
-            {/* Payment Summary Bottom Sheet */}
-            <div className="mt-8 flex w-full flex-col items-center rounded-t-[40px] bg-[#241612] px-6 pt-6 pb-9">
+            {/* Payment Summary Bottom Sheet: in the exact same color as mobile navbar (#241612) and extending to the bottom edge */}
+            <div className="mt-8 flex flex-1 w-full flex-col items-center rounded-t-[40px] bg-[#241612] px-6 pt-6 pb-9 shadow-[0px_-6px_20px_rgba(10,6,4,0.45)]">
               <div className="flex w-full max-w-[366px] flex-col gap-3">
                 {/* Promo Code Input */}
                 {appliedCoupon ? (
