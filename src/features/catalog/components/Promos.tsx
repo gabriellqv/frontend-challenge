@@ -26,6 +26,11 @@ const PROMOS = [
  * conforme especificação oficial do Figma (`Promos`).
  */
 export function Promos() {
+  function scrollToCatalog() {
+    const el = document.getElementById('catalogo-section')
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
+  }
+
   return (
     <section
       aria-label="Destaques promocionais"
@@ -69,6 +74,7 @@ export function Promos() {
 
             <button
               type="button"
+              onClick={scrollToCatalog}
               className={cn(
                 'group flex h-[40px] w-[140px] shrink-0 cursor-pointer items-center justify-center gap-2 rounded-[6px] bg-primary font-mono text-[14px] leading-5 font-medium text-ink transition-colors duration-150 hover:bg-highlight',
                 focusRing,

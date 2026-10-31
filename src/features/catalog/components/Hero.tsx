@@ -1,16 +1,103 @@
+import { useState } from 'react'
+
 import { ArrowRight } from 'lucide-react'
+
+import { cn } from '@/shared/lib/cn'
+
+interface HeroSlide {
+  id: string
+  tag: string
+  desktopTitle: string
+  desktopDescription: string
+  mobileTag: string
+  mobileTitle: string
+  mobileDescription: string
+  desktopImage: string
+  desktopAlt: string
+  mobileMainImage: string
+  mobileMainAlt: string
+  mobileSecondaryImage: string
+  mobileSecondaryAlt: string
+}
+
+const HERO_SLIDES: readonly HeroSlide[] = [
+  {
+    id: 'slide-emerald',
+    tag: 'Bem-vindo à Kurio',
+    desktopTitle: 'SEJA DONO DO FUTURO\nDA ARTE DIGITAL',
+    desktopDescription:
+      'Descubra NFTs selecionados de criadores emergentes e consagrados. Colecione arte digital rara, apoie artistas e tenha uma parte da cultura da internet.',
+    mobileTag: 'Bem-vindo à Kurio',
+    mobileTitle: 'SEJA DONO DA\nCULTURA DIGITAL',
+    mobileDescription: 'Descubra NFTs selecionados de criadores do mundo todo.',
+    desktopImage: '/images/Frame-136.png',
+    desktopAlt: 'Obra digital em destaque da coleção Kurio: Emerald Ape #042 por Nova Sato',
+    mobileMainImage: '/images/Frame-136.png',
+    mobileMainAlt: 'Emerald Ape #042 por Nova Sato',
+    mobileSecondaryImage: '/images/NFT-Artwork-18.png',
+    mobileSecondaryAlt: 'Sage Nomad por Aisha Thorne',
+  },
+  {
+    id: 'slide-nomad',
+    tag: 'Criadores em destaque',
+    desktopTitle: 'COLECIONE OBRAS\nDE ARTISTAS ÚNICOS',
+    desktopDescription:
+      'Aisha Thorne traz coleções conceituais de arte generativa e figurativa. Conheça criadores independentes que moldam a cultura na blockchain.',
+    mobileTag: 'Criadores em destaque',
+    mobileTitle: 'CRIADORES EM\nDESTAQUE',
+    mobileDescription: 'Conheça Aisha Thorne e criadores da cultura digital.',
+    desktopImage: '/images/NFT-Artwork-18.png',
+    desktopAlt: 'Obra digital em destaque da coleção Kurio: Sage Nomad por Aisha Thorne',
+    mobileMainImage: '/images/NFT-Artwork-18.png',
+    mobileMainAlt: 'Sage Nomad por Aisha Thorne',
+    mobileSecondaryImage: '/images/NFT-Artwork-09.png',
+    mobileSecondaryAlt: 'Solace in Motion por Kaelen Voss',
+  },
+  {
+    id: 'slide-motion',
+    tag: 'Lançamentos selecionados',
+    desktopTitle: 'ARTE DIGITAL RARA\nE VERIFICADA',
+    desktopDescription:
+      'Kaelen Voss e estúdios parceiros com lançamentos verificados na rede Ethereum. Colecionismo autêntico com procedência e direitos autorais garantidos.',
+    mobileTag: 'Lançamentos selecionados',
+    mobileTitle: 'EDIÇÕES RARAS\nVERIFICADAS',
+    mobileDescription: 'Obras verificadas com procedência na rede Ethereum.',
+    desktopImage: '/images/NFT-Artwork-09.png',
+    desktopAlt: 'Obra digital em destaque da coleção Kurio: Solace in Motion por Kaelen Voss',
+    mobileMainImage: '/images/NFT-Artwork-09.png',
+    mobileMainAlt: 'Solace in Motion por Kaelen Voss',
+    mobileSecondaryImage: '/images/NFT-Artwork-05.png',
+    mobileSecondaryAlt: 'Neon Drift por Marcus Vance',
+  },
+]
+
+const DEFAULT_SLIDE: HeroSlide = HERO_SLIDES[0]!
 
 /**
  * Hero da Início:
  * - Desktop: layout 1200px com headline expandida e Frame-136 em 450px
  * - Mobile: banner 366px x 190px com artes sobrepostas e texto compacto fiel ao Figma
+ * - Bolinhas (elipses) interativas para alternar as obras/criadores em destaque
  *
  * @returns Seção hero da página inicial.
  */
 export function Hero() {
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const slide: HeroSlide = HERO_SLIDES[currentSlide] ?? DEFAULT_SLIDE
+
   function scrollToCatalog() {
     const el = document.getElementById('catalogo-section')
     if (el) el.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'ArrowRight') {
+      e.preventDefault()
+      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length)
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault()
+      setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)
+    }
   }
 
   return (
@@ -45,18 +132,18 @@ export function Hero() {
         {/* Content Row: Text (left) + Stacked Artworks (right) */}
         <div className="relative z-10 flex items-start justify-between gap-2">
           {/* Frame 405 */}
-          <div className="flex w-[190px] shrink-0 flex-col gap-1">
+          <div className="flex w-[190px] shrink-0 flex-col gap-1 transition-opacity duration-200">
             <span className="font-mono text-[12px] leading-4 font-medium text-[#F5F1EB]">
-              Bem-vindo à Kurio
+              {slide.mobileTag}
             </span>
             <h1
               id="mobile-hero-title"
               className="font-mono text-[18px] leading-[22px] font-bold tracking-tight text-[#F5F1EB]"
             >
-              SEJA DONO DA{'\n'}CULTURA DIGITAL
+              {slide.mobileTitle}
             </h1>
             <p className="mt-0.5 font-mono text-[12px] leading-[15px] font-normal text-[#CFB28C]">
-              Descubra NFTs selecionados de criadores do mundo todo.
+              {slide.mobileDescription}
             </p>
             <button
               type="button"
@@ -71,27 +158,46 @@ export function Hero() {
           {/* Group 105: Stacked Artworks */}
           <div className="relative flex size-[138px] shrink-0 items-center justify-end">
             <img
-              src="/images/Frame-136.png"
-              alt="Emerald Ape"
+              src={slide.mobileMainImage}
+              alt={slide.mobileMainAlt}
               width={134}
               height={134}
-              className="size-[134px] rounded-[16px] border border-[#D28A4C]/30 object-cover shadow-md"
+              className="size-[134px] rounded-[16px] border border-[#D28A4C]/30 object-cover shadow-md transition-all duration-300"
             />
             <img
-              src="/images/NFT-Artwork-18.png"
-              alt="Sage Nomad"
+              src={slide.mobileSecondaryImage}
+              alt={slide.mobileSecondaryAlt}
               width={58}
               height={58}
-              className="absolute -bottom-1 -left-2 size-[58px] rounded-[16px] border-2 border-[#140D0A] object-cover shadow-xl"
+              className="absolute -bottom-1 -left-2 size-[58px] rounded-[16px] border-2 border-[#140D0A] object-cover shadow-xl transition-all duration-300"
             />
           </div>
         </div>
 
-        {/* Frame 4: 3 dots */}
-        <div className="relative z-10 flex items-center justify-center gap-1.5 pt-2">
-          <span className="size-[7px] rounded-full bg-[#D28A4C]" />
-          <span className="size-[7px] rounded-full bg-[#D28A4C]" />
-          <span className="size-[7px] rounded-full bg-[#D28A4C]" />
+        {/* Frame 4: 3 dots (elipses) */}
+        <div
+          role="tablist"
+          aria-label="Carrossel de criadores em destaque"
+          onKeyDown={handleKeyDown}
+          className="relative z-10 flex items-center justify-center gap-1.5 pt-2"
+        >
+          {HERO_SLIDES.map((item, idx) => {
+            const isActive = currentSlide === idx
+            return (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                aria-label={`Slide ${idx + 1} de ${HERO_SLIDES.length}: ${item.mobileTag}`}
+                onClick={() => setCurrentSlide(idx)}
+                className={cn(
+                  'size-[7px] cursor-pointer rounded-full transition-all duration-200 focus:outline-none',
+                  isActive ? 'bg-[#D28A4C]' : 'bg-[#D28A4C]/40 hover:bg-[#D28A4C]/80',
+                )}
+              />
+            )
+          })}
         </div>
       </section>
 
@@ -105,22 +211,21 @@ export function Hero() {
           {/* Frame 134: 32px gap */}
           <div className="flex w-full flex-col gap-8">
             {/* Frame 133: 4px gap */}
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 transition-opacity duration-200">
               {/* Frame 132: 8px gap */}
               <div className="flex flex-col gap-2">
                 <p className="font-mono text-[14px] leading-4 font-medium tracking-[0.1em] text-foreground">
-                  Bem-vindo à Kurio
+                  {slide.tag}
                 </p>
                 <h1
                   id="hero-title"
                   className="font-mono text-[43px] leading-[70px] font-bold whitespace-pre-line text-foreground"
                 >
-                  {'SEJA DONO DO FUTURO\nDA ARTE DIGITAL'}
+                  {slide.desktopTitle}
                 </h1>
               </div>
               <p className="max-w-[557px] font-mono text-[14px] leading-6 font-normal text-text-secondary">
-                Descubra NFTs selecionados de criadores emergentes e consagrados. Colecione arte
-                digital rara, apoie artistas e tenha uma parte da cultura da internet.
+                {slide.desktopDescription}
               </p>
             </div>
 
@@ -134,21 +239,40 @@ export function Hero() {
             </button>
           </div>
 
-          {/* Group 4: 40px width, 3 dots of 8px */}
-          <div className="flex w-10 gap-2 self-end" aria-hidden="true">
-            <span className="size-2 rounded-full bg-primary" />
-            <span className="size-2 rounded-full bg-primary/60" />
-            <span className="size-2 rounded-full bg-primary/60" />
+          {/* Group 4: 40px width, 3 dots of 8px (Ellipse 2, Ellipse 3, Ellipse 4) */}
+          <div
+            role="tablist"
+            aria-label="Carrossel de criadores em destaque"
+            onKeyDown={handleKeyDown}
+            className="flex w-10 gap-2 self-end"
+          >
+            {HERO_SLIDES.map((item, idx) => {
+              const isActive = currentSlide === idx
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-label={`Slide ${idx + 1} de ${HERO_SLIDES.length}: ${item.tag}`}
+                  onClick={() => setCurrentSlide(idx)}
+                  className={cn(
+                    'size-2 cursor-pointer rounded-full transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                    isActive ? 'bg-primary' : 'bg-primary/60 hover:bg-primary/90',
+                  )}
+                />
+              )
+            })}
           </div>
         </div>
 
         {/* Frame 136: 450px x 450px, border-radius 24px */}
         <img
-          src="/images/Frame-136.png"
-          alt="Obra digital em destaque da coleção Kurio"
+          src={slide.desktopImage}
+          alt={slide.desktopAlt}
           width={450}
           height={450}
-          className="hidden size-[450px] shrink-0 rounded-[24px] object-cover lg:block"
+          className="hidden size-[450px] shrink-0 rounded-[24px] object-cover transition-all duration-300 lg:block"
         />
       </section>
     </>
