@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
@@ -18,6 +18,7 @@ import { favoritesQueryOptions, useToggleFavorite } from '@/features/favorites/a
 import { CatalogSkeleton } from '@/shared/components/skeletons/CatalogSkeleton'
 import { DEFAULT_NFT_LIST_QUERY, type NftListQuery, nftListQuerySchema } from '@/shared/contracts'
 import { cn } from '@/shared/lib/cn'
+import { useBodyScrollLock } from '@/shared/lib/useBodyScrollLock'
 
 export const Route = createFileRoute('/')({
   validateSearch: (search) => nftListQuerySchema.parse(search),
@@ -28,6 +29,18 @@ function HomePage() {
   const search = Route.useSearch()
   const navigate = Route.useNavigate()
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false)
+  useBodyScrollLock(isMobileFiltersOpen)
+
+  useEffect(() => {
+    if (!isMobileFiltersOpen) return
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setIsMobileFiltersOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isMobileFiltersOpen])
 
   const catalog = useQuery(nftsQueryOptions(search))
   const favorites = useQuery(favoritesQueryOptions())
@@ -122,7 +135,7 @@ function HomePage() {
           role="dialog"
           aria-modal="true"
           aria-label="Filtros de coleções e redes"
-          className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-[#140D0A]/95 p-6 backdrop-blur-md md:hidden"
+          className="fixed inset-0 z-50 flex flex-col overflow-y-auto overscroll-contain bg-[#140D0A]/95 p-6 backdrop-blur-md md:hidden"
         >
           <div className="flex items-center justify-between border-b border-[#3F2319] pb-4">
             <h3 className="font-mono text-lg font-bold text-[#F5F1EB]">Filtros</h3>

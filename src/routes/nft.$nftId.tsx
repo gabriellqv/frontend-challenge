@@ -27,6 +27,7 @@ import { NftDetailSkeleton } from '@/shared/components/skeletons/NftDetailSkelet
 import { DEFAULT_NFT_LIST_QUERY } from '@/shared/contracts'
 import { cn } from '@/shared/lib/cn'
 import { formatEth } from '@/shared/lib/money'
+import { useBodyScrollLock } from '@/shared/lib/useBodyScrollLock'
 
 export const Route = createFileRoute('/nft/$nftId')({
   component: NftDetailPage,
@@ -109,6 +110,7 @@ function NftDetailPage() {
   const [quantity, setQuantity] = useState(1)
   const [activeTab, setActiveTab] = useState<'detalhes' | 'avaliacoes'>('detalhes')
   const [isZoomOpen, setIsZoomOpen] = useState(false)
+  useBodyScrollLock(isZoomOpen)
   const [activeDot, setActiveDot] = useState(1)
   const [copiedLink, setCopiedLink] = useState(false)
 
@@ -903,7 +905,7 @@ function NftDetailPage() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="zoom-artwork-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center overscroll-contain bg-black/85 p-4 backdrop-blur-sm"
           onClick={() => setIsZoomOpen(false)}
         >
           <div

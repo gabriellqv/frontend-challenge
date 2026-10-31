@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 import { Link, useRouterState } from '@tanstack/react-router'
@@ -9,6 +9,7 @@ import { sessionQueryOptions, useLogout } from '@/features/auth/api'
 import { cartQueryOptions } from '@/features/cart/api'
 import { DEFAULT_NFT_LIST_QUERY } from '@/shared/contracts'
 import { cn } from '@/shared/lib/cn'
+import { useBodyScrollLock } from '@/shared/lib/useBodyScrollLock'
 
 /** Seções planejadas, mas fora do escopo do desafio: renderizadas como "em breve". */
 const COMING_SOON_SECTIONS = ['Criadores', 'Aprenda'] as const
@@ -44,6 +45,9 @@ interface HeaderProps {
 export function Header({ cartItemCount }: HeaderProps) {
   const menuDialogRef = useRef<HTMLDialogElement>(null)
   const menuTriggerRef = useRef<HTMLButtonElement>(null)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  useBodyScrollLock(isMenuOpen)
+
   const session = useQuery(sessionQueryOptions())
   const cartQuery = useQuery(cartQueryOptions())
   const logout = useLogout()
@@ -70,15 +74,17 @@ export function Header({ cartItemCount }: HeaderProps) {
   const cartLabel = totalCartCount === 1 ? 'Carrinho, 1 item' : `Carrinho, ${totalCartCount} itens`
 
   function openMenu() {
-    // `showModal` dá de graça foco preso, Esc e fundo inerte.
+    setIsMenuOpen(true)
     menuDialogRef.current?.showModal()
   }
 
   function closeMenu() {
+    setIsMenuOpen(false)
     menuDialogRef.current?.close()
   }
 
   function restoreFocusToTrigger() {
+    setIsMenuOpen(false)
     menuTriggerRef.current?.focus()
   }
 
@@ -295,7 +301,7 @@ export function Header({ cartItemCount }: HeaderProps) {
           // Clique no backdrop chega com o próprio dialog como alvo.
           if (event.target === event.currentTarget) closeMenu()
         }}
-        className="m-0 ml-auto h-dvh max-h-none w-[min(20rem,85vw)] max-w-none bg-surface-card p-0 text-canvas shadow-option backdrop:bg-ink/70 md:hidden"
+        className="m-0 ml-auto h-dvh max-h-none w-[min(20rem,85vw)] max-w-none overscroll-contain bg-surface-card p-0 text-canvas shadow-option backdrop:bg-ink/70 md:hidden"
       >
         <div className="flex h-full flex-col gap-6 p-4">
           <div className="flex items-center justify-between">
