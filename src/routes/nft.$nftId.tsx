@@ -209,16 +209,16 @@ function NftDetailPage() {
   return (
     <>
       {/* Mobile / Detalhes do NFT (Figma 414px x 896px) */}
-      <div className="flex w-full flex-col pb-44 md:hidden">
+      <div className="relative flex h-full min-h-[100dvh] max-h-[100dvh] w-full flex-col justify-between overflow-hidden bg-[#140D0A] md:hidden">
         {/* Hero Artwork Section */}
         <div
-          className="relative flex min-h-[440px] w-full flex-col justify-between p-6 pb-6"
+          className="relative flex flex-1 min-h-0 w-full flex-col justify-between p-4 pb-2"
           style={{
             background: 'linear-gradient(143.28deg, #241612 -12%, #2F1D15 106.59%)',
           }}
         >
           {/* Top Actions: Back Button (Left) + Favorite Button (Right) */}
-          <div className="z-10 flex w-full items-center justify-between">
+          <div className="z-10 flex shrink-0 w-full items-center justify-between">
             <button
               type="button"
               onClick={() => {
@@ -251,17 +251,17 @@ function NftDetailPage() {
           </div>
 
           {/* Main Hero Artwork */}
-          <div className="my-auto flex w-full items-center justify-center pt-2 pb-3">
+          <div className="my-auto flex flex-1 min-h-0 w-full items-center justify-center py-1">
             <img
               src={mainArtworkUrl}
               alt={nft.name}
-              className="size-[340px] max-w-[361px] cursor-zoom-in rounded-[24px] border border-[#D28A4C]/15 object-cover shadow-2xl"
+              className="max-h-full max-w-[280px] sm:max-w-[320px] aspect-square cursor-zoom-in rounded-[24px] border border-[#D28A4C]/15 object-cover shadow-2xl"
               onClick={() => setIsZoomOpen(true)}
             />
           </div>
 
           {/* Group 62: Carousel indicator (pill + dots) */}
-          <div className="flex items-center justify-center gap-1.5 pt-1">
+          <div className="flex shrink-0 items-center justify-center gap-1.5 py-1">
             <span className="h-[7px] w-[28px] rounded-[25px] bg-[#D28A4C]" />
             <span className="size-[7px] rounded-full bg-[#D28A4C]" />
             <span className="size-[7px] rounded-full bg-[#D28A4C]" />
@@ -269,10 +269,10 @@ function NftDetailPage() {
         </div>
 
         {/* Details Sheet */}
-        <div className="relative -mt-4 z-10 flex w-full flex-col gap-4 rounded-t-[31px] bg-[#241612] px-6 pt-8 pb-12 shadow-xl">
+        <div className="relative z-10 flex shrink-0 w-full flex-col gap-3 rounded-t-[31px] bg-[#241612] px-6 pt-4 pb-3 shadow-xl">
           {/* Title Row: Name + Rating Badge */}
           <div className="flex items-center justify-between gap-2">
-            <h1 className="truncate font-mono text-[20px] font-bold leading-5 text-[#F5F1EB]">
+            <h1 className="truncate font-mono text-[19px] font-bold leading-5 text-[#F5F1EB]">
               {nft.name}
             </h1>
 
@@ -280,30 +280,30 @@ function NftDetailPage() {
             <div
               role="img"
               aria-label="Avaliação 4.8 de 19 colecionadores"
-              className="flex h-[27px] shrink-0 items-center gap-1.5 rounded-[32px] border border-[#D28A4C] px-2.5"
+              className="flex h-[26px] shrink-0 items-center gap-1.5 rounded-[32px] border border-[#D28A4C] px-2.5"
             >
               <Star className="size-3.5 fill-[#E3A44E] text-[#E3A44E]" />
-              <span className="font-mono text-[14px] font-medium leading-4 text-[#F5F1EB]">
+              <span className="font-mono text-[13px] font-medium leading-4 text-[#F5F1EB]">
                 4.8
               </span>
-              <span className="font-mono text-[14px] font-normal leading-4 text-[#CFB28C]">
+              <span className="font-mono text-[13px] font-normal leading-4 text-[#CFB28C]">
                 (19)
               </span>
             </div>
           </div>
 
           {/* Description */}
-          <p className="font-mono text-[14px] font-normal leading-6 text-[#CFB28C]">
+          <p className="line-clamp-2 font-mono text-[13px] font-normal leading-5 text-[#CFB28C]">
             {nft.description ||
               'Um colecionável digital 1/50 finalizado à mão da coleção Kurio Editions, verificado na Ethereum.'}
           </p>
 
           {/* Frame 66: Edition selector */}
-          <div className="flex flex-col gap-2 pt-1">
-            <span className="font-mono text-[15px] font-bold leading-4 text-[#F5F1EB]">
+          <div className="flex flex-col gap-1.5">
+            <span className="font-mono text-[14px] font-bold leading-4 text-[#F5F1EB]">
               Edição:
             </span>
-            <div className="flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-none">
+            <div className="flex items-center gap-2 overflow-x-auto pb-0.5 scrollbar-none">
               {['1/10', '1/10', '1/50', 'ABERTA'].map((edLabel, idx) => {
                 const isSelected =
                   selectedEditionId === edLabel || (idx === 2 && selectedEditionId === '1/50')
@@ -313,7 +313,7 @@ function NftDetailPage() {
                     type="button"
                     onClick={() => selectEdition(edLabel)}
                     className={cn(
-                      'cursor-pointer rounded-full px-3 py-1 font-mono text-[14px] transition-colors',
+                      'cursor-pointer rounded-full px-3 py-0.5 font-mono text-[13px] transition-colors',
                       isSelected
                         ? 'border border-[#D28A4C] font-medium text-[#E89B55]'
                         : 'border border-[#3F2319] font-normal text-[#CFB28C] hover:border-[#D28A4C]/50',
@@ -327,32 +327,32 @@ function NftDetailPage() {
           </div>
 
           {/* Token Info */}
-          <div className="flex flex-col gap-2 pt-1 font-mono text-[15px] leading-5 text-[#B39463]">
+          <div className="flex flex-col gap-1 font-mono text-[13px] leading-4 text-[#B39463]">
             <p>ID do token: #{nft.id.replace('nft-', '').padStart(4, '0')}</p>
             <p>Coleção: {nft.collection}</p>
             <p>Atributos: Óculos, Esmeralda, Raro</p>
           </div>
         </div>
 
-        {/* Buy Bar (Fixed Bottom Bar) */}
-        <div className="fixed right-0 bottom-0 left-0 z-40 rounded-t-[40px] border-t border-[#3F2319]/50 bg-[#241612] px-6 pt-5 pb-8 shadow-[0px_0px_20px_rgba(10,6,4,0.45)]">
-          <div className="mx-auto flex max-w-[366px] flex-col gap-4">
+        {/* Buy Bar (Docked at Bottom) */}
+        <div className="relative z-20 shrink-0 w-full border-t border-[#3F2319]/50 bg-[#241612] px-6 pt-3 pb-6 shadow-[0px_-4px_20px_rgba(10,6,4,0.45)]">
+          <div className="mx-auto flex max-w-[366px] flex-col gap-3">
             {/* Top Row: Quantity + Price */}
             <div className="flex items-center justify-between">
               {/* Quantity */}
               <div className="flex items-center gap-2 font-mono">
-                <span className="text-[15px] font-medium text-[#CFB28C]">Qtd.</span>
+                <span className="text-[14px] font-medium text-[#CFB28C]">Qtd.</span>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     disabled={quantity <= 1 || isSoldOut}
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     aria-label="Diminuir quantidade"
-                    className="flex h-[30px] w-[24px] cursor-pointer items-center justify-center rounded-[20px] border border-[#140D0A] bg-[#D28A4C] text-black shadow-sm disabled:cursor-not-allowed disabled:opacity-40"
+                    className="flex h-[28px] w-[24px] cursor-pointer items-center justify-center rounded-[20px] border border-[#140D0A] bg-[#D28A4C] text-black shadow-sm disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <Minus className="size-3.5 text-black" strokeWidth={3} />
                   </button>
-                  <span className="min-w-4 text-center font-mono text-[18px] font-medium text-[#F5F1EB]">
+                  <span className="min-w-4 text-center font-mono text-[16px] font-medium text-[#F5F1EB]">
                     {quantity}
                   </span>
                   <button
@@ -360,7 +360,7 @@ function NftDetailPage() {
                     disabled={quantity >= maxQuantity || isSoldOut}
                     onClick={() => setQuantity((q) => Math.min(maxQuantity, q + 1))}
                     aria-label="Aumentar quantidade"
-                    className="flex h-[30px] w-[24px] cursor-pointer items-center justify-center rounded-[20px] border border-[#140D0A] bg-[#D28A4C] text-black shadow-sm disabled:cursor-not-allowed disabled:opacity-40"
+                    className="flex h-[28px] w-[24px] cursor-pointer items-center justify-center rounded-[20px] border border-[#140D0A] bg-[#D28A4C] text-black shadow-sm disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <Plus className="size-3.5 text-black" strokeWidth={3} />
                   </button>
@@ -368,7 +368,7 @@ function NftDetailPage() {
               </div>
 
               {/* Price */}
-              <div className="font-mono text-[20px] font-bold text-[#E89B55]">
+              <div className="font-mono text-[18px] font-bold text-[#E89B55]">
                 {formatEth(Big(nft.priceEth).times(quantity).toString())} ETH
               </div>
             </div>
@@ -392,7 +392,7 @@ function NftDetailPage() {
                     },
                   )
                 }}
-                className="flex h-[60px] flex-1 cursor-pointer items-center justify-center rounded-[40px] font-mono text-[16px] font-bold text-[#140D0A] shadow-md transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-[52px] flex-1 cursor-pointer items-center justify-center rounded-[40px] font-mono text-[16px] font-bold text-[#140D0A] shadow-md transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                 style={{
                   background:
                     'linear-gradient(93.21deg, #D28A4C -3.96%, rgba(210, 138, 76, 0.8) 121.97%)',
@@ -412,9 +412,9 @@ function NftDetailPage() {
                   })
                 }}
                 aria-label="Adicionar ao carrinho"
-                className="flex size-[60px] shrink-0 cursor-pointer items-center justify-center rounded-[40px] border border-[#3F2319] bg-[#2F1D15] text-[#B39463] shadow-md transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex size-[52px] shrink-0 cursor-pointer items-center justify-center rounded-[40px] border border-[#3F2319] bg-[#2F1D15] text-[#B39463] shadow-md transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <ShoppingCart className="size-6" />
+                <ShoppingCart className="size-5" />
               </button>
             </div>
           </div>

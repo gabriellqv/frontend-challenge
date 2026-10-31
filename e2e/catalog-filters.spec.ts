@@ -54,3 +54,14 @@ test('mobile: trava scroll do body quando menu de filtros estiver aberto', async
   const restoredOverflow = await page.evaluate(() => document.body.style.overflow)
   expect(restoredOverflow).toBe(initialOverflow)
 })
+
+test('mobile: detalhes do NFT não possui scroll de página', async ({ page }) => {
+  await page.setViewportSize({ width: 414, height: 896 })
+  await page.goto('/nft/nft-1')
+  await expect(page.getByRole('heading', { name: /Emerald Ape/i })).toBeVisible({ timeout: 10_000 })
+
+  const isScrollable = await page.evaluate(() => {
+    return document.documentElement.scrollHeight > window.innerHeight
+  })
+  expect(isScrollable).toBe(false)
+})
