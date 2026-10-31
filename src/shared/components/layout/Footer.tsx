@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useRouterState } from '@tanstack/react-router'
 
 import { DEFAULT_NFT_LIST_QUERY } from '@/shared/contracts'
 import { cn } from '@/shared/lib/cn'
@@ -19,8 +19,23 @@ const linkClass = cn(
  * - Copyright final centralizado
  */
 export function Footer() {
+  const routerState = useRouterState()
+  const pathname = routerState.location.pathname
+  const isMobileAppScreen =
+    pathname === '/' ||
+    pathname.startsWith('/nft/') ||
+    pathname === '/carrinho' ||
+    pathname === '/pagamento' ||
+    pathname === '/login' ||
+    pathname === '/cadastro'
+
   return (
-    <footer className="mt-24 w-full bg-background text-foreground pb-6">
+    <footer
+      className={cn(
+        'mt-24 w-full bg-background pb-6 text-foreground',
+        isMobileAppScreen && 'hidden md:block',
+      )}
+    >
       <div className="mx-auto flex w-full max-w-[1200px] flex-col">
         {/* Frame 122: Medalhões (W, C, D) + Newsletter (1200px x 250px, bg: #241612, p: 32px) */}
         <div className="flex w-full max-w-[1200px] flex-col items-start bg-card p-6 sm:p-8 lg:h-[250px] lg:w-[1200px] lg:p-[32px]">

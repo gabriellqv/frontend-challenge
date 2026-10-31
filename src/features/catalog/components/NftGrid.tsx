@@ -27,7 +27,7 @@ export function NftGrid({ nfts, favoriteIds, onToggleFavorite }: NftGridProps) {
   return (
     <>
       {/* Mobile Staggered 2-Column Grid (Figma Mobile / Início) */}
-      <div className="grid w-full max-w-[366px] grid-cols-2 gap-4 sm:hidden">
+      <div className="mx-auto grid w-full max-w-[366px] grid-cols-2 gap-4 sm:hidden">
         {/* Column L (P-1, P-3, ...) */}
         <div className="flex w-full flex-col gap-6">
           {leftColumnNfts.map((nft) => (

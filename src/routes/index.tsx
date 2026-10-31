@@ -44,7 +44,7 @@ function HomePage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 px-4 pt-4 sm:px-6 md:gap-[96px] md:px-0 md:pt-0">
+    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-6 pt-10 sm:px-6 md:gap-[96px] md:px-0 md:pt-0">
       {/* Mobile Search Bar: 366px x 45px (Figma Mobile / Início) */}
       <div className="mx-auto flex w-full max-w-[366px] items-center gap-2 md:hidden">
         {/* Frame 404: Search Input */}
@@ -284,8 +284,10 @@ function HomePage() {
         </div>
       </section>
 
-      <Promos />
-      <Blog />
+      <div className="hidden md:flex md:flex-col md:gap-[96px]">
+        <Promos />
+        <Blog />
+      </div>
     </div>
   )
 }

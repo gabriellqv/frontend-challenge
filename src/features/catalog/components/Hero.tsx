@@ -18,7 +18,7 @@ export function Hero() {
       {/* Mobile Hero Banner: 366px x 190px (Figma Mobile / Início) */}
       <section
         aria-labelledby="mobile-hero-title"
-        className="relative mx-auto flex w-full max-w-[366px] flex-col justify-between overflow-hidden rounded-[30px] border border-[#D28A4C]/20 p-4 shadow-[0px_4px_24px_rgba(10,6,4,0.6)] md:hidden"
+        className="relative mx-auto flex h-[190px] w-full max-w-[366px] flex-col justify-between overflow-hidden rounded-[30px] border border-[#D28A4C]/20 p-4 shadow-[0px_4px_24px_rgba(10,6,4,0.6)] md:hidden"
         style={{
           background:
             'linear-gradient(104.74deg, rgba(210, 138, 76, 0.22) 1.08%, rgba(210, 138, 76, 0.08) 99.23%), #18100C',
@@ -73,16 +73,16 @@ export function Hero() {
             <img
               src="/images/Frame-136.png"
               alt="Emerald Ape"
-              width={128}
-              height={128}
-              className="size-[128px] rounded-[16px] border border-[#D28A4C]/30 object-cover shadow-md"
+              width={134}
+              height={134}
+              className="size-[134px] rounded-[16px] border border-[#D28A4C]/30 object-cover shadow-md"
             />
             <img
               src="/images/NFT-Artwork-18.png"
               alt="Sage Nomad"
-              width={54}
-              height={54}
-              className="absolute -bottom-1 -left-2 size-[54px] rounded-[14px] border-2 border-[#140D0A] object-cover shadow-xl"
+              width={58}
+              height={58}
+              className="absolute -bottom-1 -left-2 size-[58px] rounded-[16px] border-2 border-[#140D0A] object-cover shadow-xl"
             />
           </div>
         </div>
