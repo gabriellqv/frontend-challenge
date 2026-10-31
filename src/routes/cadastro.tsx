@@ -542,7 +542,7 @@ function RegisterPage() {
           >
             {/* 4 input fields container: 50px each, gap 12px -> 4 * 50 + 3 * 12 = 236px */}
             <div className="flex w-full flex-col gap-3">
-              {/* Username Field (Container: 358px x 50px, border 1px solid #3F2319, rounded 10px, text-center placeholder) */}
+              {/* Username Field (Container: 358px x 50px, border 1px solid #3F2319, rounded 10px) */}
               <div>
                 <label htmlFor="mobile-name" className="sr-only">
                   Nome do colecionador
@@ -554,7 +554,7 @@ function RegisterPage() {
                   autoComplete="name"
                   aria-invalid={Boolean(mobileForm.formState.errors.name)}
                   className={cn(
-                    'h-[50px] w-full rounded-[10px] border border-[#3F2319] bg-transparent px-4 text-center font-mono text-[14px] text-[#F5F1EB] placeholder:text-[#B39463] focus:border-primary focus:outline-none transition-colors',
+                    'h-[50px] w-full rounded-[10px] border border-[#3F2319] bg-transparent px-4 font-mono text-[14px] text-[#F5F1EB] placeholder:text-[#B39463] focus:border-primary focus:outline-none transition-colors',
                     mobileForm.formState.errors.name && 'border-error',
                   )}
                   {...mobileForm.register('name', {
@@ -565,7 +565,7 @@ function RegisterPage() {
                   })}
                 />
                 {mobileForm.formState.errors.name && (
-                  <p role="alert" className="mt-1 text-center font-mono text-xs text-error">
+                  <p role="alert" className="mt-1 font-mono text-xs text-error">
                     {mobileForm.formState.errors.name.message}
                   </p>
                 )}
