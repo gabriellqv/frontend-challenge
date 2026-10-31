@@ -35,7 +35,8 @@ export function MobileTabBar() {
     pathname.startsWith('/nft/') ||
     pathname === '/carrinho' ||
     pathname === '/pagamento' ||
-    pathname === '/login'
+    pathname === '/login' ||
+    pathname === '/cadastro'
   ) {
     return null
   }
