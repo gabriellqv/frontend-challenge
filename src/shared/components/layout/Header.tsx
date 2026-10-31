@@ -89,7 +89,8 @@ export function Header({ cartItemCount }: HeaderProps) {
         (pathname === '/' ||
           pathname.startsWith('/nft/') ||
           pathname === '/carrinho' ||
-          pathname === '/pagamento') &&
+          pathname === '/pagamento' ||
+          pathname === '/login') &&
           'hidden md:block',
       )}
     >
