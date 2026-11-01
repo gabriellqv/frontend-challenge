@@ -29,6 +29,22 @@ export class ApiError extends Error {
   }
 }
 
+type SessionExpiredHandler = () => void
+
+let onSessionExpired: SessionExpiredHandler | null = null
+
+/**
+ * Registra a reação da aplicação a uma sessão inválida ou expirada (401 em
+ * requisição autenticada): limpar dados privados e retomar pelo login.
+ *
+ * @param handler - Chamado uma vez por resposta 401 autenticada; `null` remove.
+ * @example
+ * setSessionExpiredHandler(() => { clearSession(); queryClient.clear() })
+ */
+export function setSessionExpiredHandler(handler: SessionExpiredHandler | null): void {
+  onSessionExpired = handler
+}
+
 /** Instância única do Axios — todo tráfego REST passa por aqui. */
 export const httpClient = axios.create({
   baseURL: API_URL,
@@ -48,6 +64,17 @@ httpClient.interceptors.response.use(
     // Cancelamento proposital (consulta obsoleta): não é falha para a interface.
     if (axios.isCancel(error)) throw error
     if (error.response) {
+      // Só a sessão atual pode expirar: um 401 atrasado de um token antigo
+      // (usuário anterior) não pode derrubar quem acabou de entrar.
+      const sentAuthorization = error.config?.headers?.Authorization
+      const currentToken = getToken()
+      if (
+        error.response.status === 401 &&
+        currentToken !== null &&
+        sentAuthorization === `Bearer ${currentToken}`
+      ) {
+        onSessionExpired?.()
+      }
       const parsed = errorEnvelopeSchema.safeParse(error.response.data)
       if (parsed.success) {
         throw new ApiError({ status: error.response.status, ...parsed.data.error })

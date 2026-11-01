@@ -39,9 +39,12 @@ export function getAuthenticatedUser(request: Request) {
   return db.users.find((u) => u.id === session.userId) ?? null
 }
 
-/** ownerKey derivado do request (usuário autenticado ou visitante). */
+/**
+ * Dono do carrinho: o usuário autenticado (pelo id, estável entre sessões) ou,
+ * sem sessão válida, o visitante identificado por `X-Cart-Id`.
+ */
 export function getOwnerKey(request: Request): string {
-  const token = getToken(request)
-  if (token) return `user:${token}`
+  const user = getAuthenticatedUser(request)
+  if (user) return `user:${user.id}`
   return `visitor:${getVisitorId(request) ?? 'anon'}`
 }

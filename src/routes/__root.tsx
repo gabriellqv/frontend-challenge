@@ -2,6 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 import { Outlet, createRootRoute, useRouterState } from '@tanstack/react-router'
 
 import { sessionQueryOptions } from '@/features/auth/api'
+import { useSessionExpiryHandler } from '@/features/auth/use-session-expiry'
+import { NotFoundPage } from '@/shared/components/NotFoundPage'
 import { Footer } from '@/shared/components/layout/Footer'
 import { Header } from '@/shared/components/layout/Header'
 import { MobileTabBar } from '@/shared/components/layout/MobileTabBar'
@@ -12,10 +14,12 @@ import { Toaster } from '@/shared/ui/sonner'
 
 export const Route = createRootRoute({
   component: Root,
+  notFoundComponent: NotFoundPage,
 })
 
 function Root() {
   const session = useQuery(sessionQueryOptions())
+  useSessionExpiryHandler()
   useRealtimeSync(session.data?.user.id ?? 'visitante')
 
   const routerState = useRouterState()

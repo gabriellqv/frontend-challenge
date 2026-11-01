@@ -14,11 +14,12 @@ import { ApiError } from '@/shared/api/http-client'
 import { DEFAULT_NFT_LIST_QUERY, type LoginRequest, loginRequestSchema } from '@/shared/contracts'
 import { cn } from '@/shared/lib/cn'
 import { formatEth } from '@/shared/lib/money'
+import { toSafeRedirect } from '@/shared/lib/redirect'
 
 export const Route = createFileRoute('/login')({
   validateSearch: (search: Record<string, unknown>): { redirect?: string } => {
-    const redirect = search.redirect
-    return typeof redirect === 'string' ? { redirect } : {}
+    const redirect = toSafeRedirect(search.redirect)
+    return redirect ? { redirect } : {}
   },
   component: LoginPage,
 })

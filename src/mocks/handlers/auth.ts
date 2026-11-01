@@ -7,8 +7,11 @@ import { errorResponse, getAuthenticatedUser, getToken, getVisitorId } from '../
 
 export const SESSION_TTL_MS = 60 * 60 * 1000 // 1h (cenários podem encurtar)
 
-/** Preserva os itens do carrinho do visitante ao autenticar (merge no login). */
-function mergeVisitorCart(request: Request, userToken: string): void {
+/**
+ * Preserva os itens do carrinho do visitante ao autenticar. O carrinho do
+ * usuário é indexado pelo id (não pelo token), então sobrevive a novos logins.
+ */
+function mergeVisitorCart(request: Request, userId: string): void {
   const visitorId = getVisitorId(request)
   if (!visitorId) return
 
@@ -17,7 +20,7 @@ function mergeVisitorCart(request: Request, userToken: string): void {
   const visitorCart = db.carts[visitorKey]
   if (!visitorCart || visitorCart.items.length === 0) return
 
-  const userKey = `user:${userToken}`
+  const userKey = `user:${userId}`
   const userCart = db.carts[userKey] ?? { items: [], version: 0 }
   for (const item of visitorCart.items) {
     const existing = userCart.items.find(
@@ -29,25 +32,6 @@ function mergeVisitorCart(request: Request, userToken: string): void {
   userCart.version += 1
   db.carts[userKey] = userCart
   delete db.carts[visitorKey]
-  persist()
-}
-
-/** Preserva os favoritos do visitante ao autenticar (merge no login). */
-function mergeVisitorFavorites(request: Request, userId: string): void {
-  const visitorId = getVisitorId(request)
-  if (!visitorId) return
-
-  const db = getDb()
-  const visitorKey = `visitor:${visitorId}`
-  const visitorFavorites = db.favorites[visitorKey]
-  if (!visitorFavorites || visitorFavorites.length === 0) return
-
-  const userFavorites = db.favorites[userId] ?? []
-  for (const nftId of visitorFavorites) {
-    if (!userFavorites.includes(nftId)) userFavorites.push(nftId)
-  }
-  db.favorites[userId] = userFavorites
-  delete db.favorites[visitorKey]
   persist()
 }
 
@@ -83,7 +67,7 @@ export const authHandlers = [
     }
     db.users.push(user)
     persist()
-    mergeVisitorFavorites(request, user.id)
+    mergeVisitorCart(request, user.id)
     return HttpResponse.json(buildSession(user), { status: 201 })
   }),
 
@@ -99,8 +83,7 @@ export const authHandlers = [
       })
     }
     const session = buildSession(user)
-    mergeVisitorCart(request, session.token)
-    mergeVisitorFavorites(request, user.id)
+    mergeVisitorCart(request, user.id)
     return HttpResponse.json(session)
   }),
 
