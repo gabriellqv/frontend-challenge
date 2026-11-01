@@ -23,6 +23,14 @@ dist-ssr
 # Artefatos locais de design
 design/
 
+# Documentação interna de planejamento (apenas os docs referenciados são publicados)
+docs/*
+!docs/12-RESPONSIVIDADE.md
+!docs/13-PERFORMANCE.md
+
+# Vercel
+.vercel/
+
 # Testes e auditoria
 coverage/
 playwright-report/
