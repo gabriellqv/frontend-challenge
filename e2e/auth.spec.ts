@@ -55,6 +55,16 @@ test('login com credenciais inválidas exibe erro', async ({ page }) => {
   ).toBeVisible()
 })
 
+test('mobile: login e cadastro podem ser fechados e voltam ao catálogo', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+
+  for (const path of ['/login', '/cadastro']) {
+    await page.goto(path)
+    await page.getByRole('button', { name: 'Fechar' }).click()
+    await expect(page).toHaveURL((url) => url.pathname === '/')
+  }
+})
+
 test('sessão expirada na área privada volta ao login e retoma o contexto', async ({ page }) => {
   await login(page)
   await page.goto('/carteiras')

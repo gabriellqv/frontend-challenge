@@ -102,7 +102,7 @@ export function Footer() {
         {/* Frame 122: Medalhões (W, C, D) + Newsletter (1200px x 250px, bg: #241612, p: 32px) */}
         <div className="flex w-full max-w-[1200px] flex-col items-start bg-card p-6 sm:p-8 lg:p-[32px] xl:h-[250px] xl:w-[1200px]">
           {/* Frame 100: 1154px x 202px */}
-          <div className="mx-auto flex w-full flex-col justify-between gap-6 lg:flex-row lg:items-start lg:gap-0 xl:h-[202px] xl:w-[1154px]">
+          <div className="mx-auto grid w-full grid-cols-1 justify-between gap-6 md:grid-cols-2 lg:flex lg:flex-row lg:items-start lg:gap-0 xl:h-[202px] xl:w-[1154px]">
             {/* Coluna W (Frame 22: 264.67px x 202px, px: 16px) */}
             <div className="flex flex-col items-start gap-[10px] lg:min-w-0 lg:flex-1 lg:px-[16px] xl:h-[202px] xl:w-[264.67px] xl:flex-none">
               <div className="flex flex-col items-start gap-[12px] xl:h-[202px] xl:w-[232.67px]">

@@ -49,8 +49,11 @@ const reviewDateFormat = new Intl.DateTimeFormat('pt-BR', {
   year: 'numeric',
 })
 
-/** Quantos relacionados mostrar (linha de 5 cards do Figma). */
+/** Quantos relacionados mostrar por página (linha de 5 cards do Figma). */
 const RELATED_COUNT = 5
+
+/** Páginas do carrossel de relacionados (3 bolinhas do Figma). */
+const RELATED_PAGES = 3
 
 function NftDetailPage() {
   const { nftId } = Route.useParams()
@@ -62,7 +65,12 @@ function NftDetailPage() {
   const reviewsQuery = useQuery(nftReviewsQueryOptions(nftId))
   const collection = nftQuery.data?.collection
   const relatedQuery = useQuery({
-    ...nftsQueryOptions({ ...DEFAULT_NFT_LIST_QUERY, collection, pageSize: RELATED_COUNT + 1 }),
+    ...nftsQueryOptions({
+      ...DEFAULT_NFT_LIST_QUERY,
+      collection,
+      // +1 porque o próprio NFT é removido da lista abaixo.
+      pageSize: RELATED_COUNT * RELATED_PAGES + 1,
+    }),
     enabled: Boolean(collection),
   })
 
@@ -70,7 +78,7 @@ function NftDetailPage() {
   const [selectedThumbnailIdx, setSelectedThumbnailIdx] = useState<number>(1)
   const [quantity, setQuantity] = useState(1)
   const [isZoomOpen, setIsZoomOpen] = useState(false)
-  const [activeDot, setActiveDot] = useState(1)
+  const [activeDot, setActiveDot] = useState(0)
   const [copiedLink, setCopiedLink] = useState(false)
 
   if (nftQuery.isLoading) {
@@ -113,9 +121,13 @@ function NftDetailPage() {
   const isFavorite = favorites.data?.items.some((item) => item.nftId === nft.id) ?? false
   const reviews = reviewsQuery.data
   const ratingAverage = reviews ? Number(reviews.average) : null
-  const related = (relatedQuery.data?.items ?? [])
-    .filter((item) => item.id !== nft.id)
-    .slice(0, RELATED_COUNT)
+  const relatedPool = (relatedQuery.data?.items ?? []).filter((item) => item.id !== nft.id)
+  const relatedPageCount = Math.max(1, Math.ceil(relatedPool.length / RELATED_COUNT))
+  const activeRelatedPage = Math.min(activeDot, relatedPageCount - 1)
+  const related = relatedPool.slice(
+    activeRelatedPage * RELATED_COUNT,
+    (activeRelatedPage + 1) * RELATED_COUNT,
+  )
 
   // 4 thumbnails of the artwork; thumbnail index 1 is active by default (matching Figma)
   const thumbnails = [mainArtworkUrl, mainArtworkUrl, mainArtworkUrl, mainArtworkUrl]
@@ -793,50 +805,31 @@ function NftDetailPage() {
           </div>
 
           {/* Carousel Dots */}
-          <div
-            className="flex items-center justify-center gap-2 pt-2"
-            aria-label="Navegação do carrossel"
-          >
-            <button
-              type="button"
-              onClick={() => setActiveDot(0)}
-              aria-label="Página anterior"
-              className="flex size-6 cursor-pointer items-center justify-center p-1"
+          {relatedPageCount > 1 && (
+            <div
+              role="group"
+              className="flex items-center justify-center gap-2 pt-2"
+              aria-label="Navegação do carrossel"
             >
-              <span
-                className={cn(
-                  'size-[12px] rounded-full transition-colors',
-                  activeDot === 0 ? 'bg-primary' : 'border-[1.3px] border-primary',
-                )}
-              />
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveDot(1)}
-              aria-label="Página atual"
-              className="flex size-6 cursor-pointer items-center justify-center p-1"
-            >
-              <span
-                className={cn(
-                  'size-[12px] rounded-full transition-colors',
-                  activeDot === 1 ? 'bg-primary' : 'border-[1.3px] border-primary',
-                )}
-              />
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveDot(2)}
-              aria-label="Próxima página"
-              className="flex size-6 cursor-pointer items-center justify-center p-1"
-            >
-              <span
-                className={cn(
-                  'size-[12px] rounded-full transition-colors',
-                  activeDot === 2 ? 'bg-primary' : 'border-[1.3px] border-primary',
-                )}
-              />
-            </button>
-          </div>
+              {Array.from({ length: relatedPageCount }, (_, page) => (
+                <button
+                  key={page}
+                  type="button"
+                  onClick={() => setActiveDot(page)}
+                  aria-label={`Ir para a página ${page + 1} de ${relatedPageCount}`}
+                  aria-current={activeRelatedPage === page ? 'true' : undefined}
+                  className="flex size-6 cursor-pointer items-center justify-center p-1"
+                >
+                  <span
+                    className={cn(
+                      'size-[12px] rounded-full transition-colors',
+                      activeRelatedPage === page ? 'bg-primary' : 'border-[1.3px] border-primary',
+                    )}
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </section>
       </div>
 

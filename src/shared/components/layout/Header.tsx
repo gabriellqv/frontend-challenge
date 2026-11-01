@@ -198,7 +198,7 @@ export function Header({ cartItemCount }: HeaderProps) {
               focusRing,
             )}
           >
-            <Search aria-hidden="true" className="size-5 text-foreground" strokeWidth={2.25} />
+            <Search aria-hidden="true" className="size-5" strokeWidth={2.25} />
           </button>
 
           <Link
@@ -209,7 +209,7 @@ export function Header({ cartItemCount }: HeaderProps) {
               focusRing,
             )}
           >
-            <ShoppingCart aria-hidden="true" className="size-6 text-foreground" strokeWidth={2} />
+            <ShoppingCart aria-hidden="true" className="size-6" strokeWidth={2} />
             {totalCartCount > 0 && (
               <span
                 aria-hidden="true"

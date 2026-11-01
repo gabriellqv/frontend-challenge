@@ -11,14 +11,22 @@ export const profileSchema = z.object({
 export type Profile = z.infer<typeof profileSchema>
 
 export const updateProfileRequestSchema = z.object({
-  name: z.string().min(2),
+  name: z
+    .string({ error: 'Nome é obrigatório' })
+    .min(1, 'Nome é obrigatório')
+    .min(2, 'Nome deve ter no mínimo 2 caracteres'),
   avatarUrl: z.string().nullable().optional(),
 })
 export type UpdateProfileRequest = z.infer<typeof updateProfileRequestSchema>
 
 export const changePasswordRequestSchema = z.object({
-  currentPassword: z.string().min(1),
-  newPassword: z.string().min(6),
+  currentPassword: z
+    .string({ error: 'Senha atual é obrigatória' })
+    .min(1, 'Senha atual é obrigatória'),
+  newPassword: z
+    .string({ error: 'Nova senha é obrigatória' })
+    .min(1, 'Nova senha é obrigatória')
+    .min(6, 'Nova senha deve ter no mínimo 6 caracteres'),
 })
 export type ChangePasswordRequest = z.infer<typeof changePasswordRequestSchema>
 
@@ -48,8 +56,12 @@ export const walletAddressSchema = z
 
 export const createWalletRequestSchema = z.object({
   address: walletAddressSchema,
-  network: z.string().min(1),
-  label: z.string().trim().min(2).nullable(),
+  network: z.string({ error: 'Rede é obrigatória' }).min(1, 'Rede é obrigatória'),
+  label: z
+    .string({ error: 'Informe um apelido para a carteira' })
+    .trim()
+    .min(2, 'Apelido deve ter no mínimo 2 caracteres')
+    .nullable(),
   provider: walletProviderSchema,
   ensName: z.string().nullable(),
   referralCode: z.string().nullable(),

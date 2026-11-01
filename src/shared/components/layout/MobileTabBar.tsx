@@ -104,10 +104,7 @@ export function MobileTabBar() {
             aria-label="Início"
           >
             <Home
-              className={cn(
-                'size-6 transition-colors',
-                isHome ? 'fill-[#E89B55] text-[#E89B55]' : 'text-[#CFB28C]',
-              )}
+              className={cn('size-6 transition-colors', isHome && 'fill-current')}
               strokeWidth={isHome ? 2.5 : 2}
             />
           </Link>
@@ -123,7 +120,7 @@ export function MobileTabBar() {
             className="flex size-11 cursor-pointer items-center justify-center text-[#CFB28C] transition-colors hover:text-[#E89B55]"
             aria-label="Favoritos"
           >
-            <Heart className="size-6 fill-[#CFB28C] text-[#CFB28C]" strokeWidth={2} />
+            <Heart className="size-6 fill-current" strokeWidth={2} />
           </button>
 
           {/* Spacer for center button */}
@@ -138,7 +135,7 @@ export function MobileTabBar() {
             )}
             aria-label={`Carrinho com ${totalCartCount} itens`}
           >
-            <ShoppingCart className="size-6 text-[#CFB28C]" strokeWidth={isCart ? 2.5 : 2} />
+            <ShoppingCart className="size-6" strokeWidth={isCart ? 2.5 : 2} />
             {totalCartCount > 0 && (
               <span
                 aria-hidden="true"
@@ -158,7 +155,7 @@ export function MobileTabBar() {
             )}
             aria-label={user ? 'Meu Perfil' : 'Entrar na conta'}
           >
-            <User className="size-6 fill-[#CFB28C] text-[#CFB28C]" strokeWidth={2} />
+            <User className="size-6 fill-current" strokeWidth={2} />
           </Link>
         </div>
       </div>

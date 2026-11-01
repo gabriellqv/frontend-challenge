@@ -406,7 +406,17 @@ function LoginPage() {
       </div>
 
       {/* Mobile / Login (Figma: width 414px, height 896px, padding: 80px 28px 24px, gap: 40px) */}
-      <div className="flex min-h-screen w-full flex-col items-center bg-[#140D0A] px-[28px] pt-[80px] pb-[24px] md:hidden">
+      <div className="relative flex min-h-screen w-full flex-col items-center bg-[#140D0A] px-[28px] pt-[80px] pb-[24px] md:hidden">
+        {/* Fechar: volta para o catálogo (o mobile não tem o modal do desktop). */}
+        <button
+          type="button"
+          onClick={handleClose}
+          aria-label="Fechar"
+          className="absolute top-5 right-5 z-10 flex size-10 cursor-pointer items-center justify-center rounded-full border border-[#3F2319] bg-[#2F1D15] text-[#CFB28C] transition-colors hover:border-[#D28A4C] hover:text-[#E89B55] active:scale-95"
+        >
+          <X className="size-5" strokeWidth={2} />
+        </button>
+
         <div className="flex w-full max-w-[358px] flex-col items-center gap-[40px]">
           {/* Logo (Frame: 358px x 136px) */}
           <div className="flex h-[136px] w-full items-center justify-center">
