@@ -208,6 +208,10 @@ Desvios conscientes:
 - **Carteiras**: nome, nome do perfil e e-mail vêm do perfil (somente leitura).
 - **Código de indicação** obrigatório no checkout e nas carteiras, como no
   asterisco do layout.
+- **Perfil**: conteúdo e validações completos, mas a composição usa dois cards
+  com campos empilhados em vez do formulário em duas colunas do frame.
+- **Busca na sidebar**: a home desktop tem um campo de busca na coluna de
+  filtros que não aparece no frame original.
 - Seções fora do escopo (atividade, ofertas, suporte, editoriais) aparecem como
   no layout, mas marcadas "em breve", sem aparentar ação.
 - Artes em WebP (mesmas dimensões dos PNGs do Figma, ~94% menores).
@@ -229,6 +233,16 @@ Desvios conscientes:
 - O banco do mock não sincroniza duas abas em tempo real: a compra concorrente
   é bloqueada pelo servidor, mas a sessão da outra aba só é atualizada no
   próximo refetch/foco.
+- A suíte mobile principal usa Pixel 7 (412 px). 390 px é coberto pelos testes
+  de acessibilidade/reflow, não por todos os fluxos; a regressão visual tem
+  baselines desktop, sem baseline mobile.
+- O cenário de latência ainda usa uma espera fixa de 2 s. Os demais cenários
+  usam esperas por condição; não há `page.clock`.
+- O deploy é validado por smoke, mas a igualdade exata entre o bundle publicado
+  e o build local não é comprovada por hash.
+- O hash de senha do mock é propositalmente simples (DJB2 com sal). Ele evita
+  senha em claro, mas não é criptográfico; o modelo não deve ser usado em
+  produção.
 
 ## 11. Testes
 

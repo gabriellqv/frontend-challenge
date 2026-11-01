@@ -1,5 +1,12 @@
 # Decisões do projeto
 
+## Estado final
+
+Entrega no commit `1278752`, publicada em
+<https://frontend-challenge-beta.vercel.app>. O resumo executivo, o ranking
+comparativo e as lacunas conhecidas estão em
+[`docs/14-AUDITORIA-COMPARATIVA.md`](./docs/14-AUDITORIA-COMPARATIVA.md).
+
 ## Tema e produto
 
 **Kurio**, um marketplace de NFTs (arte digital) sobre o enunciado da Jungle

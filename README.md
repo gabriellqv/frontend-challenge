@@ -170,6 +170,9 @@ medições em `docs/13-PERFORMANCE.md`.
 
 - Contratos REST, eventos e decisões de arquitetura: [`ARCHITECTURE.md`](./ARCHITECTURE.md)
 - Justificativas, trade-offs e uso de IA: [`DECISOES.md`](./DECISOES.md)
+- Auditoria comparativa, ranking e lacunas conhecidas: [`docs/14-AUDITORIA-COMPARATIVA.md`](./docs/14-AUDITORIA-COMPARATIVA.md)
+- Responsividade: [`docs/12-RESPONSIVIDADE.md`](./docs/12-RESPONSIVIDADE.md)
+- Performance: [`docs/13-PERFORMANCE.md`](./docs/13-PERFORMANCE.md)
 
 ## Deploy
 

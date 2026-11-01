@@ -27,6 +27,7 @@ design/
 docs/*
 !docs/12-RESPONSIVIDADE.md
 !docs/13-PERFORMANCE.md
+!docs/14-AUDITORIA-COMPARATIVA.md
 
 # Vercel
 .vercel/

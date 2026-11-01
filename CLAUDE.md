@@ -54,8 +54,8 @@ Playwright · Lighthouse. Extra: zod, react-hook-form, big.js, sonner,
 
 ## Como trabalhar
 
-1. Consulte `docs/03-PLANO-IMPLEMENTACAO.md` para a fase atual e siga o roadmap.
-2. Consulte `docs/07-DESIGN-SYSTEM.md` para fidelidade visual.
+1. Consulte `ARCHITECTURE.md` para contratos, cache, sessão e limitações.
+2. Consulte `DECISOES.md` para trade-offs e `docs/14-AUDITORIA-COMPARATIVA.md` para o estado final e lacunas conhecidas.
 3. Rode `npm run typecheck` e `npm run lint` antes de considerar algo pronto.
 4. Registre decisões em `docs/` e, ao final, em `DECISOES.md`.
 
