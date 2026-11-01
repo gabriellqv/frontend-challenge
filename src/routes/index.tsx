@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 
 import { Search, SlidersHorizontal, X } from 'lucide-react'
@@ -14,7 +14,8 @@ import { Pagination } from '@/features/catalog/components/Pagination'
 import { Promos } from '@/features/catalog/components/Promos'
 import { SearchInput } from '@/features/catalog/components/SearchInput'
 import { SortSelect } from '@/features/catalog/components/SortSelect'
-import { favoritesQueryOptions, useToggleFavorite } from '@/features/favorites/api'
+import { favoritesQueryOptions } from '@/features/favorites/api'
+import { useFavoriteToggle } from '@/features/favorites/use-favorite-toggle'
 import { CatalogSkeleton } from '@/shared/components/skeletons/CatalogSkeleton'
 import { DEFAULT_NFT_LIST_QUERY, type NftListQuery, nftListQuerySchema } from '@/shared/contracts'
 import { cn } from '@/shared/lib/cn'
@@ -42,9 +43,11 @@ function HomePage() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isMobileFiltersOpen])
 
-  const catalog = useQuery(nftsQueryOptions(search))
+  // Ao trocar filtros, o resultado anterior fica visível enquanto o novo carrega.
+  const catalog = useQuery({ ...nftsQueryOptions(search), placeholderData: keepPreviousData })
+  const facets = catalog.data?.facets
   const favorites = useQuery(favoritesQueryOptions())
-  const toggleFavorite = useToggleFavorite()
+  const { toggleFavorite } = useFavoriteToggle()
 
   const favoriteIds = new Set(favorites.data?.items.map((item) => item.nftId) ?? [])
 
@@ -53,7 +56,7 @@ function HomePage() {
   }
 
   function handleToggleFavorite(nftId: string, favorite: boolean) {
-    toggleFavorite.mutate({ nftId, favorite })
+    toggleFavorite(nftId, favorite)
   }
 
   return (
@@ -151,6 +154,7 @@ function HomePage() {
             </div>
             <div className="py-4">
               <FilterSidebar
+                facets={facets}
                 hideBanner
                 namePrefix="mobile"
                 value={{
@@ -190,6 +194,7 @@ function HomePage() {
           {/* Desktop Filter Sidebar */}
           <div className="hidden lg:block">
             <FilterSidebar
+              facets={facets}
               namePrefix="desktop"
               value={{
                 collection: search.collection,
@@ -251,6 +256,9 @@ function HomePage() {
                 </div>
               </div>
 
+              <p role="status" className="sr-only">
+                {catalog.isPlaceholderData ? 'Atualizando resultados…' : ''}
+              </p>
               {catalog.isLoading ? (
                 <CatalogSkeleton />
               ) : catalog.isError ? (
@@ -267,30 +275,17 @@ function HomePage() {
                   <div className="mt-4 flex flex-wrap gap-3">
                     <button
                       type="button"
-                      onClick={() => {
-                        if (typeof window !== 'undefined' && window.__kurio) {
-                          window.__kurio.applyScenario('default')
-                        }
-                        updateSearch({ page: 1 })
-                        void catalog.refetch()
-                      }}
+                      onClick={() => void catalog.refetch()}
                       className="cursor-pointer rounded-[5px] bg-primary px-4 py-2 font-mono text-sm font-bold text-ink transition-colors hover:bg-highlight"
                     >
                       Tentar novamente
                     </button>
                     <button
                       type="button"
-                      onClick={() => {
-                        if (typeof window !== 'undefined' && window.__kurio) {
-                          window.__kurio.reset()
-                          window.__kurio.applyScenario('default')
-                        }
-                        navigate({ to: '/', search: DEFAULT_NFT_LIST_QUERY })
-                        void catalog.refetch()
-                      }}
+                      onClick={() => navigate({ to: '/', search: DEFAULT_NFT_LIST_QUERY })}
                       className="cursor-pointer rounded-[5px] border border-primary px-4 py-2 font-mono text-sm font-medium text-highlight transition-colors hover:bg-primary/10"
                     >
-                      Restaurar catálogo completo
+                      Limpar busca e filtros
                     </button>
                   </div>
                 </div>
@@ -302,11 +297,19 @@ function HomePage() {
                   Nenhum NFT encontrado com esses filtros.
                 </div>
               ) : catalog.data ? (
-                <NftGrid
-                  nfts={catalog.data.items}
-                  favoriteIds={favoriteIds}
-                  onToggleFavorite={handleToggleFavorite}
-                />
+                <div
+                  aria-busy={catalog.isPlaceholderData}
+                  className={cn(
+                    'w-full transition-opacity',
+                    catalog.isPlaceholderData && 'opacity-60',
+                  )}
+                >
+                  <NftGrid
+                    nfts={catalog.data.items}
+                    favoriteIds={favoriteIds}
+                    onToggleFavorite={handleToggleFavorite}
+                  />
+                </div>
               ) : null}
             </div>
 

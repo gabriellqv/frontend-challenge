@@ -96,7 +96,11 @@ function load(): Db {
             changed = true
           }
         }
-        if (changed || raw !== stored) {
+        // Catálogo salvo antes de atributos/edições por faixa: o seed atual o
+        // substitui (ids de NFT e da edição principal se mantêm).
+        const isCatalogOutdated = parsed.nfts.some((nft) => !Array.isArray(nft.attributes))
+        if (isCatalogOutdated) parsed.nfts = createNfts()
+        if (changed || raw !== stored || isCatalogOutdated) {
           persistRaw(parsed)
         }
         return parsed

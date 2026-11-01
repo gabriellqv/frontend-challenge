@@ -33,6 +33,10 @@ export const nftSchema = z.object({
   imageUrl: z.string(),
   creator: creatorSchema,
   editions: z.array(editionSchema),
+  /** Características da obra exibidas no detalhe. */
+  attributes: z.array(z.string()),
+  /** Contrato (simulado) onde o token foi cunhado. */
+  contractAddress: z.string(),
   /** Versão crescente, usada para ordenar eventos em tempo real. */
   version: z.number().int().min(0),
 })
@@ -54,11 +58,38 @@ export const nftListQuerySchema = z.object({
 })
 export type NftListQuery = z.infer<typeof nftListQuerySchema>
 
+const facetCountSchema = z.object({ value: z.string(), count: z.number().int().min(0) })
+
+/** Contagens por coleção e rede, considerando os demais filtros ativos. */
+export const nftFacetsSchema = z.object({
+  collections: z.array(facetCountSchema),
+  networks: z.array(facetCountSchema.extend({ value: networkSchema })),
+})
+export type NftFacets = z.infer<typeof nftFacetsSchema>
+
 export const nftPageSchema = z.object({
   items: z.array(nftSchema),
   pagination: paginationSchema,
+  facets: nftFacetsSchema,
 })
 export type NftPage = z.infer<typeof nftPageSchema>
 
 /** Parâmetros padrão da listagem (usados em links para "/"). */
 export const DEFAULT_NFT_LIST_QUERY: NftListQuery = nftListQuerySchema.parse({})
+
+export const reviewSchema = z.object({
+  id: idSchema,
+  author: z.string(),
+  rating: z.number().int().min(1).max(5),
+  createdAt: z.string().datetime(),
+  comment: z.string(),
+})
+export type Review = z.infer<typeof reviewSchema>
+
+/** Avaliações de um NFT: resumo agregado e as mais recentes. */
+export const nftReviewsSchema = z.object({
+  average: z.string().regex(/^\d(\.\d)?$/),
+  count: z.number().int().min(0),
+  items: z.array(reviewSchema),
+})
+export type NftReviews = z.infer<typeof nftReviewsSchema>

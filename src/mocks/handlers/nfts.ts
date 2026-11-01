@@ -1,10 +1,39 @@
 import { HttpResponse, http } from 'msw'
 
-import { nftListQuerySchema } from '@/shared/contracts'
+import {
+  type Nft,
+  type NftFacets,
+  type NftListQuery,
+  networkSchema,
+  nftListQuerySchema,
+} from '@/shared/contracts'
+import { compare } from '@/shared/lib/money'
 
 import { getDb } from '../db'
+import { COLLECTIONS, reviewsFor } from '../fixtures'
 import { simulateNetwork } from '../scenarios'
 import { errorResponse } from '../utils'
+
+/**
+ * Aplica busca e filtros da listagem a um NFT.
+ *
+ * @param ignore - Filtro a desconsiderar (cálculo da faceta correspondente).
+ */
+function matchesQuery(nft: Nft, query: NftListQuery, ignore?: 'collection' | 'network'): boolean {
+  if (query.q) {
+    const q = query.q.toLowerCase()
+    if (!nft.name.toLowerCase().includes(q) && !nft.collection.toLowerCase().includes(q)) {
+      return false
+    }
+  }
+  if (ignore !== 'collection' && query.collection && nft.collection !== query.collection) {
+    return false
+  }
+  if (ignore !== 'network' && query.network && nft.network !== query.network) return false
+  if (query.priceMin && compare(nft.priceEth, query.priceMin) < 0) return false
+  if (query.priceMax && compare(nft.priceEth, query.priceMax) > 0) return false
+  return true
+}
 
 export const nftHandlers = [
   http.get('/api/nfts', async ({ request }) => {
@@ -45,41 +74,37 @@ export const nftHandlers = [
           pageSize: 9,
         }
 
-    let items = getDb().nfts.slice()
+    const catalog = getDb().nfts
+    let items = catalog.filter((nft) => matchesQuery(nft, query))
 
-    if (query.q) {
-      const q = query.q.toLowerCase()
-      items = items.filter(
-        (n) => n.name.toLowerCase().includes(q) || n.collection.toLowerCase().includes(q),
-      )
-    }
-    if (query.collection) {
-      const c = query.collection.toLowerCase()
-      items = items.filter(
-        (n) =>
-          n.collection.toLowerCase() === c ||
-          (c === 'arte digital' && n.collection === 'Kurio Apes') ||
-          (c === 'fotografia' && n.collection === 'Genesis Drops') ||
-          (c === 'música' && n.collection === 'Kurio Editions') ||
-          (c === 'musica' && n.collection === 'Kurio Editions') ||
-          (c === 'arte 3d' && n.collection === 'Curated Art'),
-      )
-    }
-    if (query.network) items = items.filter((n) => n.network === query.network)
-    if (query.priceMin) items = items.filter((n) => Number(n.priceEth) >= Number(query.priceMin))
-    if (query.priceMax) items = items.filter((n) => Number(n.priceEth) <= Number(query.priceMax))
-
-    if (query.sort === 'price_asc') items.sort((a, b) => Number(a.priceEth) - Number(b.priceEth))
-    if (query.sort === 'price_desc') items.sort((a, b) => Number(b.priceEth) - Number(a.priceEth))
+    if (query.sort === 'price_asc') items.sort((a, b) => compare(a.priceEth, b.priceEth))
+    if (query.sort === 'price_desc') items.sort((a, b) => compare(b.priceEth, a.priceEth))
+    if (query.sort === 'newest') items = [...items].reverse()
 
     const total = items.length
     const totalPages = Math.max(1, Math.ceil(total / query.pageSize))
     const start = (query.page - 1) * query.pageSize
     const pageItems = items.slice(start, start + query.pageSize)
 
+    // Facetas: cada contagem considera os demais filtros ativos, não o próprio.
+    const facets: NftFacets = {
+      collections: COLLECTIONS.map((value) => ({
+        value,
+        count: catalog.filter(
+          (nft) => nft.collection === value && matchesQuery(nft, query, 'collection'),
+        ).length,
+      })),
+      networks: networkSchema.options.map((value) => ({
+        value,
+        count: catalog.filter((nft) => nft.network === value && matchesQuery(nft, query, 'network'))
+          .length,
+      })),
+    }
+
     return HttpResponse.json({
       items: pageItems,
       pagination: { page: query.page, pageSize: query.pageSize, total, totalPages },
+      facets,
     })
   }),
 
@@ -89,5 +114,15 @@ export const nftHandlers = [
     const nft = getDb().nfts.find((n) => n.id === params.id)
     if (!nft) return errorResponse('NOT_FOUND', 'NFT não encontrado', 404)
     return HttpResponse.json(nft)
+  }),
+
+  http.get('/api/nfts/:id/reviews', async ({ params }) => {
+    const failure = await simulateNetwork()
+    if (failure) return failure
+    const nftId = String(params.id)
+    if (!getDb().nfts.some((n) => n.id === nftId)) {
+      return errorResponse('NOT_FOUND', 'NFT não encontrado', 404)
+    }
+    return HttpResponse.json(reviewsFor(nftId))
   }),
 ]

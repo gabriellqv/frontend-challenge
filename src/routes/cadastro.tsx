@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+import { useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
 
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -8,10 +9,12 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { useRegister } from '@/features/auth/api'
+import { nftsQueryOptions } from '@/features/catalog/api'
 import { Hero } from '@/features/catalog/components/Hero'
 import { ApiError } from '@/shared/api/http-client'
 import { DEFAULT_NFT_LIST_QUERY, registerRequestSchema } from '@/shared/contracts'
 import { cn } from '@/shared/lib/cn'
+import { formatEth } from '@/shared/lib/money'
 
 export const Route = createFileRoute('/cadastro')({
   component: RegisterPage,
@@ -40,6 +43,8 @@ const signUpSchema = registerRequestSchema
 type SignUpFormValues = z.infer<typeof signUpSchema>
 
 function RegisterPage() {
+  // Fundo do modal: prévia do catálogo real (decorativa, atrás do diálogo).
+  const preview = useQuery(nftsQueryOptions({ ...DEFAULT_NFT_LIST_QUERY, pageSize: 3 }))
   const navigate = Route.useNavigate()
   const registerMutation = useRegister()
   const [showPassword, setShowPassword] = useState(false)
@@ -150,44 +155,31 @@ function RegisterPage() {
               <div className="w-[310px] shrink-0 rounded-[8px] bg-card p-5">
                 <h3 className="font-mono text-[18px] font-bold text-foreground">Coleções</h3>
                 <div className="mt-4 flex flex-col gap-3 font-mono text-sm text-text-secondary">
-                  <div className="flex justify-between text-highlight">
-                    <span>Arte digital</span>
-                    <span>(33)</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Fotografia</span>
-                    <span>(12)</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Música</span>
-                    <span>(65)</span>
-                  </div>
+                  {preview.data?.facets.collections.slice(0, 3).map((facet, index) => (
+                    <div
+                      key={facet.value}
+                      className={cn('flex justify-between', index === 0 && 'text-highlight')}
+                    >
+                      <span>{facet.value}</span>
+                      <span>({facet.count})</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
               {/* Products preview */}
               <div className="grid flex-1 grid-cols-3 gap-6">
-                {[
-                  { title: 'Emerald Ape #042', price: '1.19 ETH', image: '/images/Frame-136.webp' },
-                  {
-                    title: 'Sage Nomad #009',
-                    price: '1.69 ETH',
-                    image: '/images/NFT-Artwork-09.webp',
-                  },
-                  {
-                    title: 'Neon Vessel #552',
-                    price: '1.99 ETH',
-                    image: '/images/NFT-Artwork-05.webp',
-                  },
-                ].map((item) => (
-                  <div key={item.title} className="rounded-[8px] bg-card p-3">
+                {preview.data?.items.map((item) => (
+                  <div key={item.id} className="rounded-[8px] bg-card p-3">
                     <img
-                      src={item.image}
+                      src={item.imageUrl}
                       alt=""
                       className="h-48 w-full rounded-[6px] object-cover"
                     />
-                    <p className="mt-3 font-mono text-sm text-foreground">{item.title}</p>
-                    <p className="font-mono text-sm font-bold text-highlight">{item.price}</p>
+                    <p className="mt-3 font-mono text-sm text-foreground">{item.name}</p>
+                    <p className="font-mono text-sm font-bold text-highlight">
+                      {formatEth(item.priceEth)} ETH
+                    </p>
                   </div>
                 ))}
               </div>

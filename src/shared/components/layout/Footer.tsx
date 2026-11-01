@@ -17,6 +17,13 @@ const linkClass = cn(
   focusRing,
 )
 
+/** Atalhos de coleção no rodapé (Figma): levam ao catálogo já filtrado. */
+/** Seções fora do escopo: visíveis como no Figma, mas sem aparentar ação. */
+const comingSoonClass =
+  'cursor-default font-mono text-[14px] leading-[30px] font-normal text-foreground/60'
+
+const FOOTER_COLLECTIONS = ['Arte digital', 'Fotografia', 'Música', 'Arte 3D', 'Utilidade'] as const
+
 /**
  * Rodapé global completo do Kurio, conforme o Figma:
  * - Bloco superior: 3 medalhões (W, C, D) com divisórias verticais + Newsletter
@@ -315,18 +322,21 @@ export function Footer() {
                       </Link>
                     </li>
                     <li className="h-[30px]">
-                      <span className={cn(linkClass, 'cursor-pointer hover:text-primary')}>
+                      <span className={comingSoonClass} title="Em breve">
                         Atividade
+                        <span className="sr-only"> (em breve)</span>
                       </span>
                     </li>
                     <li className="h-[30px]">
-                      <span className={cn(linkClass, 'cursor-pointer hover:text-primary')}>
+                      <span className={comingSoonClass} title="Em breve">
                         Estúdio do criador
+                        <span className="sr-only"> (em breve)</span>
                       </span>
                     </li>
                     <li className="h-[30px]">
-                      <span className={cn(linkClass, 'cursor-pointer hover:text-primary')}>
+                      <span className={comingSoonClass} title="Em breve">
                         Lista de interesse
+                        <span className="sr-only"> (em breve)</span>
                       </span>
                     </li>
                   </ul>
@@ -339,13 +349,15 @@ export function Footer() {
                   </h4>
                   <ul className="flex h-[150px] flex-col">
                     <li className="h-[30px]">
-                      <span className={cn(linkClass, 'cursor-pointer hover:text-primary')}>
+                      <span className={comingSoonClass} title="Em breve">
                         Central de ajuda
+                        <span className="sr-only"> (em breve)</span>
                       </span>
                     </li>
                     <li className="h-[30px]">
-                      <span className={cn(linkClass, 'cursor-pointer hover:text-primary')}>
+                      <span className={comingSoonClass} title="Em breve">
                         Como comprar NFTs
+                        <span className="sr-only"> (em breve)</span>
                       </span>
                     </li>
                     <li className="h-[30px]">
@@ -354,13 +366,15 @@ export function Footer() {
                       </Link>
                     </li>
                     <li className="h-[30px]">
-                      <span className={cn(linkClass, 'cursor-pointer hover:text-primary')}>
+                      <span className={comingSoonClass} title="Em breve">
                         Política do mercado
+                        <span className="sr-only"> (em breve)</span>
                       </span>
                     </li>
                     <li className="h-[30px]">
-                      <span className={cn(linkClass, 'cursor-pointer hover:text-primary')}>
+                      <span className={comingSoonClass} title="Em breve">
                         Denunciar item
+                        <span className="sr-only"> (em breve)</span>
                       </span>
                     </li>
                   </ul>
@@ -372,35 +386,17 @@ export function Footer() {
                     Coleções
                   </h4>
                   <ul className="flex h-[150px] flex-col">
-                    <li className="h-[30px]">
-                      <Link
-                        to="/"
-                        search={{ ...DEFAULT_NFT_LIST_QUERY, collection: 'Curated Art' }}
-                        className={linkClass}
-                      >
-                        Arte digital
-                      </Link>
-                    </li>
-                    <li className="h-[30px]">
-                      <span className={cn(linkClass, 'cursor-pointer hover:text-primary')}>
-                        Fotografia
-                      </span>
-                    </li>
-                    <li className="h-[30px]">
-                      <span className={cn(linkClass, 'cursor-pointer hover:text-primary')}>
-                        Música
-                      </span>
-                    </li>
-                    <li className="h-[30px]">
-                      <span className={cn(linkClass, 'cursor-pointer hover:text-primary')}>
-                        Arte 3D
-                      </span>
-                    </li>
-                    <li className="h-[30px]">
-                      <span className={cn(linkClass, 'cursor-pointer hover:text-primary')}>
-                        Utilidade
-                      </span>
-                    </li>
+                    {FOOTER_COLLECTIONS.map((collection) => (
+                      <li key={collection} className="h-[30px]">
+                        <Link
+                          to="/"
+                          search={{ ...DEFAULT_NFT_LIST_QUERY, collection }}
+                          className={linkClass}
+                        >
+                          {collection}
+                        </Link>
+                      </li>
+                    ))}
                   </ul>
                 </div>
 

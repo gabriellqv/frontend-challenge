@@ -9,6 +9,7 @@ export const queryKeys = {
     all: ['nfts'] as const,
     list: (query: NftListQuery) => ['nfts', 'list', query] as const,
     detail: (id: string) => ['nfts', 'detail', id] as const,
+    reviews: (id: string) => ['nfts', 'reviews', id] as const,
   },
   favorites: {
     all: (ownerKey: string) => ['favorites', ownerKey] as const,

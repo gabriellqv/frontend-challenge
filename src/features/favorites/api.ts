@@ -1,11 +1,12 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { getJson, httpClient } from '@/shared/api/http-client'
 import { queryKeys } from '@/shared/api/query-keys'
 import { favoriteSchema } from '@/shared/contracts'
-import { getOwnerKey } from '@/shared/session'
+import { getOwnerKey, getToken } from '@/shared/session'
 
 export const favoritesResponseSchema = z.object({ items: z.array(favoriteSchema) })
 export type FavoritesResponse = z.infer<typeof favoritesResponseSchema>
@@ -20,6 +21,7 @@ export function favoritesQueryOptions() {
   return queryOptions({
     queryKey: queryKeys.favorites.all(getOwnerKey()),
     queryFn: () => getJson(favoritesResponseSchema, '/favorites'),
+    enabled: Boolean(getToken()),
   })
 }
 
@@ -55,8 +57,13 @@ export function useToggleFavorite() {
 
       return { previous }
     },
-    onError: (_error, _variables, context) => {
+    onError: (_error, { favorite }, context) => {
       if (context?.previous) queryClient.setQueryData(queryKey, context.previous)
+      toast.error(
+        favorite
+          ? 'Não foi possível adicionar aos favoritos. Tente novamente.'
+          : 'Não foi possível remover dos favoritos. Tente novamente.',
+      )
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey }),
   })

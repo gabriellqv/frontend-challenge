@@ -45,6 +45,8 @@ httpClient.interceptors.request.use((config) => {
 httpClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
+    // Cancelamento proposital (consulta obsoleta): não é falha para a interface.
+    if (axios.isCancel(error)) throw error
     if (error.response) {
       const parsed = errorEnvelopeSchema.safeParse(error.response.data)
       if (parsed.success) {

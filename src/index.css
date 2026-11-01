@@ -18,6 +18,8 @@
   --color-surface-card: #241612;
   --color-surface-dark: #38220f;
   --color-surface-raised: #2f1d15;
+  /* Borda de campos e divisórias das telas (recorrente no Figma). */
+  --color-field: #3f2319;
   --color-amber: #e3a44e;
   --color-gray-light: #ededed;
   --color-success: #00a66c;

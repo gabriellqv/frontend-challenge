@@ -1,37 +1,15 @@
 import { useCallback, useRef, useState } from 'react'
 
-import type { Network } from '@/shared/contracts'
+import type { Network, NftFacets } from '@/shared/contracts'
 import { cn } from '@/shared/lib/cn'
+
+import { FacetListPlaceholder } from './FacetListPlaceholder'
 
 const focusRing =
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
 
 const MIN_LIMIT = 0
 const MAX_LIMIT = 20
-
-/**
- * Coleções oficiais extraídas da especificação do Figma (`Sidebar > Filters > Collections Filter`).
- */
-export const FIGMA_COLLECTIONS = [
-  { name: 'Arte digital', count: 33, value: 'Kurio Apes' },
-  { name: 'Fotografia', count: 12, value: 'Genesis Drops' },
-  { name: 'Música', count: 65, value: 'Kurio Editions' },
-  { name: 'Arte 3D', count: 39, value: 'Curated Art' },
-  { name: 'Colecionáveis', count: 23, value: 'Colecionáveis' },
-  { name: 'Generativa', count: 17, value: 'Generativa' },
-  { name: 'Jogos', count: 19, value: 'Jogos' },
-  { name: 'Assinaturas', count: 13, value: 'Assinaturas' },
-  { name: 'Utilidade', count: 18, value: 'Utilidade' },
-] as const
-
-/**
- * Redes oficiais extraídas da especificação do Figma (`Sidebar > Filters > Network Filter`).
- */
-export const FIGMA_NETWORKS = [
-  { name: 'Ethereum', count: 119, value: 'Ethereum' as const },
-  { name: 'Polygon', count: 78, value: 'Polygon' as const },
-  { name: 'Solana', count: 86, value: 'Solana' as const },
-] as const
 
 /**
  * Valores dos filtros do catálogo.
@@ -49,10 +27,11 @@ export interface FilterValues {
 
 /** Props de {@link FilterSidebar}. */
 export interface FilterSidebarProps {
-  /** Coleções disponíveis para filtro (opcional, defaults para a lista do Figma). */
-  collections?: readonly string[]
-  /** Redes disponíveis para filtro (opcional, defaults para as redes do Figma). */
-  networks?: readonly Network[]
+  /**
+   * Coleções e redes com as contagens da API (facetas). Ausente enquanto a
+   * primeira consulta carrega.
+   */
+  facets: NftFacets | undefined
   /** Filtros ativos. */
   value: FilterValues
   /** Aplica um subconjunto de filtros; a página deve voltar para 1. */
@@ -73,6 +52,7 @@ export interface FilterSidebarProps {
  * @returns Coluna lateral completa de 310px.
  */
 export function FilterSidebar({
+  facets,
   value,
   onChange,
   hideBanner = false,
@@ -243,11 +223,12 @@ export function FilterSidebar({
 
             {/* List: 270px x 360px, padding: 0 12px */}
             <div className="flex flex-col px-3">
-              {FIGMA_COLLECTIONS.map((item) => {
-                const isSelected = value.collection === item.value || value.collection === item.name
+              {!facets && <FacetListPlaceholder rows={9} />}
+              {facets?.collections.map((item) => {
+                const isSelected = value.collection === item.value
                 return (
                   <label
-                    key={item.name}
+                    key={item.value}
                     className={cn(
                       'group relative flex h-[40px] w-full cursor-pointer items-center justify-between font-mono text-[15px] leading-[40px] transition-colors duration-150',
                       isSelected ? 'text-highlight' : 'text-text-secondary hover:text-highlight',
@@ -257,13 +238,12 @@ export function FilterSidebar({
                       type="radio"
                       name={namePrefix ? `${namePrefix}-collection` : 'collection'}
                       value={item.value}
-                      aria-label={item.value === 'Kurio Apes' ? 'Kurio Apes' : item.name}
                       checked={isSelected}
                       onChange={() => handleCollectionClick(item.value)}
                       className="absolute inset-0 z-10 cursor-pointer opacity-0"
                     />
                     <span className="pointer-events-none transition-colors duration-150">
-                      {item.name}
+                      {item.value}
                     </span>
                     <span
                       className={cn(
@@ -390,11 +370,12 @@ export function FilterSidebar({
 
             {/* List: padding 0 0 0 12px, 3 items */}
             <div className="flex flex-col pl-3">
-              {FIGMA_NETWORKS.map((net) => {
+              {!facets && <FacetListPlaceholder rows={3} />}
+              {facets?.networks.map((net) => {
                 const isSelected = value.network === net.value
                 return (
                   <label
-                    key={net.name}
+                    key={net.value}
                     className={cn(
                       'group relative flex h-[40px] w-[258px] cursor-pointer items-center justify-between font-mono text-[15px] leading-[40px] transition-colors duration-150',
                       isSelected ? 'text-highlight' : 'text-text-secondary hover:text-highlight',
@@ -409,7 +390,7 @@ export function FilterSidebar({
                       className="absolute inset-0 z-10 cursor-pointer opacity-0"
                     />
                     <span className="pointer-events-none transition-colors duration-150">
-                      {net.name}
+                      {net.value}
                     </span>
                     <span
                       className={cn(
