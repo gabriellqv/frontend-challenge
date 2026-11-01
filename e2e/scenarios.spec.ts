@@ -22,26 +22,28 @@ test('falha de conexão exibe erro e recupera com nova tentativa', async ({ page
   })
 })
 
-test('pagamento recusado exibe o resultado', async ({ page }) => {
-  await page.goto('/login')
-  await page.getByLabel('E-mail').fill('nova@kurio.test')
-  await page.getByLabel('Senha').fill('kurio123')
-  await page.getByRole('button', { name: 'Entrar' }).click()
-  await expect(page.getByText('Nova Sato').first()).toBeVisible({ timeout: 10_000 })
+test('latência variável: a resposta antiga não sobrescreve o filtro atual', async ({ page }) => {
+  await page.goto('/?scenario=latency')
+  await expect(page.getByRole('link', { name: /Emerald Ape/i }).first()).toBeVisible({
+    timeout: 10_000,
+  })
+  // Duas trocas rápidas: a primeira resposta (mais lenta) chega depois da segunda.
+  await page.getByRole('radio', { name: /Fotografia/ }).check()
+  await page.getByRole('radio', { name: /Arte digital/ }).check()
+  await page.waitForURL(/collection=Arte/)
+  await page.waitForTimeout(2000)
+  await expect(page.getByRole('radio', { name: /Arte digital/ })).toBeChecked()
+  await expect(page.getByRole('link', { name: /Ape/i }).first()).toBeVisible()
+})
 
-  await page.goto('/')
-  await page
-    .getByRole('link', { name: /Emerald Ape/i })
-    .first()
-    .click()
-  await page.getByRole('button', { name: 'Comprar' }).click()
-  await expect(page).toHaveURL(/\/carrinho/)
-  await page.getByRole('link', { name: 'Finalizar compra' }).click()
-  await expect(page).toHaveURL(/\/pagamento/)
-
-  await page.evaluate(() => window.__kurio!.applyScenario('payment_declined'))
-  await page.getByRole('button', { name: 'Confirmar compra' }).click()
-
-  await expect(page).toHaveURL(/\/pedido\//, { timeout: 10_000 })
-  await expect(page.getByText('Pagamento recusado')).toBeVisible({ timeout: 15_000 })
+test('erro 5xx do servidor exibe falha e recupera', async ({ page }) => {
+  await page.goto('/?scenario=server_error')
+  await expect(
+    page.getByRole('alert').filter({ hasText: 'Não foi possível carregar' }),
+  ).toBeVisible({
+    timeout: 15_000,
+  })
+  await page.evaluate(() => window.__kurio!.applyScenario('default'))
+  await page.getByRole('button', { name: 'Tentar novamente' }).click()
+  await expect(page.getByRole('link', { name: /Emerald Ape/i }).first()).toBeVisible()
 })

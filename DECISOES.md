@@ -36,6 +36,33 @@ app após o worker subir.
 - **ETH como string**: cálculos com `big.js`; a cotação da API é a referência.
 - **Desvios do Figma**: alinhei o grid, unifiquei o preço por card e corrigi
   rótulos — mantendo a intenção visual. Documentado em `ARCHITECTURE.md`.
+- **Responsividade entre os frames**: o Figma só tem 414 e 1440. As medidas
+  exatas valem a partir de `xl` (1280, onde cabem os 1200px). Em `lg` o mesmo
+  arranjo fica fluido, e em `md` o que não cabe usa o padrão mobile (filtros em
+  modal). Detalhes em `docs/12-RESPONSIVIDADE.md`.
+- **Artes em WebP**: os PNGs (2,4 MB) dominavam o LCP mobile. Em WebP q85,
+  sem perda visual perceptível, o LCP em 4G lento caiu de ~9,7 s para ~4,6 s
+  (medido). O banco mock salvo é migrado ao carregar. Detalhes em
+  `docs/13-PERFORMANCE.md`.
+- **Split por rota + cache imutável**: cada rota em seu chunk, com preload por
+  intenção; o chunk de entrada só decide os mocks (zod sai do caminho crítico,
+  mas a validação de env continua no boot da app). O split depende do
+  `Cache-Control: immutable` em `/assets` para não penalizar visitas repetidas.
+
+- **Sem dados fictícios na interface**: pagamento, recibo, carrinho, detalhe,
+  filtros e telas de login exibem só dados da API simulada; o que não existe
+  (ex.: carrinho vazio) vira estado vazio, nunca um exemplo inventado.
+- **Tempo real global**: uma conexão Socket.IO por sessão, no layout raiz, com
+  descarte de duplicatas/eventos antigos e reconciliação via REST ao reconectar.
+- **Checkout com cotação revisada**: mudança de preço, estoque ou taxa exige
+  aceite explícito; a API confere o total esperado. Idempotência com conflito
+  para conteúdo diferente e reenvio seguro em timeout.
+- **Carteira simulada de verdade**: só carteiras cadastradas, com conexão,
+  recusa e desconexão; o pedido guarda a carteira usada.
+- **Edições reais**: cada NFT oferece 1/1, 1/10, 1/50 e ABERTA com estoque
+  próprio (inclusive esgotadas), em vez de pílulas fixas na tela.
+- **shadcn/ui tematizado**: Button, Input, Select, Dialog e Tabs com os tokens
+  do design system, usados nos formulários, diálogos e abas.
 
 ## Escopo consciente
 

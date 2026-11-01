@@ -17,8 +17,9 @@
     "test:unit:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:report": "playwright show-report",
-    "lighthouse": "npm run build && CHROME_PATH=${CHROME_PATH:-$(node -e 'console.log(require(\"playwright\").chromium.executablePath())')} lhci autorun",
-    "prepare": "husky"
+    "lighthouse": "npm run build && npm run lighthouse:run -- --config=lighthouserc.json && npm run lighthouse:run -- --config=lighthouserc.desktop.json && node scripts/lighthouse-summary.mjs",
+    "prepare": "husky",
+    "lighthouse:run": "CHROME_PATH=${CHROME_PATH:-$(node -e 'console.log(require(\"playwright\").chromium.executablePath())')} lhci autorun"
   },
   "dependencies": {
     "@fontsource-variable/roboto-mono": "^5.3.0",

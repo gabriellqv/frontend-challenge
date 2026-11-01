@@ -19,3 +19,6 @@ docs/
 
 # Claude Code (config local)
 .claude/
+
+# Relatórios gerados pelo Lighthouse (entregues como estão)
+lighthouse/

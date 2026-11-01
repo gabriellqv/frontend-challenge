@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 
+import { addToCartAndOpenCart, login } from './support/helpers'
+
 test.describe('regressão visual', () => {
   test('início: catálogo e destaques', async ({ page }) => {
     await page.goto('/')
@@ -22,12 +24,8 @@ test.describe('regressão visual', () => {
   })
 
   test('pagamento: dados do colecionador e revisão', async ({ page }) => {
-    await page.goto('/login')
-    await page.getByLabel('E-mail').fill('nova@kurio.test')
-    await page.getByLabel('Senha').fill('kurio123')
-    await page.getByRole('button', { name: 'Entrar' }).click()
-    await page.waitForURL(/\/(\?.*)?$/)
-
+    await login(page)
+    await addToCartAndOpenCart(page)
     await page.goto('/pagamento')
     await expect(page.getByRole('button', { name: 'Confirmar compra' })).toBeVisible({
       timeout: 10_000,

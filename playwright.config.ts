@@ -11,7 +11,8 @@ export default defineConfig({
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: 'http://localhost:5173',
-    trace: 'on-first-retry',
+    // Trace de toda falha (inclusive local, sem retry) para diagnóstico.
+    trace: 'retain-on-failure',
   },
   webServer: {
     command: 'npm run dev',
@@ -19,5 +20,13 @@ export default defineConfig({
     reuseExistingServer: true,
     timeout: 120_000,
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    {
+      // Fluxos principais também no viewport mobile (Chromium).
+      name: 'mobile-chromium',
+      use: { ...devices['Pixel 7'] },
+      testMatch: ['checkout.spec.ts', 'realtime.spec.ts', 'catalog.spec.ts', 'a11y.spec.ts'],
+    },
+  ],
 })

@@ -7,8 +7,12 @@ test('catálogo: busca, filtros combinados e ordenação refletem na URL', async
   await page.waitForURL(/q=ape/)
   await expect(page.getByRole('link', { name: /Emerald Ape/i }).first()).toBeVisible()
 
-  await page.getByRole('radio', { name: 'Kurio Apes' }).check()
+  await page.getByRole('radio', { name: /Arte digital/ }).check()
   await page.waitForURL(/collection=/)
+  // Filtros combináveis: coleção + rede ao mesmo tempo.
+  await page.getByRole('radio', { name: /Polygon/ }).check()
+  await page.waitForURL(/network=Polygon/)
+  await expect(page).toHaveURL(/collection=/)
 
   await page.getByLabel('Ordenar por').selectOption('price_asc')
   await page.waitForURL(/sort=price_asc/)
@@ -16,6 +20,23 @@ test('catálogo: busca, filtros combinados e ordenação refletem na URL', async
   await page.reload()
   await expect(page.getByPlaceholder('Buscar NFTs')).toHaveValue('ape')
   await expect(page.getByLabel('Ordenar por')).toHaveValue('price_asc')
+})
+
+test('catálogo: mudar filtro reinicia a paginação', async ({ page }) => {
+  await page.goto('/?page=2')
+  await expect(
+    page.getByRole('link', { name: /Emerald Ape|Genesis|Ape|Drop/i }).first(),
+  ).toBeVisible()
+  await page.getByRole('radio', { name: /Ethereum/ }).check()
+  await page.waitForURL(/network=Ethereum/)
+  await expect(page).toHaveURL(/page=1/)
+})
+
+test('rota inexistente exibe a página 404 com retorno ao catálogo', async ({ page }) => {
+  await page.goto('/rota-que-nao-existe')
+  await expect(page.getByRole('heading', { name: 'Página não encontrada' })).toBeVisible()
+  await page.getByRole('link', { name: 'Voltar ao catálogo' }).click()
+  await expect(page).toHaveURL(/\/(\?.*)?$/)
 })
 
 test('catálogo: paginação altera a URL e o histórico restaura', async ({ page }) => {

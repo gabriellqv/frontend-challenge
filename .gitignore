@@ -29,7 +29,6 @@ playwright-report/
 test-results/
 .lighthouseci/
 reports/
-lighthouse/
 
 # Editor
 .vscode/*
