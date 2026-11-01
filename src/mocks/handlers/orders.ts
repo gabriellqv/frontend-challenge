@@ -21,7 +21,7 @@ function scheduleOrderResolution(orderId: string): void {
     order.version += 1
     order.transactionRef = `0x${crypto.randomUUID().replace(/-/g, '')}`
     persist()
-    emitOrderUpdated(order.id, order.status, order.version)
+    emitOrderUpdated({ orderId: order.id, status: order.status, version: order.version })
   }, 2000)
 }
 

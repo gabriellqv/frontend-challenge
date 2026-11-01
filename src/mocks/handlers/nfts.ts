@@ -1,16 +1,15 @@
-import { HttpResponse, delay, http } from 'msw'
+import { HttpResponse, http } from 'msw'
 
 import { nftListQuerySchema } from '@/shared/contracts'
 
 import { getDb } from '../db'
-import { getLatencyMs, isOffline } from '../scenarios'
+import { simulateNetwork } from '../scenarios'
 import { errorResponse } from '../utils'
 
 export const nftHandlers = [
   http.get('/api/nfts', async ({ request }) => {
-    if (isOffline()) return HttpResponse.error()
-    const latency = getLatencyMs()
-    if (latency > 0) await delay(latency)
+    const failure = await simulateNetwork()
+    if (failure) return failure
 
     const url = new URL(request.url)
 
@@ -84,7 +83,9 @@ export const nftHandlers = [
     })
   }),
 
-  http.get('/api/nfts/:id', ({ params }) => {
+  http.get('/api/nfts/:id', async ({ params }) => {
+    const failure = await simulateNetwork()
+    if (failure) return failure
     const nft = getDb().nfts.find((n) => n.id === params.id)
     if (!nft) return errorResponse('NOT_FOUND', 'NFT não encontrado', 404)
     return HttpResponse.json(nft)

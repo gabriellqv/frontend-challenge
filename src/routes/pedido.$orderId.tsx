@@ -7,7 +7,6 @@ import { orderQueryOptions } from '@/features/orders/api'
 import { DEFAULT_NFT_LIST_QUERY } from '@/shared/contracts'
 import { cn } from '@/shared/lib/cn'
 import { formatEth, mul } from '@/shared/lib/money'
-import { useRealtimeUpdates } from '@/shared/realtime/use-realtime'
 import { getToken } from '@/shared/session'
 
 export const Route = createFileRoute('/pedido/$orderId')({
@@ -176,7 +175,6 @@ function OrderPage() {
   const { orderId } = Route.useParams()
   const navigate = useNavigate()
   const orderQuery = useQuery(orderQueryOptions(orderId))
-  useRealtimeUpdates()
 
   if (orderQuery.isLoading) {
     return (

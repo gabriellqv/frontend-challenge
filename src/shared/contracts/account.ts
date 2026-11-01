@@ -43,3 +43,26 @@ export const favoriteSchema = z.object({
   addedAt: isoDateSchema,
 })
 export type Favorite = z.infer<typeof favoriteSchema>
+
+/** Provedores de carteira oferecidos no checkout (conexão simulada). */
+export const walletProviderSchema = z.enum(['walletconnect', 'metamask', 'coinbase'])
+export type WalletProvider = z.infer<typeof walletProviderSchema>
+
+export const connectWalletRequestSchema = z.object({
+  provider: walletProviderSchema,
+  network: z.string().min(1),
+})
+export type ConnectWalletRequest = z.infer<typeof connectWalletRequestSchema>
+
+/**
+ * Conexão simulada de uma carteira cadastrada. Vive só na sessão do mock:
+ * recarregar a página ou o cenário `wallet_disconnected` encerra a conexão.
+ */
+export const walletConnectionSchema = z.object({
+  connectionId: idSchema,
+  walletId: idSchema,
+  address: z.string().min(1),
+  network: z.string().min(1),
+  provider: walletProviderSchema,
+})
+export type WalletConnection = z.infer<typeof walletConnectionSchema>

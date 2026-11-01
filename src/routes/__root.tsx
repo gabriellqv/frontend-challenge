@@ -1,10 +1,13 @@
+import { useQuery } from '@tanstack/react-query'
 import { Outlet, createRootRoute, useRouterState } from '@tanstack/react-router'
 
+import { sessionQueryOptions } from '@/features/auth/api'
 import { Footer } from '@/shared/components/layout/Footer'
 import { Header } from '@/shared/components/layout/Header'
 import { MobileTabBar } from '@/shared/components/layout/MobileTabBar'
 import { SkipToContent } from '@/shared/components/layout/SkipToContent'
 import { cn } from '@/shared/lib/cn'
+import { useRealtimeSync } from '@/shared/realtime/use-realtime-sync'
 import { Toaster } from '@/shared/ui/sonner'
 
 export const Route = createRootRoute({
@@ -12,6 +15,9 @@ export const Route = createRootRoute({
 })
 
 function Root() {
+  const session = useQuery(sessionQueryOptions())
+  useRealtimeSync(session.data?.user.id ?? 'visitante')
+
   const routerState = useRouterState()
   const pathname = routerState.location.pathname
   const isNftDetail = pathname.startsWith('/nft/')
