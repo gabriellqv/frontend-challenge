@@ -11,6 +11,10 @@ import {
   useRemoveCartItem,
   useUpdateCartItem,
 } from '@/features/cart/api'
+import { CartItemNotice } from '@/features/cart/components/CartItemNotice'
+import { readStoredCoupon, storeCoupon } from '@/features/cart/coupon-storage'
+import { nftsQueryOptions } from '@/features/catalog/api'
+import { formatTokenId } from '@/features/checkout/format'
 import { ApiError } from '@/shared/api/http-client'
 import { CartSummarySkeleton } from '@/shared/components/skeletons/CartSummarySkeleton'
 import { DEFAULT_NFT_LIST_QUERY } from '@/shared/contracts'
@@ -21,38 +25,8 @@ export const Route = createFileRoute('/carrinho')({
   component: CartPage,
 })
 
-const RELATED_NFTS = [
-  {
-    id: 'nft-19',
-    name: 'Cosmic Bloom #118',
-    priceEth: '1.29',
-    imageUrl: '/images/NFT-Artwork-18.webp',
-  },
-  {
-    id: 'nft-20',
-    name: 'Violet Nomad #314',
-    priceEth: '1.39',
-    imageUrl: '/images/NFT-Artwork-18.webp',
-  },
-  {
-    id: 'nft-21',
-    name: 'Ivory Baron #088',
-    priceEth: '1.79',
-    imageUrl: '/images/NFT-Artwork-05.webp',
-  },
-  {
-    id: 'nft-22',
-    name: 'Golden Beat #207',
-    priceEth: '0.99',
-    imageUrl: '/images/NFT-Artwork-09.webp',
-  },
-  {
-    id: 'nft-23',
-    name: 'Golden Signal #160',
-    priceEth: '0.39',
-    imageUrl: '/images/NFT-Artwork-09.webp',
-  },
-]
+/** Quantos relacionados mostrar (linha de 5 cards do Figma). */
+const RELATED_COUNT = 5
 
 function CartPage() {
   const cartQuery = useQuery(cartQueryOptions())
@@ -60,7 +34,12 @@ function CartPage() {
   const removeItem = useRemoveCartItem()
 
   const [couponInput, setCouponInput] = useState('')
-  const [appliedCoupon, setAppliedCoupon] = useState<string | undefined>(undefined)
+  const [appliedCoupon, setAppliedCouponState] = useState(readStoredCoupon)
+
+  function setAppliedCoupon(code: string | undefined) {
+    setAppliedCouponState(code)
+    storeCoupon(code)
+  }
   const [activeDot, setActiveDot] = useState(1)
   const [isDeleteMode, setIsDeleteMode] = useState(false)
 
@@ -74,6 +53,13 @@ function CartPage() {
     ...(appliedCoupon ? { couponCode: appliedCoupon } : {}),
   }
   const quote = useQuery(quoteQueryOptions(quoteRequest))
+  const relatedQuery = useQuery(
+    nftsQueryOptions({ ...DEFAULT_NFT_LIST_QUERY, pageSize: RELATED_COUNT + 6 }),
+  )
+  const cartNftIds = new Set(items.map((item) => item.nftId))
+  const related = (relatedQuery.data?.items ?? [])
+    .filter((nft) => !cartNftIds.has(nft.id))
+    .slice(0, RELATED_COUNT)
 
   if (cartQuery.isLoading) {
     return (
@@ -84,37 +70,6 @@ function CartPage() {
   }
 
   const couponError = quote.error instanceof ApiError ? quote.error : null
-
-  function getItemImage(item: (typeof items)[number]) {
-    if (item.nftId === 'nft-1' || item.name.includes('Emerald Ape')) {
-      return '/images/Frame-136.webp'
-    }
-    if (item.name.includes('Violet Nomad')) {
-      return '/images/NFT-Artwork-18.webp'
-    }
-    if (item.name.includes('Ivory Baron')) {
-      return '/images/NFT-Artwork-05.webp'
-    }
-    if (item.name.includes('Golden Beat')) {
-      return '/images/NFT-Artwork-09.webp'
-    }
-    return item.imageUrl
-  }
-
-  function getItemEdition(item: (typeof items)[number]) {
-    if (item.name.includes('Violet Nomad')) return 'Edição: 1/1'
-    if (item.name.includes('Ivory Baron')) return 'Edição: 1/10'
-    if (item.name.includes('Golden Beat')) return 'Edição: 1/50'
-    if (item.name.includes('Emerald Ape')) return 'Edição: 1/50'
-    return 'Edição: 1/50'
-  }
-
-  function getItemTokenId(item: (typeof items)[number]) {
-    if (item.nftId === 'nft-1') return '#0042'
-    if (item.nftId === 'nft-20') return '#0009'
-    if (item.nftId === 'nft-21') return '#0552'
-    return `#${item.nftId.replace('nft-', '00')}`
-  }
 
   return (
     <>
@@ -184,8 +139,8 @@ function CartPage() {
                 <ul className="flex flex-col gap-3">
                   {items.map((item) => {
                     const itemTotalEth = mul(item.priceEth, item.quantity.toString())
-                    const imgSrc = getItemImage(item)
-                    const tokenId = getItemTokenId(item)
+                    const imgSrc = item.imageUrl
+                    const tokenId = formatTokenId(item.nftId)
 
                     return (
                       <li
@@ -208,8 +163,9 @@ function CartPage() {
                               {item.name}
                             </Link>
                             <span className="text-[14px] leading-4 font-normal text-[#B39463]">
-                              ID do token: {tokenId}
+                              ID do token: {tokenId} · {item.editionName}
                             </span>
+                            <CartItemNotice item={item} />
                           </div>
                         </div>
 
@@ -225,7 +181,7 @@ function CartPage() {
                             <button
                               type="button"
                               aria-label={`Diminuir quantidade de ${item.name}`}
-                              disabled={item.quantity <= 1}
+                              disabled={updateItem.isPending || item.quantity <= 1}
                               onClick={() => {
                                 const next = Math.max(1, item.quantity - 1)
                                 updateItem.mutate({ itemId: item.id, quantity: next })
@@ -240,7 +196,9 @@ function CartPage() {
                             <button
                               type="button"
                               aria-label={`Aumentar quantidade de ${item.name}`}
-                              disabled={item.quantity >= Math.max(1, item.available)}
+                              disabled={
+                                updateItem.isPending || item.quantity >= Math.max(1, item.available)
+                              }
                               onClick={() => {
                                 const next = Math.min(
                                   Math.max(1, item.available),
@@ -434,7 +392,7 @@ function CartPage() {
 
           {/* 5 Cards Row */}
           <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:flex lg:justify-between lg:gap-[28px]">
-            {RELATED_NFTS.map((item) => (
+            {related.map((item) => (
               <Link
                 key={item.id}
                 to="/nft/$nftId"
@@ -445,6 +403,8 @@ function CartPage() {
                   <img
                     src={item.imageUrl}
                     alt={item.name}
+                    loading="lazy"
+                    decoding="async"
                     className="size-[212px] max-h-full max-w-full rounded-[15px] object-cover"
                   />
                 </div>
@@ -453,7 +413,7 @@ function CartPage() {
                     {item.name}
                   </p>
                   <p className="text-[16px] leading-4 font-bold text-[#E89B55]">
-                    {item.priceEth} ETH
+                    {formatEth(item.priceEth)} ETH
                   </p>
                 </div>
               </Link>
@@ -579,8 +539,8 @@ function CartPage() {
                 <div className="flex w-full max-w-[358px] flex-col gap-4">
                   {items.map((item) => {
                     const itemTotalEth = mul(item.priceEth, item.quantity.toString())
-                    const imgSrc = getItemImage(item)
-                    const editionText = getItemEdition(item)
+                    const imgSrc = item.imageUrl
+                    const editionText = `Edição: ${item.editionName}`
 
                     return (
                       <div
@@ -608,6 +568,7 @@ function CartPage() {
                             <span className="text-[13px] font-normal leading-4 text-[#CFB28C]">
                               {editionText}
                             </span>
+                            <CartItemNotice item={item} />
                           </div>
                           <div className="text-[17px] font-bold leading-4 text-[#E89B55]">
                             {formatEth(itemTotalEth)} ETH
@@ -643,6 +604,7 @@ function CartPage() {
                               <button
                                 type="button"
                                 aria-label={`Diminuir quantidade de ${item.name}`}
+                                disabled={updateItem.isPending}
                                 onClick={() => {
                                   if (item.quantity > 1) {
                                     updateItem.mutate({
@@ -671,7 +633,10 @@ function CartPage() {
                               <button
                                 type="button"
                                 aria-label={`Aumentar quantidade de ${item.name}`}
-                                disabled={item.quantity >= Math.max(1, item.available)}
+                                disabled={
+                                  updateItem.isPending ||
+                                  item.quantity >= Math.max(1, item.available)
+                                }
                                 onClick={() => {
                                   const next = Math.min(
                                     Math.max(1, item.available),
@@ -767,7 +732,7 @@ function CartPage() {
                       Taxa de rede
                     </span>
                     <span className="text-[16px] leading-4 font-normal text-[#F5F1EB]">
-                      {quote.data ? `${formatEth(quote.data.networkFeeEth)} ETH` : '0.016 ETH'}
+                      {quote.data ? `${formatEth(quote.data.networkFeeEth)} ETH` : '—'}
                     </span>
                   </div>
                   <span className="text-[12px] leading-4 font-normal text-[#E89B55]">

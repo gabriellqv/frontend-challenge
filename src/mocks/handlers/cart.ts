@@ -4,23 +4,15 @@ import type {
   AddCartItemRequest,
   Cart,
   CartItem,
-  CouponType,
   Quote,
   QuoteRequest,
   UpdateCartItemRequest,
 } from '@/shared/contracts'
-import { add, compare, div, mul, sub } from '@/shared/lib/money'
 
 import { getDb, persist } from '../db'
+import { QuoteError, computeTotals } from '../pricing'
+import { simulateNetwork } from '../scenarios'
 import { errorResponse, getOwnerKey } from '../utils'
-
-type CouponDefinition = { type: CouponType; value: string; expired?: boolean }
-
-const COUPONS: Record<string, CouponDefinition> = {
-  KURIO10: { type: 'percent', value: '10' },
-  LANCAMENTO5: { type: 'percent', value: '5' },
-  EXPIRADO20: { type: 'percent', value: '20', expired: true },
-}
 
 function getCart(ownerKey: string): Cart {
   return getDb().carts[ownerKey] ?? { items: [], version: 0 }
@@ -34,9 +26,33 @@ function resolveEdition(nftId: string, editionId: string) {
   return { nft, edition }
 }
 
+/**
+ * O carrinho guarda a escolha do usuário; preço, nome, imagem e estoque vêm
+ * sempre do catálogo atual — mudanças de preço/estoque aparecem ao reabrir.
+ */
+function withCurrentCatalog(cart: Cart): Cart {
+  const items: CartItem[] = cart.items.map((item) => {
+    const resolved = resolveEdition(item.nftId, item.editionId)
+    if (!resolved) return item
+    return {
+      ...item,
+      name: resolved.nft.name,
+      editionName: resolved.edition.name,
+      imageUrl: resolved.nft.imageUrl,
+      priceEth: resolved.nft.priceEth,
+      // Carrinhos salvos antes deste campo guardavam o preço da adição em `priceEth`.
+      addedPriceEth: item.addedPriceEth || item.priceEth,
+      available: resolved.edition.available,
+    }
+  })
+  return { ...cart, items }
+}
+
 export const cartHandlers = [
-  http.get('/api/cart', ({ request }) => {
-    return HttpResponse.json(getCart(getOwnerKey(request)))
+  http.get('/api/cart', async ({ request }) => {
+    const failure = await simulateNetwork()
+    if (failure) return failure
+    return HttpResponse.json(withCurrentCatalog(getCart(getOwnerKey(request))))
   }),
 
   http.post('/api/cart/items', async ({ request }) => {
@@ -59,18 +75,23 @@ export const cartHandlers = [
     if (existing) {
       existing.quantity = newQuantity
       existing.name = resolved.nft.name
+      existing.editionName = resolved.edition.name
       existing.imageUrl = resolved.nft.imageUrl
       existing.priceEth = resolved.nft.priceEth
+      // Adicionar de novo é aceitar o preço atual.
+      existing.addedPriceEth = resolved.nft.priceEth
       existing.available = resolved.edition.available
     } else {
       const item: CartItem = {
         id: `ci-${crypto.randomUUID()}`,
         nftId: resolved.nft.id,
         editionId: resolved.edition.id,
+        editionName: resolved.edition.name,
         name: resolved.nft.name,
         imageUrl: resolved.nft.imageUrl,
         quantity: body.quantity,
         priceEth: resolved.nft.priceEth,
+        addedPriceEth: resolved.nft.priceEth,
         available: resolved.edition.available,
       }
       cart.items.push(item)
@@ -117,44 +138,33 @@ export const cartHandlers = [
   }),
 
   http.post('/api/quote', async ({ request }) => {
+    const failure = await simulateNetwork()
+    if (failure) return failure
     const body = (await request.json()) as QuoteRequest
     const db = getDb()
 
-    let subtotalEth = '0'
+    const pricedItems: Array<{ priceEth: string; quantity: number }> = []
     for (const item of body.items) {
       const nft = db.nfts.find((n) => n.id === item.nftId)
       if (!nft) return errorResponse('NOT_FOUND', 'NFT não encontrado', 404)
       const edition = nft.editions.find((e) => e.id === item.editionId)
       if (!edition) return errorResponse('NOT_FOUND', 'Edição não encontrada', 404)
       if (edition.available < item.quantity) {
-        return errorResponse('AVAILABILITY_CONFLICT', 'Estoque insuficiente para esta edição', 409)
+        return errorResponse('AVAILABILITY_CONFLICT', `Estoque insuficiente para ${nft.name}`, 409)
       }
-      subtotalEth = add(subtotalEth, mul(nft.priceEth, String(item.quantity)))
+      pricedItems.push({ priceEth: nft.priceEth, quantity: item.quantity })
     }
 
-    let discountEth = '0'
-    if (body.couponCode) {
-      const coupon = COUPONS[body.couponCode]
-      if (!coupon) return errorResponse('COUPON_INVALID', 'Cupom inválido', 422)
-      if (coupon.expired) return errorResponse('COUPON_EXPIRED', 'Cupom expirado', 422)
-      discountEth =
-        coupon.type === 'percent'
-          ? mul(subtotalEth, div(coupon.value, '100'))
-          : compare(coupon.value, subtotalEth) > 0
-            ? subtotalEth
-            : coupon.value
+    // Mesmo cálculo da criação do pedido: a cotação é a referência para confirmar.
+    let totals
+    try {
+      totals = computeTotals(pricedItems, body.couponCode)
+    } catch (e) {
+      if (e instanceof QuoteError) return errorResponse(e.code, e.message, e.status)
+      throw e
     }
 
-    const networkFeeEth = mul(subtotalEth, '0.025')
-    const totalEth = add(sub(subtotalEth, discountEth), networkFeeEth)
-
-    const quote: Quote = {
-      subtotalEth,
-      discountEth,
-      networkFeeEth,
-      totalEth,
-      version: getCart(getOwnerKey(request)).version,
-    }
+    const quote: Quote = { ...totals, version: getCart(getOwnerKey(request)).version }
     return HttpResponse.json(quote)
   }),
 ]

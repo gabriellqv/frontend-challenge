@@ -6,11 +6,15 @@ export const cartItemSchema = z.object({
   id: idSchema,
   nftId: idSchema,
   editionId: idSchema,
+  /** Nome da edição (ex.: "1/50", "ABERTA"). */
+  editionName: z.string(),
   name: z.string(),
   imageUrl: z.string(),
   quantity: z.number().int().min(1),
-  /** Preço unitário em ETH (string decimal) no momento da adição. */
+  /** Preço unitário atual em ETH (string decimal), vindo do catálogo. */
   priceEth: ethSchema,
+  /** Preço quando o item entrou no carrinho: diferente de `priceEth` = preço mudou. */
+  addedPriceEth: ethSchema,
   available: z.number().int().min(0),
 })
 export type CartItem = z.infer<typeof cartItemSchema>

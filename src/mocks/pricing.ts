@@ -1,4 +1,4 @@
-import { add, div, mul, sub } from '@/shared/lib/money'
+import { add, compare, div, mul, sub } from '@/shared/lib/money'
 
 export type CouponDef = {
   code: string
@@ -56,7 +56,8 @@ export function computeTotals(
     if (coupon.type === 'percent') {
       discountEth = mul(subtotalEth, div(coupon.value, '100'))
     } else {
-      discountEth = coupon.value
+      // Desconto fixo nunca passa do subtotal.
+      discountEth = compare(coupon.value, subtotalEth) > 0 ? subtotalEth : coupon.value
     }
   }
 
