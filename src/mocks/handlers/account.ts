@@ -1,15 +1,11 @@
 import { http } from 'msw/core/http'
 import type { ZodError } from 'zod'
 
-import type {
-  ChangePasswordRequest,
-  Profile,
-  UpdateProfileRequest,
-  Wallet,
-} from '@/shared/contracts'
+import type { ChangePasswordRequest, Profile, Wallet } from '@/shared/contracts'
 import {
   connectWalletRequestSchema,
   createWalletRequestSchema,
+  updateProfileRequestSchema,
   updateWalletRequestSchema,
 } from '@/shared/contracts'
 
@@ -38,42 +34,69 @@ function duplicateAddressError() {
   })
 }
 
+function toProfile(user: {
+  id: string
+  name: string
+  username: string
+  email: string
+  ensName: string | null
+  walletNickname: string | null
+  avatarUrl: string | null
+}): Profile {
+  return {
+    id: user.id,
+    name: user.name,
+    username: user.username,
+    email: user.email,
+    ensName: user.ensName,
+    walletNickname: user.walletNickname,
+    avatarUrl: user.avatarUrl,
+  }
+}
+
 export const accountHandlers = [
   http.get('/api/profile', ({ request }) => {
     const user = getAuthenticatedUser(request)
     if (!user) return unauthorized()
 
-    const profile: Profile = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      avatarUrl: user.avatarUrl,
-    }
-    return json(profile)
+    return json(toProfile(user))
   }),
 
   http.patch('/api/profile', async ({ request }) => {
     const user = getAuthenticatedUser(request)
     if (!user) return unauthorized()
 
-    const body = (await request.json()) as UpdateProfileRequest
-    if (!body.name || body.name.length < 2) {
-      return errorResponse('VALIDATION_ERROR', 'Nome deve ter ao menos 2 caracteres', 422, {
-        name: 'Mínimo de 2 caracteres',
+    const parsed = updateProfileRequestSchema.safeParse(await request.json())
+    if (!parsed.success) {
+      const fields: Record<string, string> = {}
+      for (const issue of parsed.error.issues) {
+        const field = issue.path[0]
+        if (typeof field === 'string' && !fields[field]) fields[field] = issue.message
+      }
+      return errorResponse('VALIDATION_ERROR', 'Confira os dados do perfil', 422, fields)
+    }
+    const body = parsed.data
+    const db = getDb()
+    if (db.users.some((u) => u.id !== user.id && u.username === body.username)) {
+      return errorResponse('CONFLICT', 'Este nome de usuário já está em uso', 409, {
+        username: 'Nome de usuário já em uso',
+      })
+    }
+    if (db.users.some((u) => u.id !== user.id && u.email === body.email)) {
+      return errorResponse('CONFLICT', 'Este e-mail já está em uso', 409, {
+        email: 'E-mail já em uso',
       })
     }
 
     user.name = body.name
-    if (body.avatarUrl !== undefined) user.avatarUrl = body.avatarUrl
+    user.username = body.username
+    user.email = body.email
+    user.ensName = body.ensName?.trim() || null
+    user.walletNickname = body.walletNickname?.trim() || null
+    if (body.avatarUrl !== undefined) user.avatarUrl = body.avatarUrl || null
     persist()
 
-    const profile: Profile = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      avatarUrl: user.avatarUrl,
-    }
-    return json(profile)
+    return json(toProfile(user))
   }),
 
   http.post('/api/profile/password', async ({ request }) => {

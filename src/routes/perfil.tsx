@@ -1,10 +1,14 @@
+import { type ChangeEvent, useRef, useState } from 'react'
+
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 
 import { profileQueryOptions, useChangePassword, useUpdateProfile } from '@/features/account/api'
+import { ProfileField } from '@/features/account/components/ProfileField'
+import { ProfilePageShell } from '@/features/account/components/ProfilePageShell'
 import { ApiError } from '@/shared/api/http-client'
 import {
   type ChangePasswordRequest,
@@ -23,85 +27,198 @@ export const Route = createFileRoute('/perfil')({
   component: ProfilePage,
 })
 
+const MAX_AVATAR_BYTES = 256 * 1024
+const AVATAR_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp'])
+
 function ProfilePage() {
   const profileQuery = useQuery(profileQueryOptions())
   const updateProfile = useUpdateProfile()
   const changePassword = useChangePassword()
+  const fileInput = useRef<HTMLInputElement>(null)
+  const [avatarError, setAvatarError] = useState<string | null>(null)
 
   const profileForm = useForm<UpdateProfileRequest>({
     resolver: zodResolver(updateProfileRequestSchema),
     values: profileQuery.data
-      ? { name: profileQuery.data.name, avatarUrl: profileQuery.data.avatarUrl ?? '' }
-      : { name: '', avatarUrl: '' },
+      ? {
+          name: profileQuery.data.name,
+          username: profileQuery.data.username,
+          email: profileQuery.data.email,
+          ensName: profileQuery.data.ensName ?? '',
+          walletNickname: profileQuery.data.walletNickname ?? '',
+          avatarUrl: profileQuery.data.avatarUrl,
+        }
+      : {
+          name: '',
+          username: '',
+          email: '',
+          ensName: '',
+          walletNickname: '',
+          avatarUrl: null,
+        },
   })
 
   const passwordForm = useForm<ChangePasswordRequest>({
     resolver: zodResolver(changePasswordRequestSchema),
     defaultValues: { currentPassword: '', newPassword: '' },
   })
+  const avatarUrl = useWatch({ control: profileForm.control, name: 'avatarUrl' })
 
   if (profileQuery.isLoading) {
-    return <Shell>Carregando perfil…</Shell>
+    return (
+      <ProfilePageShell>
+        <p role="status" className="font-mono text-sm text-text-secondary">
+          Carregando perfil…
+        </p>
+      </ProfilePageShell>
+    )
   }
 
   const profileError = updateProfile.error instanceof ApiError ? updateProfile.error : null
   const passwordError = changePassword.error instanceof ApiError ? changePassword.error : null
   const profile = profileQuery.data
+  const fieldError = (field: keyof UpdateProfileRequest) =>
+    profileError?.fields?.[field] ?? profileForm.formState.errors[field]?.message
+
+  function onAvatarChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    if (!AVATAR_TYPES.has(file.type)) {
+      setAvatarError('Use uma imagem PNG, JPEG ou WebP.')
+      return
+    }
+    if (file.size > MAX_AVATAR_BYTES) {
+      setAvatarError('A imagem deve ter no máximo 256 KB.')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => {
+      setAvatarError(null)
+      profileForm.setValue('avatarUrl', String(reader.result), { shouldDirty: true })
+    }
+    reader.onerror = () => setAvatarError('Não foi possível ler a imagem.')
+    reader.readAsDataURL(file)
+  }
+
+  function submitProfile(values: UpdateProfileRequest) {
+    updateProfile.mutate({
+      ...values,
+      ensName: values.ensName?.trim() || null,
+      walletNickname: values.walletNickname?.trim() || null,
+      avatarUrl: values.avatarUrl || null,
+    })
+  }
 
   return (
-    <Shell>
+    <ProfilePageShell>
       <div className="grid gap-8 lg:grid-cols-2">
         <section className="rounded-[16px] border border-surface-dark bg-surface-card p-5 text-canvas">
           <h2 className="font-mono text-lg font-bold">Dados do colecionador</h2>
 
           <form
             className="mt-4 flex flex-col gap-4"
-            onSubmit={profileForm.handleSubmit((values) =>
-              updateProfile.mutate({
-                name: values.name,
-                avatarUrl: values.avatarUrl ? values.avatarUrl : null,
-              }),
-            )}
+            onSubmit={profileForm.handleSubmit(submitProfile)}
             noValidate
           >
             <div className="flex items-center gap-4">
-              <span className="inline-flex size-14 items-center justify-center overflow-hidden rounded-full border border-surface-dark bg-surface-raised font-bold">
-                {profile?.avatarUrl ? (
-                  <img src={profile.avatarUrl} alt="" className="size-full object-cover" />
+              <span className="inline-flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-surface-dark bg-surface-raised font-bold">
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt="Avatar do colecionador"
+                    className="size-full object-cover"
+                  />
                 ) : (
                   (profile?.name ?? '?').slice(0, 1).toUpperCase()
                 )}
               </span>
-              <div className="min-w-0 flex-1">
-                <label htmlFor="avatarUrl" className="text-sm text-text-secondary">
-                  URL do avatar
-                </label>
-                <Input
-                  id="avatarUrl"
-                  placeholder="https://…"
-                  {...profileForm.register('avatarUrl')}
+              <div className="flex min-w-0 flex-1 flex-col gap-2">
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => fileInput.current?.click()}
+                  >
+                    Alterar avatar
+                  </Button>
+                  {avatarUrl && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        setAvatarError(null)
+                        profileForm.setValue('avatarUrl', null, { shouldDirty: true })
+                      }}
+                    >
+                      Remover
+                    </Button>
+                  )}
+                </div>
+                <p className="font-mono text-xs text-text-secondary">
+                  PNG, JPEG ou WebP, até 256 KB.
+                </p>
+                {avatarError && (
+                  <p role="alert" className="font-mono text-xs text-error">
+                    {avatarError}
+                  </p>
+                )}
+                <input
+                  ref={fileInput}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="sr-only"
+                  aria-label="Selecionar avatar"
+                  onChange={onAvatarChange}
                 />
               </div>
             </div>
 
-            <div>
-              <label htmlFor="name" className="text-sm text-text-secondary">
-                Nome
-              </label>
-              <Input
-                id="name"
-                aria-invalid={Boolean(profileForm.formState.errors.name)}
-                aria-describedby="name-error"
-                {...profileForm.register('name')}
+            <ProfileField
+              id="name"
+              label="Nome de exibição"
+              error={fieldError('name')}
+              input={<Input id="name" {...profileForm.register('name')} />}
+            />
+            <ProfileField
+              id="username"
+              label="Nome de usuário"
+              hint="3 a 20 caracteres: letras minúsculas, números, ponto ou _."
+              error={fieldError('username')}
+              input={<Input id="username" {...profileForm.register('username')} />}
+            />
+            <ProfileField
+              id="email"
+              label="E-mail"
+              error={fieldError('email')}
+              input={<Input id="email" type="email" {...profileForm.register('email')} />}
+            />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <ProfileField
+                id="ensName"
+                label="Nome ENS"
+                error={fieldError('ensName')}
+                input={
+                  <Input id="ensName" placeholder="nome.eth" {...profileForm.register('ensName')} />
+                }
               />
-              {profileForm.formState.errors.name && (
-                <p id="name-error" role="alert" className="mt-1 text-xs text-error">
-                  {profileForm.formState.errors.name.message}
-                </p>
-              )}
+              <ProfileField
+                id="walletNickname"
+                label="Apelido da carteira"
+                error={fieldError('walletNickname')}
+                input={
+                  <Input
+                    id="walletNickname"
+                    placeholder="Principal"
+                    {...profileForm.register('walletNickname')}
+                  />
+                }
+              />
             </div>
 
-            {profileError && (
+            {profileError && !profileError.fields && (
               <p role="alert" className="text-sm text-error">
                 {profileError.message}
               </p>
@@ -133,35 +250,33 @@ function ProfilePage() {
             )}
             noValidate
           >
-            <div>
-              <label htmlFor="currentPassword" className="text-sm text-text-secondary">
-                Senha atual
-              </label>
-              <Input
-                id="currentPassword"
-                type="password"
-                autoComplete="current-password"
-                {...passwordForm.register('currentPassword')}
-              />
-            </div>
-            <div>
-              <label htmlFor="newPassword" className="text-sm text-text-secondary">
-                Nova senha
-              </label>
-              <Input
-                id="newPassword"
-                type="password"
-                autoComplete="new-password"
-                aria-invalid={Boolean(passwordForm.formState.errors.newPassword)}
-                aria-describedby="new-password-error"
-                {...passwordForm.register('newPassword')}
-              />
-              {passwordForm.formState.errors.newPassword && (
-                <p id="new-password-error" role="alert" className="mt-1 text-xs text-error">
-                  {passwordForm.formState.errors.newPassword.message}
-                </p>
-              )}
-            </div>
+            <ProfileField
+              id="currentPassword"
+              label="Senha atual"
+              error={passwordForm.formState.errors.currentPassword?.message}
+              input={
+                <Input
+                  id="currentPassword"
+                  type="password"
+                  autoComplete="current-password"
+                  {...passwordForm.register('currentPassword')}
+                />
+              }
+            />
+            <ProfileField
+              id="newPassword"
+              label="Nova senha"
+              hint="Mínimo de 6 caracteres."
+              error={passwordForm.formState.errors.newPassword?.message}
+              input={
+                <Input
+                  id="newPassword"
+                  type="password"
+                  autoComplete="new-password"
+                  {...passwordForm.register('newPassword')}
+                />
+              }
+            />
 
             {passwordError && (
               <p role="alert" className="text-sm text-error">
@@ -185,15 +300,6 @@ function ProfilePage() {
           </form>
         </section>
       </div>
-    </Shell>
-  )
-}
-
-function Shell({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 xl:px-0">
-      <h1 className="mb-6 font-mono text-2xl font-bold text-ink">Perfil do colecionador</h1>
-      {children}
-    </div>
+    </ProfilePageShell>
   )
 }

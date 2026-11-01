@@ -10,9 +10,9 @@ import { cn } from '@/shared/lib/cn'
 
 /**
  * Barra de navegação inferior mobile (Tab Bar) conforme a especificação do Figma:
- * - Fundo #241612 com recorte côncavo suave (scalloped notch) ao redor do botão central
- * - Botão flutuante central de 65px com gradiente #D28A4C e ícone retículo de 5 vetores
- * - 5 itens: Início (preenchido #E89B55), Favoritos (#CFB28C), Botão Central, Carrinho (#CFB28C) e Perfil (#CFB28C)
+ * - Fundo var(--color-surface-card) com recorte côncavo suave (scalloped notch) ao redor do botão central
+ * - Botão flutuante central de 65px com gradiente var(--color-primary) e ícone retículo de 5 vetores
+ * - 5 itens: Início (preenchido var(--color-highlight)), Favoritos (var(--color-text-secondary)), Botão Central, Carrinho (var(--color-text-secondary)) e Perfil (var(--color-text-secondary))
  */
 export function MobileTabBar() {
   const routerState = useRouterState()
@@ -47,7 +47,7 @@ export function MobileTabBar() {
       className="fixed right-0 bottom-0 left-0 z-40 pointer-events-none md:hidden"
     >
       <div className="relative mx-auto flex h-[92px] w-full max-w-[414px] items-end justify-center">
-        {/* Scalloped Notched Tab Bar SVG Background (#241612) */}
+        {/* Scalloped Notched Tab Bar SVG Background (var(--color-surface-card)) */}
         <svg
           viewBox="0 0 414 95"
           preserveAspectRatio="none"
@@ -56,7 +56,7 @@ export function MobileTabBar() {
         >
           <path
             d="M 0,32 C 0,18 14,16 28,16 L 158,16 C 170,16 176,18 181,24 C 188,35 196,58 207,58 C 218,58 226,35 233,24 C 238,18 244,16 256,16 L 386,16 C 400,16 414,18 414,32 L 414,95 L 0,95 Z"
-            fill="#241612"
+            fill="var(--color-surface-card)"
           />
         </svg>
 
@@ -68,7 +68,7 @@ export function MobileTabBar() {
             className="flex size-[65px] cursor-pointer items-center justify-center rounded-full shadow-[0px_4px_20px_rgba(210,138,76,0.5)] transition-transform active:scale-95"
             style={{
               background:
-                'linear-gradient(180deg, rgba(210, 138, 76, 0.4) -16.92%, #D28A4C 109.23%)',
+                'linear-gradient(180deg, rgba(210, 138, 76, 0.4) -16.92%, var(--color-primary) 109.23%)',
             }}
             aria-label="Kurio Explorar"
           >
@@ -77,7 +77,7 @@ export function MobileTabBar() {
               viewBox="0 0 28 28"
               className="size-[28px]"
               fill="none"
-              stroke="#F5F1EB"
+              stroke="var(--color-foreground)"
               strokeWidth="2.1"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -99,7 +99,7 @@ export function MobileTabBar() {
             search={DEFAULT_NFT_LIST_QUERY}
             className={cn(
               'flex size-11 items-center justify-center transition-colors',
-              isHome ? 'text-[#E89B55]' : 'text-[#CFB28C] hover:text-[#E89B55]',
+              isHome ? 'text-highlight' : 'text-text-secondary hover:text-highlight',
             )}
             aria-label="Início"
           >
@@ -117,7 +117,7 @@ export function MobileTabBar() {
                 document.getElementById('catalogo-section')?.scrollIntoView({ behavior: 'smooth' })
               }
             }}
-            className="flex size-11 cursor-pointer items-center justify-center text-[#CFB28C] transition-colors hover:text-[#E89B55]"
+            className="flex size-11 cursor-pointer items-center justify-center text-text-secondary transition-colors hover:text-highlight"
             aria-label="Favoritos"
           >
             <Heart className="size-6 fill-current" strokeWidth={2} />
@@ -131,7 +131,7 @@ export function MobileTabBar() {
             to="/carrinho"
             className={cn(
               'relative flex size-11 items-center justify-center transition-colors',
-              isCart ? 'text-[#E89B55]' : 'text-[#CFB28C] hover:text-[#E89B55]',
+              isCart ? 'text-highlight' : 'text-text-secondary hover:text-highlight',
             )}
             aria-label={`Carrinho com ${totalCartCount} itens`}
           >
@@ -151,7 +151,7 @@ export function MobileTabBar() {
             to={user ? '/perfil' : '/login'}
             className={cn(
               'flex size-11 items-center justify-center transition-colors',
-              isProfile ? 'text-[#E89B55]' : 'text-[#CFB28C] hover:text-[#E89B55]',
+              isProfile ? 'text-highlight' : 'text-text-secondary hover:text-highlight',
             )}
             aria-label={user ? 'Meu Perfil' : 'Entrar na conta'}
           >

@@ -80,13 +80,55 @@ test.describe('acessibilidade e teclado', () => {
     expect(await dialog.evaluate((element) => element.contains(document.activeElement))).toBe(true)
   })
 
-  for (const path of ['/', '/nft/nft-1', '/carrinho', '/login']) {
-    test(`axe: sem violações críticas em ${path}`, async ({ page }) => {
+  for (const path of ['/', '/nft/nft-1', '/carrinho', '/login', '/cadastro']) {
+    test(`axe: sem violações serious/critical em ${path}`, async ({ page }) => {
       await page.goto(path)
       await page.waitForLoadState('networkidle')
       const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze()
-      const critical = results.violations.filter((v) => v.impact === 'critical')
-      expect(critical.map((v) => `${v.id}: ${v.help}`)).toEqual([])
+      const relevant = results.violations.filter(
+        (v) => v.impact === 'critical' || v.impact === 'serious',
+      )
+      expect(relevant.map((v) => `${v.impact}: ${v.id}: ${v.help}`)).toEqual([])
     })
   }
+
+  test('axe: telas privadas sem violações serious/critical', async ({ page }) => {
+    await login(page)
+    await addToCartAndOpenCart(page)
+    for (const path of ['/pagamento', '/perfil', '/carteiras']) {
+      await page.goto(path)
+      await page.waitForLoadState('networkidle')
+      const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze()
+      const relevant = results.violations.filter(
+        (v) => v.impact === 'critical' || v.impact === 'serious',
+      )
+      expect(relevant.map((v) => `${v.impact}: ${v.id}: ${v.help}`)).toEqual([])
+    }
+  })
+
+  test('reflow a 320 px sem overflow horizontal', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 720 })
+    for (const path of ['/', '/nft/nft-1', '/carrinho', '/login', '/cadastro']) {
+      await page.goto(path)
+      await page.waitForLoadState('networkidle')
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      )
+      expect(overflow, `${path} tem ${overflow}px de overflow`).toBeLessThanOrEqual(1)
+    }
+  })
+
+  test('reflow a 320 px nas telas privadas', async ({ page }) => {
+    await login(page)
+    await addToCartAndOpenCart(page)
+    await page.setViewportSize({ width: 320, height: 720 })
+    for (const path of ['/pagamento', '/perfil', '/carteiras']) {
+      await page.goto(path)
+      await page.waitForLoadState('networkidle')
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      )
+      expect(overflow, `${path} tem ${overflow}px de overflow`).toBeLessThanOrEqual(1)
+    }
+  })
 })

@@ -19,6 +19,7 @@ export const SCENARIOS = [
   'session_expired',
   'order_timeout',
   'payment_declined',
+  'payment_pending',
   'favorite_error',
   'wallet_rejected',
   'wallet_disconnected',
@@ -47,6 +48,7 @@ type ScenarioState = {
   serverError: boolean
   orderTimeout: boolean
   paymentDeclined: boolean
+  paymentPending: boolean
   favoriteError: boolean
   walletRejected: boolean
 }
@@ -58,6 +60,7 @@ const INITIAL_STATE: ScenarioState = {
   serverError: false,
   orderTimeout: false,
   paymentDeclined: false,
+  paymentPending: false,
   favoriteError: false,
   walletRejected: false,
 }
@@ -100,6 +103,11 @@ export function isPaymentDeclined(): boolean {
   return state.paymentDeclined
 }
 
+/** Pagamento simulado que permanece pendente por mais tempo (teste de concorrência). */
+export function isPaymentPending(): boolean {
+  return state.paymentPending
+}
+
 /** Mutations de favoritos falham com 5xx. */
 export function isFavoriteError(): boolean {
   return state.favoriteError
@@ -117,7 +125,17 @@ function updateNft(db: Db, nftId: string, change: (nft: Db['nfts'][number]) => v
   change(nft)
   nft.version += 1
   persist()
-  emitNftUpdated({ nftId: nft.id, version: nft.version, priceEth: nft.priceEth })
+  emitNft(nft)
+}
+
+function emitNft(nft: Db['nfts'][number]): void {
+  emitNftUpdated({
+    nftId: nft.id,
+    version: nft.version,
+    priceEth: nft.priceEth,
+    available: nft.editions.reduce((total, edition) => total + edition.available, 0),
+    editions: nft.editions.map(({ id, available }) => ({ id, available })),
+  })
 }
 
 /** NFT afetado pelos cenários de compra: o mesmo usado nos fluxos de teste. */
@@ -193,6 +211,9 @@ export function applyScenario(name: string | null): void {
     case 'payment_declined':
       state.paymentDeclined = true
       break
+    case 'payment_pending':
+      state.paymentPending = true
+      break
     case 'favorite_error':
       state.favoriteError = true
       break
@@ -215,7 +236,7 @@ export function applyScenario(name: string | null): void {
     const previous = previousSignatures.get(nft.id)
     if (previous !== catalogSignature(nft)) {
       nft.version += 1
-      emitNftUpdated({ nftId: nft.id, version: nft.version, priceEth: nft.priceEth })
+      emitNft(nft)
       catalogChanged = true
     }
   }

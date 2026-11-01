@@ -50,6 +50,7 @@ export function useUpdateProfile() {
     mutationFn: (body: UpdateProfileRequest) => patchJson(profileSchema, '/profile', body),
     onSuccess: (profile) => {
       queryClient.setQueryData(queryKeys.profile.all(getOwnerKey()), profile)
+      void queryClient.invalidateQueries({ queryKey: queryKeys.session.all })
     },
   })
 }

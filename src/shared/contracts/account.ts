@@ -2,10 +2,23 @@ import { z } from 'zod'
 
 import { idSchema, isoDateSchema } from './common'
 
+/** Nome de usuário público, usado no perfil e no checkout. */
+export const usernameSchema = z
+  .string({ error: 'Nome de usuário é obrigatório' })
+  .trim()
+  .min(3, 'Use de 3 a 20 caracteres')
+  .max(20, 'Use de 3 a 20 caracteres')
+  .regex(/^[a-z0-9._]+$/, 'Use apenas letras minúsculas, números, ponto ou _')
+
 export const profileSchema = z.object({
   id: idSchema,
   name: z.string().min(2),
+  username: usernameSchema,
   email: z.string().email(),
+  /** Nome ENS completo (ex.: `nova.eth`), opcional. */
+  ensName: z.string().nullable(),
+  /** Apelido da carteira principal exibido no perfil. */
+  walletNickname: z.string().nullable(),
   avatarUrl: z.string().nullable(),
 })
 export type Profile = z.infer<typeof profileSchema>
@@ -15,6 +28,10 @@ export const updateProfileRequestSchema = z.object({
     .string({ error: 'Nome é obrigatório' })
     .min(1, 'Nome é obrigatório')
     .min(2, 'Nome deve ter no mínimo 2 caracteres'),
+  username: usernameSchema,
+  email: z.string({ error: 'E-mail é obrigatório' }).email('E-mail inválido'),
+  ensName: z.string().trim().max(60, 'Use no máximo 60 caracteres').nullable().optional(),
+  walletNickname: z.string().trim().max(40, 'Use no máximo 40 caracteres').nullable().optional(),
   avatarUrl: z.string().nullable().optional(),
 })
 export type UpdateProfileRequest = z.infer<typeof updateProfileRequestSchema>

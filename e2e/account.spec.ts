@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 import { login } from './support/helpers'
 
 test.describe('conta do colecionador', () => {
-  test('perfil: valida, salva nome e avatar e persiste após refresh', async ({ page }) => {
+  test('perfil: valida, salva dados/avatar e persiste após refresh', async ({ page }) => {
     await login(page)
     await page.goto('/perfil')
 
@@ -12,7 +12,18 @@ test.describe('conta do colecionador', () => {
     await expect(page.locator('#name')).toHaveAttribute('aria-invalid', 'true')
 
     await page.locator('#name').fill('Nova Sato Atualizada')
-    await page.locator('#avatarUrl').fill('https://kurio.test/avatar.png')
+    await page.locator('#username').fill('nova.atualizada')
+    await page.locator('#email').fill('nova.atualizada@kurio.test')
+    await page.locator('#ensName').fill('nova-atualizada.eth')
+    await page.locator('#walletNickname').fill('Principal')
+    await page.getByLabel('Selecionar avatar').setInputFiles({
+      name: 'avatar.png',
+      mimeType: 'image/png',
+      buffer: Buffer.from(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9ZlGQAAAAASUVORK5CYII=',
+        'base64',
+      ),
+    })
     await page.getByRole('button', { name: 'Salvar' }).click()
     await expect(
       page
@@ -23,6 +34,24 @@ test.describe('conta do colecionador', () => {
 
     await page.reload()
     await expect(page.locator('#name')).toHaveValue('Nova Sato Atualizada')
+    await expect(page.locator('#username')).toHaveValue('nova.atualizada')
+    await expect(page.locator('#ensName')).toHaveValue('nova-atualizada.eth')
+    await expect(page.locator('#walletNickname')).toHaveValue('Principal')
+    await expect(page.getByAltText('Avatar do colecionador')).toBeVisible()
+  })
+
+  test('perfil: recusa username e e-mail já usados', async ({ page }) => {
+    await login(page)
+    await page.goto('/perfil')
+
+    await page.locator('#username').fill('bruno.lima')
+    await page.getByRole('button', { name: 'Salvar' }).click()
+    await expect(page.getByText(/Nome de usuário já em uso/)).toBeVisible()
+
+    await page.locator('#username').fill('nova.sato')
+    await page.locator('#email').fill('bruno@kurio.test')
+    await page.getByRole('button', { name: 'Salvar' }).click()
+    await expect(page.getByText(/E-mail já em uso/)).toBeVisible()
   })
 
   test('perfil: senha atual incorreta e troca de senha', async ({ page }) => {

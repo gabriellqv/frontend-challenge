@@ -66,7 +66,6 @@ test.describe('tempo real (Socket.IO)', () => {
     await expect(notice).toHaveCount(1)
 
     await emit(10) // versão antiga
-    await page.waitForTimeout(500)
     await expect(notice).toHaveCount(1)
   })
 

@@ -46,6 +46,7 @@ test('latência variável: a resposta antiga não sobrescreve o filtro atual', a
   await page.getByRole('radio', { name: /Fotografia/ }).check()
   await page.getByRole('radio', { name: /Arte digital/ }).check()
   await page.waitForURL(/collection=Arte/)
+  // Espera a resposta lenta anterior; ela não pode substituir o resultado atual.
   await page.waitForTimeout(2000)
   await expect(page.getByRole('radio', { name: /Arte digital/ })).toBeChecked()
   await expect(page.getByRole('link', { name: /Ape/i }).first()).toBeVisible()

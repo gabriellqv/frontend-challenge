@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { Link } from '@tanstack/react-router'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Controller, type UseFormRegisterReturn, useForm } from 'react-hook-form'
+import { Controller, type UseFormRegisterReturn, useForm, useWatch } from 'react-hook-form'
 
 import {
   DEFAULT_NFT_LIST_QUERY,
@@ -13,6 +13,7 @@ import {
 } from '@/shared/contracts'
 import { cn } from '@/shared/lib/cn'
 import { formatEth, mul } from '@/shared/lib/money'
+import { getOwnerKey } from '@/shared/session'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
@@ -24,6 +25,7 @@ import {
   collectorFormSchema,
   ensDomainSchema,
 } from '../checkout-form'
+import { readCheckoutDraft, writeCheckoutDraft } from '../draft'
 import { formatTokenId, shortAddress, walletDisplayName } from '../format'
 import type { CheckoutState } from '../use-checkout'
 import { QuoteChangedAlert } from './QuoteChangedAlert'
@@ -34,11 +36,19 @@ const labelClass =
 const requiredMark = <span className="ml-0.5 text-[22px] leading-[29px] text-coral">*</span>
 const errorClass = 'mt-1 font-mono text-[12px] leading-4 text-coral'
 
-function defaultsFrom(profile: Profile | undefined): CollectorForm {
+function defaultsFrom(
+  profile: Profile | undefined,
+  draft: Partial<CollectorForm> | null,
+): CollectorForm {
   const name = profile?.name ?? ''
-  return {
-    displayName: name,
-    username: name.toLowerCase().replace(/[^a-z0-9._]/g, ''),
+  const base: CollectorForm = {
+    displayName: profile?.name ?? name,
+    username:
+      profile?.username ??
+      name
+        .toLowerCase()
+        .replace(/[^a-z0-9._]/g, '')
+        .slice(0, 20),
     profileName: name,
     email: profile?.email ?? '',
     secondaryWallet: '',
@@ -46,6 +56,7 @@ function defaultsFrom(profile: Profile | undefined): CollectorForm {
     ensDomain: '.eth',
     collectorNote: '',
   }
+  return { ...base, ...draft }
 }
 
 /** Props de {@link CheckoutDesktop}. */
@@ -61,13 +72,26 @@ interface CheckoutDesktopProps {
  * @returns Layout desktop do checkout.
  */
 export function CheckoutDesktop({ checkout }: CheckoutDesktopProps) {
+  const ownerKey = getOwnerKey()
   const form = useForm<CollectorForm>({
     resolver: zodResolver(collectorFormSchema),
-    defaultValues: defaultsFrom(checkout.profile),
+    defaultValues: defaultsFrom(checkout.profile, readCheckoutDraft(ownerKey)),
   })
   const { errors } = form.formState
   const [showPromoInput, setShowPromoInput] = useState(false)
   const [couponInput, setCouponInput] = useState('')
+  const watchedValues = useWatch({ control: form.control })
+  const profileDefaults = useMemo(() => defaultsFrom(checkout.profile, null), [checkout.profile])
+
+  useEffect(() => {
+    // Grava apenas o que o usuário alterou em relação aos dados do perfil.
+    const edited = Object.fromEntries(
+      Object.entries(watchedValues).filter(
+        ([field, value]) => value !== profileDefaults[field as keyof CollectorForm],
+      ),
+    )
+    writeCheckoutDraft(ownerKey, edited as Partial<CollectorForm>)
+  }, [ownerKey, watchedValues, profileDefaults])
 
   const otherWallet = checkout.wallets.find((w) => w.id !== checkout.selectedWallet?.id)
   const isUsingOtherWallet = Boolean(checkout.selectedWallet && !checkout.selectedWallet.isPrimary)
@@ -136,6 +160,24 @@ export function CheckoutDesktop({ checkout }: CheckoutDesktopProps) {
           <span>Pagamento</span>
         </nav>
         <h1 className="sr-only">Pagamento</h1>
+
+        {checkout.pendingOrder && (
+          <div
+            role="alert"
+            className="flex flex-wrap items-center justify-between gap-3 rounded-[8px] border border-primary/40 bg-surface-card px-4 py-3 font-mono text-[14px] text-foreground"
+          >
+            <span>
+              Você já tem uma compra em andamento. Finalize ou acompanhe antes de comprar de novo.
+            </span>
+            <Link
+              to="/pedido/$orderId"
+              params={{ orderId: checkout.pendingOrder.id }}
+              className="font-bold text-highlight underline"
+            >
+              Acompanhar pedido
+            </Link>
+          </div>
+        )}
 
         <form
           noValidate

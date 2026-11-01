@@ -165,7 +165,25 @@ export const cartHandlers = [
       throw e
     }
 
-    const quote: Quote = { ...totals, version: getCart(getOwnerKey(request)).version }
+    const ownerKey = getOwnerKey(request)
+    const now = Date.now()
+    const quote: Quote = {
+      ...totals,
+      quoteId: `q-${crypto.randomUUID()}`,
+      version: getCart(ownerKey).version,
+      expiresAt: new Date(now + 5 * 60 * 1000).toISOString(),
+    }
+    db.quotes[quote.quoteId] = {
+      ...quote,
+      ownerKey,
+      items: body.items.map(({ nftId, editionId, quantity }) => ({ nftId, editionId, quantity })),
+      couponCode: body.couponCode ?? null,
+    }
+    // Mantém apenas cotações recentes para o localStorage não crescer sem limite.
+    for (const [id, record] of Object.entries(db.quotes)) {
+      if (Date.parse(record.expiresAt) + 60 * 60 * 1000 < now) delete db.quotes[id]
+    }
+    persist()
     return json(quote)
   }),
 ]

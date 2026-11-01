@@ -29,10 +29,10 @@ export async function login(page: Page, user: keyof typeof USERS = 'nova'): Prom
 /** Abre o detalhe e compra a edição padrão, terminando no carrinho. */
 export async function addToCartAndOpenCart(page: Page, nftId = 'nft-1'): Promise<void> {
   await page.goto(`/nft/${nftId}`)
-  await page
-    .locator('button:visible', { hasText: /^(COMPRAR|Comprar NFT)$/ })
-    .first()
-    .click()
+  await page.getByRole('main').waitFor()
+  const buy = page.locator('button:visible', { hasText: /^(COMPRAR|Comprar NFT)$/ }).first()
+  await expect(buy).toBeVisible({ timeout: 15_000 })
+  await buy.click()
   await page.waitForURL(/\/carrinho/)
 }
 
@@ -52,6 +52,9 @@ export async function prepareCheckout(page: Page): Promise<void> {
   if (isDesktop(page)) await page.locator('#referralCode').fill('KURIO2026')
   await page.getByRole('button', { name: 'Conectar carteira' }).click()
   await expect(page.getByText('Carteira conectada:')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Confirmar compra' })).toBeEnabled({
+    timeout: 15_000,
+  })
 }
 
 /** Abre a revisão e confirma o pagamento. */

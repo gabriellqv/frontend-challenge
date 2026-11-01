@@ -50,7 +50,7 @@ export interface FilterSidebarProps {
 /**
  * Barra lateral de filtros e banner em destaque do catálogo.
  * Medidas e hierarquia 100% idênticas ao Figma (`Sidebar`, 310px wide):
- * - Painel de Filtros (310px x 785px, background: #241612)
+ * - Painel de Filtros (310px x 785px, background: var(--color-surface-card))
  * - Banner NFT em Destaque (310px x 470px, degradê e arte com cantos de 22px)
  *
  * @param props - {@link FilterSidebarProps}
@@ -222,8 +222,8 @@ export function FilterSidebar({
       aria-label="Filtros do catálogo"
       className="flex w-full flex-col gap-6 lg:w-[310px] lg:shrink-0"
     >
-      {/* Filters: 310px x 785px, padding 20px, bg: #241612 */}
-      <div className="flex w-full flex-col bg-[#241612] p-5 lg:min-h-[785px] lg:w-[310px]">
+      {/* Filters: 310px x 785px, padding 20px, bg: var(--color-surface-card) */}
+      <div className="flex w-full flex-col bg-surface-card p-5 lg:min-h-[785px] lg:w-[310px]">
         <div className="mb-6 flex w-full flex-col gap-3 lg:w-[270px]">
           <SearchInput value={searchQuery} onChange={onSearchChange} />
           {hasFilters && (
@@ -310,7 +310,7 @@ export function FilterSidebar({
                 className="relative flex h-[21px] w-[258px] cursor-pointer touch-none select-none items-center"
               >
                 {/* Full inactive track */}
-                <div className="h-1 w-full rounded-full bg-[#CFB28C]/30" />
+                <div className="h-1 w-full rounded-full bg-text-secondary/30" />
 
                 {/* Active bar between thumbs */}
                 <div
@@ -335,7 +335,7 @@ export function FilterSidebar({
                   style={{ left: `${minPercent}%` }}
                   className={cn(
                     'absolute top-1/2 -translate-y-1/2 -translate-x-1/2',
-                    'size-[15px] rounded-full border-[3px] border-[#140D0A] bg-primary',
+                    'size-[15px] rounded-full border-[3px] border-ink bg-primary',
                     'cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.5)] transition-colors',
                     'hover:bg-highlight focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
                     activeThumb === 'min' ? 'z-40' : 'z-30',
@@ -356,7 +356,7 @@ export function FilterSidebar({
                   style={{ left: `${maxPercent}%` }}
                   className={cn(
                     'absolute top-1/2 -translate-y-1/2 -translate-x-1/2',
-                    'size-[15px] rounded-full border-[3px] border-[#140D0A] bg-primary',
+                    'size-[15px] rounded-full border-[3px] border-ink bg-primary',
                     'cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.5)] transition-colors',
                     'hover:bg-highlight focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
                     activeThumb === 'max' ? 'z-40' : 'z-30',
@@ -372,7 +372,7 @@ export function FilterSidebar({
                 </span>
               </div>
 
-              {/* Apply Button: 92px x 36px, rounded 6px, bg: #D28A4C */}
+              {/* Apply Button: 92px x 36px, rounded 6px, bg: var(--color-primary) */}
               <button
                 type="button"
                 onClick={handleApplyPrice}

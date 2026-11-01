@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-11-01T13:41:15.795Z",
+  "generatedAt": "2026-11-01T16:28:49.207Z",
   "environment": {
     "lighthouse": "12.6.1",
     "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
-    "benchmarkIndex": 2486.5,
+    "benchmarkIndex": 2545.5,
     "node": "v22.23.3",
     "os": "Linux 7.2.9-arch1-1"
   },
@@ -13,16 +13,16 @@
       "url": "/",
       "runs": 3,
       "scores": {
-        "performance": 92,
-        "accessibility": 97,
+        "performance": 91,
+        "accessibility": 100,
         "best-practices": 100,
-        "seo": 92
+        "seo": 100
       },
       "metrics": {
-        "LCP": 3080,
+        "LCP": 3087,
         "CLS": 0,
-        "TBT": 103,
-        "FCP": 1934
+        "TBT": 129,
+        "FCP": 1941
       },
       "settings": {
         "formFactor": "mobile",
@@ -44,13 +44,13 @@
         "performance": 90,
         "accessibility": 100,
         "best-practices": 100,
-        "seo": 92
+        "seo": 100
       },
       "metrics": {
-        "LCP": 3296,
+        "LCP": 3311,
         "CLS": 0,
-        "TBT": 99,
-        "FCP": 2091
+        "TBT": 137,
+        "FCP": 2097
       },
       "settings": {
         "formFactor": "mobile",
@@ -70,15 +70,15 @@
       "runs": 3,
       "scores": {
         "performance": 100,
-        "accessibility": 97,
+        "accessibility": 100,
         "best-practices": 100,
-        "seo": 92
+        "seo": 100
       },
       "metrics": {
-        "LCP": 754,
+        "LCP": 781,
         "CLS": 0,
         "TBT": 0,
-        "FCP": 518
+        "FCP": 510
       },
       "settings": {
         "formFactor": "desktop",
@@ -100,13 +100,13 @@
         "performance": 99,
         "accessibility": 100,
         "best-practices": 100,
-        "seo": 92
+        "seo": 100
       },
       "metrics": {
-        "LCP": 906,
+        "LCP": 917,
         "CLS": 0,
         "TBT": 0,
-        "FCP": 584
+        "FCP": 594
       },
       "settings": {
         "formFactor": "desktop",

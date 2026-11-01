@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 import { queryKeys } from '@/shared/api/query-keys'
 import { type Cart, nftUpdatedEventSchema, orderUpdatedEventSchema } from '@/shared/contracts'
 import { formatEth } from '@/shared/lib/money'
-import { getOwnerKey } from '@/shared/session'
+import { getOwnerKey, getToken } from '@/shared/session'
 
 import { createEventGate } from './event-gate'
 import { REALTIME_URL } from './url'
@@ -45,7 +45,11 @@ export function useRealtimeSync(sessionScope: string): void {
       // montagem tira esse chunk do caminho crítico do primeiro paint.
       const { io } = await import('socket.io-client')
       if (disposed) return
-      socket = io(REALTIME_URL, { transports: ['websocket'] })
+      const token = getToken()
+      socket = io(REALTIME_URL, {
+        transports: ['websocket'],
+        query: token ? { token } : {},
+      })
 
       socket.on('nft.updated', (raw: unknown) => {
         const parsed = nftUpdatedEventSchema.safeParse(raw)
@@ -61,9 +65,11 @@ export function useRealtimeSync(sessionScope: string): void {
         void queryClient.invalidateQueries({ queryKey: queryKeys.quote.all })
 
         if (cartItem) {
+          const edition = event.editions.find((item) => item.id === cartItem.editionId)
+          const available = edition?.available ?? event.available
           const message =
             cartItem.priceEth === event.priceEth
-              ? `A disponibilidade de ${cartItem.name} mudou. Confira seu carrinho.`
+              ? `A disponibilidade de ${cartItem.name} mudou (${available} unidades). Confira seu carrinho.`
               : `O preço de ${cartItem.name} mudou para ${formatEth(event.priceEth)} ETH. Confira seu carrinho.`
           toast.info(message)
         }
@@ -73,6 +79,9 @@ export function useRealtimeSync(sessionScope: string): void {
         const parsed = orderUpdatedEventSchema.safeParse(raw)
         if (!parsed.success) return
         const event = parsed.data
+        // Defesa em profundidade: o mock já entrega só ao dono, mas a sessão
+        // atual precisa confirmar que o evento pertence a ela.
+        if (event.userId !== sessionScope) return
         const orderKey = queryKeys.orders.detail(ownerKey, event.orderId)
         // Pedido que esta sessão não conhece não é dela: ignora sem consumir a versão.
         if (queryClient.getQueryData(orderKey) === undefined) return

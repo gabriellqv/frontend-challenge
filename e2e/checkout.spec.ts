@@ -61,6 +61,73 @@ test.describe('compra', () => {
     await expect(page.getByRole('dialog', { name: 'Revise sua compra' })).toHaveCount(0)
   })
 
+  test('rascunho do checkout sobrevive a refresh', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'o formulário do colecionador só existe no desktop')
+    await login(page)
+    await addToCartAndOpenCart(page)
+    await page.goto('/pagamento')
+
+    await page.locator('#displayName').fill('Colecionador Persistente')
+    await page.locator('#username').fill('col.persistente')
+    await page.locator('#profileName').fill('Perfil Persistente')
+    await page.locator('#collectorNote').fill('Este rascunho precisa sobreviver ao refresh.')
+    await page.waitForFunction(() =>
+      Object.keys(sessionStorage).some((key) => key.startsWith('kurio:checkout-draft:')),
+    )
+
+    await page.reload()
+    await expect(page.locator('#displayName')).toHaveValue('Colecionador Persistente')
+    await expect(page.locator('#username')).toHaveValue('col.persistente')
+    await expect(page.locator('#profileName')).toHaveValue('Perfil Persistente')
+    await expect(page.locator('#collectorNote')).toHaveValue(
+      'Este rascunho precisa sobreviver ao refresh.',
+    )
+  })
+
+  test('pedido pendente bloqueia uma segunda compra', async ({ page }) => {
+    test.setTimeout(60_000)
+    await login(page)
+    await addToCartAndOpenCart(page)
+    await prepareCheckout(page)
+
+    await applyScenario(page, 'payment_pending')
+    await page.getByRole('button', { name: 'Confirmar compra' }).click()
+    await page.getByRole('button', { name: 'Confirmar e pagar' }).click()
+
+    await expect(page).toHaveURL(/\/pedido\//, { timeout: 10_000 })
+    await page.goto('/pagamento')
+    await expect(page.getByText(/compra em andamento/i).first()).toBeVisible({
+      timeout: 8_000,
+    })
+    await expect(page.getByRole('button', { name: 'Confirmar compra' })).toBeDisabled({
+      timeout: 8_000,
+    })
+    expect(await countOrders(page)).toBe(1)
+  })
+
+  test('rascunho não sobrescreve campos do perfil que não foram editados', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'o formulário do colecionador só existe no desktop')
+    await login(page)
+    await addToCartAndOpenCart(page)
+    await page.goto('/pagamento')
+    await page.locator('#collectorNote').fill('Observação preservada')
+    await page.waitForFunction(() =>
+      Object.keys(sessionStorage).some((key) => key.startsWith('kurio:checkout-draft:')),
+    )
+
+    await page.goto('/perfil')
+    await page.locator('#name').fill('Nova Sato Renomeada')
+    await page.getByRole('button', { name: 'Salvar' }).click()
+    await expect(page.getByRole('status').filter({ hasText: /Dados atualizados/ })).toBeVisible()
+
+    await page.goto('/pagamento')
+    await expect(page.locator('#displayName')).toHaveValue('Nova Sato Renomeada')
+    await expect(page.locator('#collectorNote')).toHaveValue('Observação preservada')
+  })
+
   test('carteira recusa a conexão e depois conecta e desconecta', async ({ page }) => {
     await login(page)
     await addToCartAndOpenCart(page)

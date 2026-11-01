@@ -5,7 +5,10 @@ import { idSchema, isoDateSchema } from './common'
 export const userSchema = z.object({
   id: idSchema,
   name: z.string().min(1),
+  username: z.string().min(3),
   email: z.string().email(),
+  ensName: z.string().nullable(),
+  walletNickname: z.string().nullable(),
   avatarUrl: z.string().nullable(),
 })
 export type User = z.infer<typeof userSchema>

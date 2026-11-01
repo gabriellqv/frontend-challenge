@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 
@@ -42,6 +40,8 @@ interface WalletFormProps {
   makePrimary: boolean
   /** Dados do colecionador exibidos (somente leitura) no formulário. */
   profile: Profile | undefined
+  /** Chamado após salvar, para o aviso sobreviver ao remount do formulário. */
+  onSaved?: (message: string) => void
 }
 
 /**
@@ -51,10 +51,9 @@ interface WalletFormProps {
  * @param props - {@link WalletFormProps}
  * @returns Formulário da carteira.
  */
-export function WalletForm({ wallet, makePrimary, profile }: WalletFormProps) {
+export function WalletForm({ wallet, makePrimary, profile, onSaved }: WalletFormProps) {
   const createWallet = useCreateWallet()
   const updateWallet = useUpdateWallet()
-  const [savedMessage, setSavedMessage] = useState<string | null>(null)
   const form = useForm<WalletFormValues>({
     resolver: zodResolver(walletFormSchema),
     defaultValues: walletFormDefaults(wallet),
@@ -94,7 +93,6 @@ export function WalletForm({ wallet, makePrimary, profile }: WalletFormProps) {
   }
 
   function onSubmit(values: WalletFormValues) {
-    setSavedMessage(null)
     const body = {
       label: values.label,
       network: values.network,
@@ -104,7 +102,7 @@ export function WalletForm({ wallet, makePrimary, profile }: WalletFormProps) {
       ensName: `${values.ensName}${values.ensDomain}`,
     }
     const callbacks = {
-      onSuccess: () => setSavedMessage('Carteira salva. Ela já pode ser usada no pagamento.'),
+      onSuccess: () => onSaved?.('Carteira salva. Ela já pode ser usada no pagamento.'),
       onError: applyApiFieldErrors,
     }
     if (wallet) updateWallet.mutate({ id: wallet.id, ...body }, callbacks)
@@ -304,12 +302,6 @@ export function WalletForm({ wallet, makePrimary, profile }: WalletFormProps) {
           {apiMessage}
         </p>
       )}
-      {savedMessage && (
-        <p role="status" className="font-mono text-sm text-success">
-          {savedMessage}
-        </p>
-      )}
-
       <Button type="submit" size="sm" className="w-[131px] rounded-[3px]" disabled={isSaving}>
         {isSaving ? 'Salvando…' : 'Salvar carteira'}
       </Button>

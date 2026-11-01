@@ -13,11 +13,28 @@ function firstMessage(result: { success: boolean; error?: { issues: { message: s
 
 describe('mensagens de validação de conta em pt-BR', () => {
   it('valida o nome do perfil', () => {
-    const empty = updateProfileRequestSchema.safeParse({ name: '', avatarUrl: null })
+    const base = { username: 'nova.sato', email: 'nova@kurio.test', avatarUrl: null }
+    const empty = updateProfileRequestSchema.safeParse({ ...base, name: '' })
     expect(firstMessage(empty)).toBe('Nome é obrigatório')
 
-    const short = updateProfileRequestSchema.safeParse({ name: 'a', avatarUrl: null })
+    const short = updateProfileRequestSchema.safeParse({ ...base, name: 'a' })
     expect(firstMessage(short)).toBe('Nome deve ter no mínimo 2 caracteres')
+  })
+
+  it('valida nome de usuário e e-mail do perfil', () => {
+    const badUsername = updateProfileRequestSchema.safeParse({
+      name: 'Nova Sato',
+      username: 'Nova Sato',
+      email: 'nova@kurio.test',
+    })
+    expect(firstMessage(badUsername)).toBe('Use apenas letras minúsculas, números, ponto ou _')
+
+    const badEmail = updateProfileRequestSchema.safeParse({
+      name: 'Nova Sato',
+      username: 'nova.sato',
+      email: 'invalido',
+    })
+    expect(firstMessage(badEmail)).toBe('E-mail inválido')
   })
 
   it('valida a troca de senha', () => {

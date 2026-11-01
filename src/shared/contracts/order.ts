@@ -51,6 +51,8 @@ export type Order = z.infer<typeof orderSchema>
  * confirmação. `connectionId` vem da conexão simulada da carteira escolhida.
  */
 export const createOrderRequestSchema = z.object({
+  /** Cotação revisada pelo usuário; o servidor recusa se ela mudou ou expirou. */
+  quoteId: idSchema,
   items: z.array(
     z.object({
       nftId: idSchema,
@@ -65,3 +67,8 @@ export const createOrderRequestSchema = z.object({
   expectedTotalEth: ethSchema,
 })
 export type CreateOrderRequest = z.infer<typeof createOrderRequestSchema>
+
+export const pendingOrdersSchema = z.object({
+  items: z.array(orderSchema),
+})
+export type PendingOrders = z.infer<typeof pendingOrdersSchema>

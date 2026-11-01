@@ -92,7 +92,7 @@ function CartPage() {
           {/* Breadcrumb: Início / Mercado / Carrinho */}
           <nav
             aria-label="Breadcrumb"
-            className="flex h-4 items-center gap-2 font-mono text-[15px] leading-4 font-bold text-[#F5F1EB]"
+            className="flex h-4 items-center gap-2 font-mono text-[15px] leading-4 font-bold text-foreground"
           >
             <Link
               to="/"
@@ -101,7 +101,7 @@ function CartPage() {
             >
               Início
             </Link>
-            <span className="text-[#F5F1EB]">/</span>
+            <span className="text-foreground">/</span>
             <Link
               to="/"
               search={DEFAULT_NFT_LIST_QUERY}
@@ -109,22 +109,22 @@ function CartPage() {
             >
               Mercado
             </Link>
-            <span className="text-[#F5F1EB]">/</span>
-            <span className="text-[#F5F1EB]">Carrinho</span>
+            <span className="text-foreground">/</span>
+            <span className="text-foreground">Carrinho</span>
           </nav>
 
           {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-[12px] border border-[#3F2319] bg-[#241612] px-6 py-16 text-center">
-              <h1 className="font-mono text-2xl font-bold text-[#F5F1EB]">
+            <div className="flex flex-col items-center justify-center rounded-[12px] border border-field bg-surface-card px-6 py-16 text-center">
+              <h1 className="font-mono text-2xl font-bold text-foreground">
                 Seu carrinho está vazio
               </h1>
-              <p className="mt-2 font-mono text-sm text-[#CFB28C]">
+              <p className="mt-2 font-mono text-sm text-text-secondary">
                 Explore o catálogo e adicione colecionáveis digitais exclusivos.
               </p>
               <Link
                 to="/"
                 search={DEFAULT_NFT_LIST_QUERY}
-                className="mt-6 inline-flex rounded-[6px] bg-primary px-6 py-2.5 font-mono text-sm font-bold text-[#140D0A] transition-colors hover:bg-highlight"
+                className="mt-6 inline-flex rounded-[6px] bg-primary px-6 py-2.5 font-mono text-sm font-bold text-ink transition-colors hover:bg-highlight"
               >
                 Explorar NFTs
               </Link>
@@ -136,15 +136,15 @@ function CartPage() {
               <div className="flex w-full flex-1 flex-col gap-3 lg:max-w-[782px]">
                 {/* Table Header: NFTs, Preço, Edições, Total */}
                 <div className="hidden h-4 w-full items-center justify-between pr-6 font-mono text-[16px] leading-4 sm:flex">
-                  <span className="w-[250px] font-bold text-[#F5F1EB]">NFTs</span>
-                  <span className="w-[77px] text-center font-medium text-[#F5F1EB]">Preço</span>
-                  <span className="w-[75px] text-center font-bold text-[#F5F1EB]">Edições</span>
-                  <span className="w-[87px] text-center font-medium text-[#F5F1EB]">Total</span>
+                  <span className="w-[250px] font-bold text-foreground">NFTs</span>
+                  <span className="w-[77px] text-center font-medium text-foreground">Preço</span>
+                  <span className="w-[75px] text-center font-bold text-foreground">Edições</span>
+                  <span className="w-[87px] text-center font-medium text-foreground">Total</span>
                   <span className="w-[24px]" aria-hidden="true" />
                 </div>
 
                 {/* Line 2 */}
-                <div className="hidden w-full border-b border-[#D28A4C]/30 pt-1 sm:block" />
+                <div className="hidden w-full border-b border-primary/30 pt-1 sm:block" />
 
                 {/* Cart Items List */}
                 <ul className="flex flex-col gap-3">
@@ -156,7 +156,7 @@ function CartPage() {
                     return (
                       <li
                         key={item.id}
-                        className="flex min-h-[70px] w-full flex-col justify-between rounded-[6px] bg-[#241612] p-3 transition-colors sm:h-[70px] sm:flex-row sm:items-center sm:p-0 sm:pr-6"
+                        className="flex min-h-[70px] w-full flex-col justify-between rounded-[6px] bg-surface-card p-3 transition-colors sm:h-[70px] sm:flex-row sm:items-center sm:p-0 sm:pr-6"
                       >
                         {/* 1. NFT Info: Image (70x70) + Title/ID */}
                         <div className="flex items-center gap-4 sm:w-[250px]">
@@ -169,11 +169,11 @@ function CartPage() {
                             <Link
                               to="/nft/$nftId"
                               params={{ nftId: item.nftId }}
-                              className="truncate text-[16px] leading-4 font-bold text-[#F5F1EB] transition-colors hover:text-primary"
+                              className="truncate text-[16px] leading-4 font-bold text-foreground transition-colors hover:text-primary"
                             >
                               {item.name}
                             </Link>
-                            <span className="text-[14px] leading-4 font-normal text-[#B39463]">
+                            <span className="text-[14px] leading-4 font-normal text-sand">
                               ID do token: {tokenId} · {item.editionName}
                             </span>
                             <CartItemNotice item={item} />
@@ -183,7 +183,7 @@ function CartPage() {
                         {/* Mobile Row with Price, Stepper, Total, Delete */}
                         <div className="mt-3 flex items-center justify-between sm:mt-0 sm:contents">
                           {/* 2. Unit Price */}
-                          <div className="font-mono text-[16px] leading-4 font-bold whitespace-nowrap text-[#CFB28C] sm:w-[77px] sm:text-center">
+                          <div className="font-mono text-[16px] leading-4 font-bold whitespace-nowrap text-text-secondary sm:w-[77px] sm:text-center">
                             {formatEth(item.priceEth)} ETH
                           </div>
 
@@ -197,11 +197,11 @@ function CartPage() {
                                 const next = Math.max(1, item.quantity - 1)
                                 updateItem.mutate({ itemId: item.id, quantity: next })
                               }}
-                              className="flex h-[30px] w-[20px] cursor-pointer items-center justify-center rounded-[20px] border border-[#140D0A] bg-primary text-[#000000] shadow-[0px_4px_12px_-2px_rgba(20,13,10,0.15)] transition-colors hover:bg-highlight disabled:cursor-not-allowed disabled:opacity-40"
+                              className="flex h-[30px] w-[20px] cursor-pointer items-center justify-center rounded-[20px] border border-ink bg-primary text-black shadow-[0px_4px_12px_-2px_rgba(20,13,10,0.15)] transition-colors hover:bg-highlight disabled:cursor-not-allowed disabled:opacity-40"
                             >
                               <Minus aria-hidden="true" className="size-3.5 stroke-[2.5]" />
                             </button>
-                            <span className="min-w-[11px] text-center font-mono text-[17px] leading-6 font-normal text-[#F5F1EB]">
+                            <span className="min-w-[11px] text-center font-mono text-[17px] leading-6 font-normal text-foreground">
                               {item.quantity}
                             </span>
                             <button
@@ -217,14 +217,14 @@ function CartPage() {
                                 )
                                 updateItem.mutate({ itemId: item.id, quantity: next })
                               }}
-                              className="flex h-[30px] w-[20px] cursor-pointer items-center justify-center rounded-[20px] border border-[#140D0A] bg-primary text-[#000000] shadow-[0px_4px_12px_-2px_rgba(20,13,10,0.15)] transition-colors hover:bg-highlight disabled:cursor-not-allowed disabled:opacity-40"
+                              className="flex h-[30px] w-[20px] cursor-pointer items-center justify-center rounded-[20px] border border-ink bg-primary text-black shadow-[0px_4px_12px_-2px_rgba(20,13,10,0.15)] transition-colors hover:bg-highlight disabled:cursor-not-allowed disabled:opacity-40"
                             >
                               <Plus aria-hidden="true" className="size-3.5 stroke-[2.5]" />
                             </button>
                           </div>
 
                           {/* 4. Item Total */}
-                          <div className="font-mono text-[16px] leading-4 font-bold whitespace-nowrap text-[#E89B55] sm:w-[87px] sm:text-center">
+                          <div className="font-mono text-[16px] leading-4 font-bold whitespace-nowrap text-highlight sm:w-[87px] sm:text-center">
                             {formatEth(itemTotalEth)} ETH
                           </div>
 
@@ -234,7 +234,7 @@ function CartPage() {
                               type="button"
                               onClick={() => removeItem.mutate(item.id)}
                               aria-label={`Remover ${item.name} do carrinho`}
-                              className="p-1 text-[#B39463] transition-colors hover:text-[#E89B55]"
+                              className="p-1 text-sand transition-colors hover:text-highlight"
                             >
                               <Trash2 aria-hidden="true" className="size-5" />
                             </button>
@@ -253,28 +253,28 @@ function CartPage() {
               >
                 {/* Heading */}
                 <div className="flex flex-col gap-3">
-                  <h2 className="font-mono text-[18px] leading-4 font-bold text-[#F5F1EB]">
+                  <h2 className="font-mono text-[18px] leading-4 font-bold text-foreground">
                     Resumo da carteira
                   </h2>
-                  <div className="w-full border-b border-[#D28A4C]/30" />
+                  <div className="w-full border-b border-primary/30" />
                 </div>
 
                 {/* Promo Code */}
                 <div className="flex flex-col gap-2">
                   <label
                     htmlFor="promo-code-input"
-                    className="font-mono text-[14px] leading-4 font-bold text-[#F5F1EB]"
+                    className="font-mono text-[14px] leading-4 font-bold text-foreground"
                   >
                     Código promocional
                   </label>
 
                   {appliedCoupon ? (
                     <div className="flex h-[40px] items-center justify-between rounded-[3px] border border-primary bg-primary/10 px-3 font-mono text-[14px]">
-                      <span className="font-bold text-[#E89B55]">{appliedCoupon}</span>
+                      <span className="font-bold text-highlight">{appliedCoupon}</span>
                       <button
                         type="button"
                         onClick={() => setAppliedCoupon(undefined)}
-                        className="text-xs text-[#CFB28C] underline hover:text-foreground"
+                        className="text-xs text-text-secondary underline hover:text-foreground"
                       >
                         Remover
                       </button>
@@ -295,11 +295,11 @@ function CartPage() {
                         value={couponInput}
                         onChange={(e) => setCouponInput(e.target.value)}
                         placeholder="Digite o código promocional..."
-                        className="h-full min-w-0 flex-1 bg-transparent px-2 font-mono text-[12px] leading-4 text-[#F5F1EB] placeholder:text-[#B39463] focus:outline-none"
+                        className="h-full min-w-0 flex-1 bg-transparent px-2 font-mono text-[12px] leading-4 text-foreground placeholder:text-sand focus:outline-none"
                       />
                       <button
                         type="submit"
-                        className="flex h-[40px] w-[102px] shrink-0 cursor-pointer items-center justify-center rounded-r-[2px] bg-primary font-mono text-[15px] leading-4 font-bold text-[#140D0A] transition-colors hover:bg-highlight"
+                        className="flex h-[40px] w-[102px] shrink-0 cursor-pointer items-center justify-center rounded-r-[2px] bg-primary font-mono text-[15px] leading-4 font-bold text-ink transition-colors hover:bg-highlight"
                       >
                         Aplicar
                       </button>
@@ -318,20 +318,20 @@ function CartPage() {
                 <div className="flex flex-col gap-3 font-mono">
                   {/* Subtotal */}
                   <div className="flex items-center justify-between">
-                    <span className="text-[15px] leading-5 font-normal text-[#F5F1EB]">
+                    <span className="text-[15px] leading-5 font-normal text-foreground">
                       Subtotal
                     </span>
-                    <span className="text-[18px] leading-4 font-normal text-[#F5F1EB]">
+                    <span className="text-[18px] leading-4 font-normal text-foreground">
                       {quote.data ? `${formatEth(quote.data.subtotalEth)} ETH` : '—'}
                     </span>
                   </div>
 
                   {/* Desconto do lançamento */}
                   <div className="flex items-center justify-between">
-                    <span className="text-[15px] leading-5 font-normal text-[#F5F1EB]">
+                    <span className="text-[15px] leading-5 font-normal text-foreground">
                       Desconto do lançamento
                     </span>
-                    <span className="text-[15px] leading-5 font-normal text-[#F5F1EB]">
+                    <span className="text-[15px] leading-5 font-normal text-foreground">
                       {quote.data && quote.data.discountEth !== '0'
                         ? `(-) ${formatEth(quote.data.discountEth)} ETH`
                         : '(-) 00.00'}
@@ -341,22 +341,22 @@ function CartPage() {
                   {/* Taxa de rede */}
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-[15px] leading-5 font-normal text-[#F5F1EB]">
+                      <span className="text-[15px] leading-5 font-normal text-foreground">
                         Taxa de rede
                       </span>
-                      <span className="text-[18px] leading-4 font-normal text-[#F5F1EB]">
+                      <span className="text-[18px] leading-4 font-normal text-foreground">
                         {quote.data ? `${formatEth(quote.data.networkFeeEth)} ETH` : '—'}
                       </span>
                     </div>
-                    <span className="text-right text-[12px] leading-4 font-normal text-[#E89B55]">
+                    <span className="text-right text-[12px] leading-4 font-normal text-highlight">
                       Taxa estimada
                     </span>
                   </div>
 
                   {/* Total */}
                   <div className="flex items-center justify-between pt-1">
-                    <span className="text-[16px] leading-4 font-bold text-[#F5F1EB]">Total</span>
-                    <span className="text-[18px] leading-4 font-bold text-[#E89B55]">
+                    <span className="text-[16px] leading-4 font-bold text-foreground">Total</span>
+                    <span className="text-[18px] leading-4 font-bold text-highlight">
                       {quote.data ? `${formatEth(quote.data.totalEth)} ETH` : '—'}
                     </span>
                   </div>
@@ -368,7 +368,7 @@ function CartPage() {
                     to="/pagamento"
                     aria-label="Finalizar compra"
                     className={cn(
-                      'flex h-[40px] w-full cursor-pointer items-center justify-center rounded-[3px] bg-primary font-mono text-[15px] leading-4 font-bold text-[#140D0A] transition-colors hover:bg-highlight',
+                      'flex h-[40px] w-full cursor-pointer items-center justify-center rounded-[3px] bg-primary font-mono text-[15px] leading-4 font-bold text-ink transition-colors hover:bg-highlight',
                       (!quote.data || items.length === 0) &&
                         'pointer-events-none cursor-not-allowed opacity-50',
                     )}
@@ -379,7 +379,7 @@ function CartPage() {
                   <Link
                     to="/"
                     search={DEFAULT_NFT_LIST_QUERY}
-                    className="font-mono text-[15px] leading-5 font-normal text-[#E89B55] transition-colors hover:underline"
+                    className="font-mono text-[15px] leading-5 font-normal text-highlight transition-colors hover:underline"
                   >
                     Continuar explorando
                   </Link>
@@ -394,11 +394,11 @@ function CartPage() {
           <div className="flex flex-col gap-3">
             <h2
               id="related-heading"
-              className="font-mono text-[17px] leading-4 font-bold text-[#E89B55]"
+              className="font-mono text-[17px] leading-4 font-bold text-highlight"
             >
               Colecionadores também viram
             </h2>
-            <div className="w-full border-b border-[#D28A4C]/30" />
+            <div className="w-full border-b border-primary/30" />
           </div>
 
           {/* 5 Cards Row */}
@@ -410,7 +410,7 @@ function CartPage() {
                 params={{ nftId: item.id }}
                 className="group flex flex-col gap-2 lg:w-[219px]"
               >
-                <div className="flex h-[255px] w-full items-center justify-center rounded-[17px] bg-[#241612] p-2 transition-transform group-hover:scale-[1.02]">
+                <div className="flex h-[255px] w-full items-center justify-center rounded-[17px] bg-surface-card p-2 transition-transform group-hover:scale-[1.02]">
                   <img
                     src={item.imageUrl}
                     alt={item.name}
@@ -420,10 +420,10 @@ function CartPage() {
                   />
                 </div>
                 <div className="flex flex-col gap-1 font-mono pt-1">
-                  <p className="truncate text-[15px] leading-5 text-[#F5F1EB] transition-colors group-hover:text-primary">
+                  <p className="truncate text-[15px] leading-5 text-foreground transition-colors group-hover:text-primary">
                     {item.name}
                   </p>
-                  <p className="text-[16px] leading-4 font-bold text-[#E89B55]">
+                  <p className="text-[16px] leading-4 font-bold text-highlight">
                     {formatEth(item.priceEth)} ETH
                   </p>
                 </div>
@@ -456,8 +456,8 @@ function CartPage() {
         </section>
       </div>
 
-      {/* Mobile / Carrinho de NFTs (Figma mobile: 414px, #140D0A) */}
-      <div className="flex min-h-[100dvh] w-full flex-1 flex-col justify-between bg-[#140D0A] pt-8 md:hidden">
+      {/* Mobile / Carrinho de NFTs (Figma mobile: 414px, var(--color-ink)) */}
+      <div className="flex min-h-[100dvh] w-full flex-1 flex-col justify-between bg-ink pt-8 md:hidden">
         {/* Screen Header: Back Button + Title "Carrinho de NFTs" + Modo de Excluir */}
         <div className="flex w-full flex-col items-center px-7">
           <div className="relative flex h-[44px] w-full max-w-[358px] items-center justify-between">
@@ -465,12 +465,12 @@ function CartPage() {
               type="button"
               onClick={() => window.history.back()}
               aria-label="Voltar"
-              className="flex size-[35px] cursor-pointer items-center justify-center rounded-full border border-[#3F2319] bg-[#2F1D15] transition-colors hover:border-[#B39463]"
+              className="flex size-[35px] cursor-pointer items-center justify-center rounded-full border border-field bg-surface-raised transition-colors hover:border-sand"
             >
-              <ArrowLeft className="size-4 text-[#B39463]" strokeWidth={2} />
+              <ArrowLeft className="size-4 text-sand" strokeWidth={2} />
             </button>
 
-            <h1 className="font-mono text-[19px] font-bold leading-4 text-[#F5F1EB]">
+            <h1 className="font-mono text-[19px] font-bold leading-4 text-foreground">
               Carrinho de NFTs
             </h1>
 
@@ -482,8 +482,8 @@ function CartPage() {
                 className={cn(
                   'flex h-[32px] cursor-pointer items-center gap-1.5 rounded-full border px-3 font-mono text-[13px] font-medium transition-all active:scale-95',
                   isDeleteMode
-                    ? 'border-[#D28A4C] bg-[#D28A4C] font-bold text-[#140D0A] shadow-md'
-                    : 'border-[#3F2319] bg-[#2F1D15] text-[#CFB28C] hover:border-[#D28A4C]/60 hover:text-[#E89B55]',
+                    ? 'border-primary bg-primary font-bold text-ink shadow-md'
+                    : 'border-field bg-surface-raised text-text-secondary hover:border-primary/60 hover:text-highlight',
                 )}
               >
                 <Trash2 className="size-3.5" />
@@ -497,14 +497,14 @@ function CartPage() {
 
         {items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center px-7 py-16 text-center">
-            <h2 className="font-mono text-xl font-bold text-[#F5F1EB]">Seu carrinho está vazio</h2>
-            <p className="mt-2 font-mono text-sm text-[#CFB28C]">
+            <h2 className="font-mono text-xl font-bold text-foreground">Seu carrinho está vazio</h2>
+            <p className="mt-2 font-mono text-sm text-text-secondary">
               Explore o catálogo e adicione colecionáveis digitais exclusivos.
             </p>
             <Link
               to="/"
               search={DEFAULT_NFT_LIST_QUERY}
-              className="mt-6 inline-flex h-[50px] w-full max-w-[358px] items-center justify-center rounded-[40px] bg-gradient-to-r from-[#D28A4C] to-[#E89B55] font-mono text-sm font-bold text-[#140D0A] transition-colors"
+              className="mt-6 inline-flex h-[50px] w-full max-w-[358px] items-center justify-center rounded-[40px] bg-gradient-to-r from-primary to-highlight font-mono text-sm font-bold text-ink transition-colors"
             >
               Explorar NFTs
             </Link>
@@ -516,8 +516,8 @@ function CartPage() {
               {/* Informative banner when in Delete Mode */}
               {isDeleteMode && (
                 <div className="mt-3 flex w-full flex-col items-center px-7">
-                  <div className="flex w-full max-w-[358px] items-center justify-between rounded-[10px] border border-[#D28A4C]/40 bg-[#241612] px-3.5 py-2">
-                    <span className="font-mono text-[13px] text-[#CFB28C]">
+                  <div className="flex w-full max-w-[358px] items-center justify-between rounded-[10px] border border-primary/40 bg-surface-card px-3.5 py-2">
+                    <span className="font-mono text-[13px] text-text-secondary">
                       Modo de exclusão ativo
                     </span>
                     <button
@@ -526,7 +526,7 @@ function CartPage() {
                         items.forEach((item) => removeItem.mutate(item.id))
                         setIsDeleteMode(false)
                       }}
-                      className="cursor-pointer font-mono text-[13px] font-bold text-[#E89B55] underline hover:text-[#F5F1EB]"
+                      className="cursor-pointer font-mono text-[13px] font-bold text-highlight underline hover:text-foreground"
                     >
                       Limpar tudo
                     </button>
@@ -546,8 +546,8 @@ function CartPage() {
                       <div
                         key={item.id}
                         className={cn(
-                          'relative flex h-[104px] w-full max-w-[358px] overflow-hidden rounded-[14px] bg-[#241612] shadow-[0px_6px_20px_rgba(10,6,4,0.45)] transition-all',
-                          isDeleteMode && 'border border-[#D28A4C]/60',
+                          'relative flex h-[104px] w-full max-w-[358px] overflow-hidden rounded-[14px] bg-surface-card shadow-[0px_6px_20px_rgba(10,6,4,0.45)] transition-all',
+                          isDeleteMode && 'border border-primary/60',
                         )}
                       >
                         {/* Thumbnail: 104x104px, rounded-l-[14px] */}
@@ -561,16 +561,16 @@ function CartPage() {
                             <Link
                               to="/nft/$nftId"
                               params={{ nftId: item.nftId }}
-                              className="truncate text-[15px] font-bold leading-4 text-[#F5F1EB] hover:text-[#E89B55]"
+                              className="truncate text-[15px] font-bold leading-4 text-foreground hover:text-highlight"
                             >
                               {item.name}
                             </Link>
-                            <span className="text-[13px] font-normal leading-4 text-[#CFB28C]">
+                            <span className="text-[13px] font-normal leading-4 text-text-secondary">
                               {editionText}
                             </span>
                             <CartItemNotice item={item} />
                           </div>
-                          <div className="text-[17px] font-bold leading-4 text-[#E89B55]">
+                          <div className="text-[17px] font-bold leading-4 text-highlight">
                             {formatEth(itemTotalEth)} ETH
                           </div>
                         </div>
@@ -581,7 +581,7 @@ function CartPage() {
                             type="button"
                             aria-label={`Excluir ${item.name} do carrinho`}
                             onClick={() => removeItem.mutate(item.id)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 flex h-[34px] cursor-pointer items-center gap-1.5 rounded-full border border-[#D28A4C] bg-[#2F1D15] px-3 font-mono text-[13px] font-bold text-[#E89B55] shadow-sm transition-all hover:bg-[#D28A4C] hover:text-[#140D0A] active:scale-95"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 flex h-[34px] cursor-pointer items-center gap-1.5 rounded-full border border-primary bg-surface-raised px-3 font-mono text-[13px] font-bold text-highlight shadow-sm transition-all hover:bg-primary hover:text-ink active:scale-95"
                           >
                             <Trash2 className="size-4" />
                             <span>Excluir</span>
@@ -593,7 +593,7 @@ function CartPage() {
                               type="button"
                               aria-label={`Remover ${item.name} do carrinho`}
                               onClick={() => removeItem.mutate(item.id)}
-                              className="absolute right-3 top-2.5 flex size-7 cursor-pointer items-center justify-center rounded-full border border-[#3F2319] bg-[#2F1D15] text-[#CFB28C] transition-colors hover:border-[#D28A4C] hover:text-[#E89B55] active:scale-95"
+                              className="absolute right-3 top-2.5 flex size-7 cursor-pointer items-center justify-center rounded-full border border-field bg-surface-raised text-text-secondary transition-colors hover:border-primary hover:text-highlight active:scale-95"
                             >
                               <Trash2 className="size-3.5" />
                             </button>
@@ -615,17 +615,17 @@ function CartPage() {
                                     removeItem.mutate(item.id)
                                   }
                                 }}
-                                className="flex size-6 cursor-pointer items-center justify-center rounded-full border border-[#3F2319] bg-[#2F1D15] transition-colors hover:border-[#CFB28C]"
+                                className="flex size-6 cursor-pointer items-center justify-center rounded-full border border-field bg-surface-raised transition-colors hover:border-text-secondary"
                               >
                                 {item.quantity <= 1 ? (
-                                  <Trash2 className="size-3 text-[#CFB28C]" />
+                                  <Trash2 className="size-3 text-text-secondary" />
                                 ) : (
-                                  <Minus className="size-3 text-[#F5F1EB]" />
+                                  <Minus className="size-3 text-foreground" />
                                 )}
                               </button>
 
                               {/* Quantity number */}
-                              <span className="min-w-[12px] text-center font-mono text-[15px] font-medium leading-[20px] text-[#F5F1EB]">
+                              <span className="min-w-[12px] text-center font-mono text-[15px] font-medium leading-[20px] text-foreground">
                                 {item.quantity}
                               </span>
 
@@ -644,9 +644,9 @@ function CartPage() {
                                   )
                                   updateItem.mutate({ itemId: item.id, quantity: next })
                                 }}
-                                className="flex size-6 cursor-pointer items-center justify-center rounded-full border border-[#3F2319] bg-[#2F1D15] transition-colors hover:border-[#CFB28C] disabled:cursor-not-allowed disabled:opacity-50"
+                                className="flex size-6 cursor-pointer items-center justify-center rounded-full border border-field bg-surface-raised transition-colors hover:border-text-secondary disabled:cursor-not-allowed disabled:opacity-50"
                               >
-                                <Plus className="size-3 text-[#F5F1EB]" />
+                                <Plus className="size-3 text-foreground" />
                               </button>
                             </div>
                           </>
@@ -658,17 +658,17 @@ function CartPage() {
               </div>
             </div>
 
-            {/* Payment Summary Bottom Sheet: in the exact same color as mobile navbar (#241612) and extending to the bottom edge */}
-            <div className="mt-8 flex flex-1 w-full flex-col items-center rounded-t-[40px] bg-[#241612] px-6 pt-6 pb-9 shadow-[0px_-6px_20px_rgba(10,6,4,0.45)]">
+            {/* Payment Summary Bottom Sheet: in the exact same color as mobile navbar (var(--color-surface-card)) and extending to the bottom edge */}
+            <div className="mt-8 flex flex-1 w-full flex-col items-center rounded-t-[40px] bg-surface-card px-6 pt-6 pb-9 shadow-[0px_-6px_20px_rgba(10,6,4,0.45)]">
               <div className="flex w-full max-w-[366px] flex-col gap-3">
                 {/* Promo Code Input */}
                 {appliedCoupon ? (
-                  <div className="flex h-[50px] w-full items-center justify-between rounded-[40px] border border-[#3F2319] bg-[#241612] px-4 font-mono text-[14px] shadow-[0px_6px_20px_rgba(10,6,4,0.45)]">
-                    <span className="font-bold text-[#E89B55]">{appliedCoupon}</span>
+                  <div className="flex h-[50px] w-full items-center justify-between rounded-[40px] border border-field bg-surface-card px-4 font-mono text-[14px] shadow-[0px_6px_20px_rgba(10,6,4,0.45)]">
+                    <span className="font-bold text-highlight">{appliedCoupon}</span>
                     <button
                       type="button"
                       onClick={() => setAppliedCoupon(undefined)}
-                      className="text-xs text-[#CFB28C] underline hover:text-[#F5F1EB]"
+                      className="text-xs text-text-secondary underline hover:text-foreground"
                     >
                       Remover
                     </button>
@@ -681,7 +681,7 @@ function CartPage() {
                         setAppliedCoupon(couponInput.trim().toUpperCase())
                       }
                     }}
-                    className="flex h-[50px] w-full items-center rounded-[40px] border border-[#3F2319] bg-[#241612] pl-4 shadow-[0px_6px_20px_rgba(10,6,4,0.45)]"
+                    className="flex h-[50px] w-full items-center rounded-[40px] border border-field bg-surface-card pl-4 shadow-[0px_6px_20px_rgba(10,6,4,0.45)]"
                   >
                     <input
                       type="text"
@@ -689,11 +689,11 @@ function CartPage() {
                       onChange={(e) => setCouponInput(e.target.value)}
                       placeholder="Digite o código promocional..."
                       aria-label="Código promocional"
-                      className="h-full min-w-0 flex-1 bg-transparent font-mono text-[13px] leading-[22px] text-[#F5F1EB] placeholder:text-[#B39463] focus:outline-none"
+                      className="h-full min-w-0 flex-1 bg-transparent font-mono text-[13px] leading-[22px] text-foreground placeholder:text-sand focus:outline-none"
                     />
                     <button
                       type="submit"
-                      className="flex h-[50px] w-[97px] shrink-0 cursor-pointer items-center justify-center rounded-[40px] bg-gradient-to-r from-[#D28A4C]/54 to-[#D28A4C] font-mono text-[15px] font-bold leading-4 text-[#F5F1EB] transition-opacity hover:opacity-90"
+                      className="flex h-[50px] w-[97px] shrink-0 cursor-pointer items-center justify-center rounded-[40px] bg-gradient-to-r from-primary/54 to-primary font-mono text-[15px] font-bold leading-4 text-foreground transition-opacity hover:opacity-90"
                     >
                       Aplicar
                     </button>
@@ -707,18 +707,20 @@ function CartPage() {
 
                 {/* Subtotal */}
                 <div className="flex h-5 items-center justify-between pt-1 font-mono">
-                  <span className="text-[15px] leading-5 font-normal text-[#F5F1EB]">Subtotal</span>
-                  <span className="text-[16px] leading-4 font-normal text-[#F5F1EB]">
+                  <span className="text-[15px] leading-5 font-normal text-foreground">
+                    Subtotal
+                  </span>
+                  <span className="text-[16px] leading-4 font-normal text-foreground">
                     {quote.data ? `${formatEth(quote.data.subtotalEth)} ETH` : '—'}
                   </span>
                 </div>
 
                 {/* Desconto do lançamento */}
                 <div className="flex h-5 items-center justify-between font-mono">
-                  <span className="text-[15px] leading-5 font-normal text-[#F5F1EB]">
+                  <span className="text-[15px] leading-5 font-normal text-foreground">
                     Desconto do lançamento
                   </span>
-                  <span className="text-[15px] leading-5 font-normal text-[#F5F1EB]">
+                  <span className="text-[15px] leading-5 font-normal text-foreground">
                     {quote.data && quote.data.discountEth !== '0'
                       ? `(-) ${formatEth(quote.data.discountEth)} ETH`
                       : '(-) 00.00'}
@@ -728,22 +730,22 @@ function CartPage() {
                 {/* Taxa de rede */}
                 <div className="flex flex-col items-end gap-0 font-mono">
                   <div className="flex h-5 w-full items-center justify-between">
-                    <span className="text-[15px] leading-5 font-normal text-[#F5F1EB]">
+                    <span className="text-[15px] leading-5 font-normal text-foreground">
                       Taxa de rede
                     </span>
-                    <span className="text-[16px] leading-4 font-normal text-[#F5F1EB]">
+                    <span className="text-[16px] leading-4 font-normal text-foreground">
                       {quote.data ? `${formatEth(quote.data.networkFeeEth)} ETH` : '—'}
                     </span>
                   </div>
-                  <span className="text-[12px] leading-4 font-normal text-[#E89B55]">
+                  <span className="text-[12px] leading-4 font-normal text-highlight">
                     Taxa estimada
                   </span>
                 </div>
 
                 {/* Total */}
                 <div className="flex h-4 items-center justify-between font-mono">
-                  <span className="text-[16px] leading-4 font-bold text-[#F5F1EB]">Total</span>
-                  <span className="text-[18px] leading-4 font-bold text-[#E89B55]">
+                  <span className="text-[16px] leading-4 font-bold text-foreground">Total</span>
+                  <span className="text-[18px] leading-4 font-bold text-highlight">
                     {quote.data ? `${formatEth(quote.data.totalEth)} ETH` : '—'}
                   </span>
                 </div>
@@ -754,7 +756,7 @@ function CartPage() {
                     to="/pagamento"
                     aria-label="Finalizar compra"
                     className={cn(
-                      'flex h-[60px] w-full cursor-pointer items-center justify-center rounded-[40px] bg-gradient-to-r from-[#D28A4C] to-[#D28A4C]/80 font-mono text-[16px] font-bold text-[#140D0A] shadow-[0px_6px_20px_rgba(10,6,4,0.45)] transition-opacity hover:opacity-95',
+                      'flex h-[60px] w-full cursor-pointer items-center justify-center rounded-[40px] bg-gradient-to-r from-primary to-primary/80 font-mono text-[16px] font-bold text-ink shadow-[0px_6px_20px_rgba(10,6,4,0.45)] transition-opacity hover:opacity-95',
                       (!quote.data || items.length === 0) &&
                         'pointer-events-none cursor-not-allowed opacity-50',
                     )}

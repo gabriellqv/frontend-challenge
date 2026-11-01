@@ -7,7 +7,12 @@ import { getDb, persist } from '../db'
 import { json, sleep } from '../http'
 import { QuoteError, computeTotals } from '../pricing'
 import { emitNftUpdated, emitOrderUpdated } from '../realtime'
-import { ORDER_TIMEOUT_DELAY_MS, isOrderTimeout, isPaymentDeclined } from '../scenarios'
+import {
+  ORDER_TIMEOUT_DELAY_MS,
+  isOrderTimeout,
+  isPaymentDeclined,
+  isPaymentPending,
+} from '../scenarios'
 import { errorResponse, getAuthenticatedUser, getOwnerKey } from '../utils'
 import { findWalletConnection } from '../wallet-connections'
 
@@ -31,6 +36,27 @@ function fingerprintOf(body: CreateOrderRequest): string {
   })
 }
 
+/** Pedido ainda em processamento do usuário, se existir. */
+function findPendingOrder(userId: string): Order | undefined {
+  const db = getDb()
+  return Object.values(db.orders).find(
+    (order) => order.status === 'pending' && db.orderOwners[order.id]?.userId === userId,
+  )
+}
+
+function sameQuoteItems(
+  quote: { nftId: string; editionId: string; quantity: number }[],
+  items: { nftId: string; editionId: string; quantity: number }[],
+): boolean {
+  const canonical = (list: typeof items) =>
+    JSON.stringify(
+      [...list]
+        .sort((a, b) => `${a.nftId}:${a.editionId}`.localeCompare(`${b.nftId}:${b.editionId}`))
+        .map(({ nftId, editionId, quantity }) => ({ nftId, editionId, quantity })),
+    )
+  return canonical(quote) === canonical(items)
+}
+
 /**
  * Confirmação: baixa o estoque (publicando `nft.updated`) e remove do
  * carrinho de origem só os itens e quantidades comprados.
@@ -43,7 +69,13 @@ function settleConfirmedOrder(order: Order): void {
     if (!nft || !edition) continue
     edition.available = Math.max(0, edition.available - item.quantity)
     nft.version += 1
-    emitNftUpdated({ nftId: nft.id, version: nft.version, priceEth: nft.priceEth })
+    emitNftUpdated({
+      nftId: nft.id,
+      version: nft.version,
+      priceEth: nft.priceEth,
+      available: nft.editions.reduce((total, edition) => total + edition.available, 0),
+      editions: nft.editions.map(({ id, available }) => ({ id, available })),
+    })
   }
 
   const owner = db.orderOwners[order.id]
@@ -73,7 +105,12 @@ function settlePayment(orderId: string): void {
   }
   order.version += 1
   persist()
-  emitOrderUpdated({ orderId: order.id, status: order.status, version: order.version })
+  emitOrderUpdated({
+    orderId: order.id,
+    userId: db.orderOwners[order.id]!.userId,
+    status: order.status,
+    version: order.version,
+  })
 }
 
 const scheduledResolutions = new Set<string>()
@@ -132,6 +169,37 @@ export const orderHandlers = [
       return json(existingOrder)
     }
 
+    // Uma compra por vez: outra aba não pode criar um segundo pedido enquanto
+    // o primeiro ainda está pendente. A mesma chave acima continua idempotente.
+    const pending = findPendingOrder(user.id)
+    if (pending) {
+      return errorResponse('ORDER_PENDING', 'Você já tem uma compra em andamento.', 409, {
+        orderId: pending.id,
+      })
+    }
+
+    const quote = db.quotes[body.quoteId]
+    if (!quote || quote.ownerKey !== getOwnerKey(request)) {
+      return errorResponse(
+        'STALE_QUOTE',
+        'A cotação revisada não está mais disponível. Revise os valores e tente novamente.',
+        409,
+      )
+    }
+    if (Date.parse(quote.expiresAt) < Date.now()) {
+      return errorResponse('STALE_QUOTE', 'A cotação expirou. Revise os valores.', 409)
+    }
+    if (
+      (quote.couponCode ?? null) !== (body.couponCode ?? null) ||
+      !sameQuoteItems(quote.items, body.items)
+    ) {
+      return errorResponse(
+        'STALE_QUOTE',
+        'Os itens ou o cupom mudaram desde a revisão. Confira os novos valores.',
+        409,
+      )
+    }
+
     const wallet = (db.wallets[user.id] ?? []).find((w) => w.id === body.walletId)
     if (!wallet) {
       return errorResponse('VALIDATION_ERROR', 'Carteira não encontrada', 422, {
@@ -177,7 +245,13 @@ export const orderHandlers = [
       throw e
     }
 
-    if (compare(totals.totalEth, body.expectedTotalEth) !== 0) {
+    if (
+      compare(totals.totalEth, body.expectedTotalEth) !== 0 ||
+      compare(totals.totalEth, quote.totalEth) !== 0 ||
+      compare(totals.subtotalEth, quote.subtotalEth) !== 0 ||
+      compare(totals.discountEth, quote.discountEth) !== 0 ||
+      compare(totals.networkFeeEth, quote.networkFeeEth) !== 0
+    ) {
       return errorResponse(
         'STALE_QUOTE',
         'Os valores mudaram desde a sua revisão. Confira o novo total e confirme novamente.',
@@ -204,7 +278,7 @@ export const orderHandlers = [
     db.orderOwners[order.id] = {
       userId: user.id,
       ownerKey: getOwnerKey(request),
-      paymentResolvesAt: Date.now() + PAYMENT_PROCESSING_MS,
+      paymentResolvesAt: Date.now() + (isPaymentPending() ? 60_000 : PAYMENT_PROCESSING_MS),
       // Decidido na criação: o cenário ativo agora define o resultado, mesmo após refresh.
       paymentOutcome: isPaymentDeclined() ? 'declined' : 'confirmed',
     }
@@ -217,6 +291,21 @@ export const orderHandlers = [
     if (isOrderTimeout()) await sleep(ORDER_TIMEOUT_DELAY_MS)
 
     return json(order, { status: 201 })
+  }),
+
+  http.get('/api/orders', ({ request }) => {
+    const user = getAuthenticatedUser(request)
+    if (!user) return errorResponse('UNAUTHORIZED', 'Autenticação necessária', 401)
+    const db = getDb()
+    const status = new URL(request.url).searchParams.get('status')
+    const items = Object.values(db.orders)
+      .filter((order) => {
+        if (db.orderOwners[order.id]?.userId !== user.id) return false
+        ensurePaymentResolution(order.id)
+        return !status || db.orders[order.id]?.status === status
+      })
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    return json({ items })
   }),
 
   http.get('/api/orders/:id', ({ request, params }) => {

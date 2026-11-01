@@ -192,12 +192,13 @@ function NftDetailPage() {
   return (
     <>
       {/* Mobile / Detalhes do NFT (Figma 414px x 896px) */}
-      <div className="relative flex h-full min-h-[100dvh] max-h-[100dvh] w-full flex-col justify-between overflow-hidden bg-[#140D0A] md:hidden">
+      <div className="relative flex h-full min-h-[100dvh] max-h-[100dvh] w-full flex-col justify-between overflow-hidden bg-ink md:hidden">
         {/* Hero Artwork Section */}
         <div
           className="relative flex flex-1 min-h-0 w-full flex-col justify-between p-4 pb-2"
           style={{
-            background: 'linear-gradient(143.28deg, #241612 -12%, #2F1D15 106.59%)',
+            background:
+              'linear-gradient(143.28deg, var(--color-surface-card) -12%, var(--color-surface-raised) 106.59%)',
           }}
         >
           {/* Top Actions: Back Button (Left) + Favorite Button (Right) */}
@@ -212,7 +213,7 @@ function NftDetailPage() {
                 }
               }}
               aria-label="Voltar"
-              className="flex size-[35px] cursor-pointer items-center justify-center rounded-full border border-[#3F2319] bg-[#2F1D15] text-[#CFB28C] shadow-sm transition-transform active:scale-95"
+              className="flex size-[35px] cursor-pointer items-center justify-center rounded-full border border-field bg-surface-raised text-text-secondary shadow-sm transition-transform active:scale-95"
             >
               <ArrowLeft className="size-5" />
             </button>
@@ -221,13 +222,13 @@ function NftDetailPage() {
               type="button"
               onClick={handleToggleFavorite}
               aria-label={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
-              className="flex size-[35px] cursor-pointer items-center justify-center rounded-full border border-[#3F2319] bg-[#2F1D15] shadow-sm transition-transform active:scale-95"
+              className="flex size-[35px] cursor-pointer items-center justify-center rounded-full border border-field bg-surface-raised shadow-sm transition-transform active:scale-95"
             >
               <Heart
                 aria-hidden="true"
                 className={cn(
                   'size-4 transition-colors',
-                  isFavorite ? 'fill-[#E89B55] text-[#E89B55]' : 'fill-transparent text-[#E89B55]',
+                  isFavorite ? 'fill-highlight text-highlight' : 'fill-transparent text-highlight',
                 )}
               />
             </button>
@@ -242,24 +243,24 @@ function NftDetailPage() {
               width={320}
               height={320}
               fetchPriority="high"
-              className="max-h-full max-w-[280px] sm:max-w-[320px] aspect-square cursor-zoom-in rounded-[24px] border border-[#D28A4C]/15 object-cover shadow-2xl"
+              className="max-h-full max-w-[280px] sm:max-w-[320px] aspect-square cursor-zoom-in rounded-[24px] border border-primary/15 object-cover shadow-2xl"
               onClick={() => setIsZoomOpen(true)}
             />
           </div>
 
           {/* Group 62: Carousel indicator (pill + dots) */}
           <div className="flex shrink-0 items-center justify-center gap-1.5 py-1">
-            <span className="h-[7px] w-[28px] rounded-[25px] bg-[#D28A4C]" />
-            <span className="size-[7px] rounded-full bg-[#D28A4C]" />
-            <span className="size-[7px] rounded-full bg-[#D28A4C]" />
+            <span className="h-[7px] w-[28px] rounded-[25px] bg-primary" />
+            <span className="size-[7px] rounded-full bg-primary" />
+            <span className="size-[7px] rounded-full bg-primary" />
           </div>
         </div>
 
         {/* Details Sheet */}
-        <div className="relative z-10 flex shrink-0 w-full flex-col gap-3 rounded-t-[31px] bg-[#241612] px-6 pt-4 pb-3 shadow-xl">
+        <div className="relative z-10 flex shrink-0 w-full flex-col gap-3 rounded-t-[31px] bg-surface-card px-6 pt-4 pb-3 shadow-xl">
           {/* Title Row: Name + Rating Badge */}
           <div className="flex items-center justify-between gap-2">
-            <h1 className="truncate font-mono text-[19px] font-bold leading-5 text-[#F5F1EB]">
+            <h1 className="truncate font-mono text-[19px] font-bold leading-5 text-foreground">
               {nft.name}
             </h1>
 
@@ -268,13 +269,13 @@ function NftDetailPage() {
               <div
                 role="img"
                 aria-label={`Avaliação ${reviews.average} de 5, ${reviews.count} avaliações`}
-                className="flex h-[26px] shrink-0 items-center gap-1.5 rounded-[32px] border border-[#D28A4C] px-2.5"
+                className="flex h-[26px] shrink-0 items-center gap-1.5 rounded-[32px] border border-primary px-2.5"
               >
                 <Star aria-hidden="true" className="size-3.5 fill-amber text-amber" />
-                <span className="font-mono text-[13px] font-medium leading-4 text-[#F5F1EB]">
+                <span className="font-mono text-[13px] font-medium leading-4 text-foreground">
                   {reviews.average}
                 </span>
-                <span className="font-mono text-[13px] font-normal leading-4 text-[#CFB28C]">
+                <span className="font-mono text-[13px] font-normal leading-4 text-text-secondary">
                   ({reviews.count})
                 </span>
               </div>
@@ -282,7 +283,7 @@ function NftDetailPage() {
           </div>
 
           {/* Description */}
-          <p className="line-clamp-2 font-mono text-[13px] font-normal leading-5 text-[#CFB28C]">
+          <p className="line-clamp-2 font-mono text-[13px] font-normal leading-5 text-text-secondary">
             {nft.description}
           </p>
 
@@ -290,7 +291,7 @@ function NftDetailPage() {
           <div className="flex flex-col gap-1.5">
             <span
               id="mobile-edition-label"
-              className="font-mono text-[14px] font-bold leading-4 text-[#F5F1EB]"
+              className="font-mono text-[14px] font-bold leading-4 text-foreground"
             >
               Edição:
             </span>
@@ -313,8 +314,8 @@ function NftDetailPage() {
                     className={cn(
                       'cursor-pointer rounded-full px-3 py-0.5 font-mono text-[13px] transition-colors disabled:cursor-not-allowed disabled:line-through disabled:opacity-50',
                       isSelected
-                        ? 'border border-[#D28A4C] font-medium text-[#E89B55]'
-                        : 'border border-[#3F2319] font-normal text-[#CFB28C] hover:border-[#D28A4C]/50',
+                        ? 'border border-primary font-medium text-highlight'
+                        : 'border border-field font-normal text-text-secondary hover:border-primary/50',
                     )}
                   >
                     {item.name}
@@ -322,13 +323,13 @@ function NftDetailPage() {
                 )
               })}
             </div>
-            <p className="font-mono text-[12px] leading-4 text-[#B39463]">
+            <p className="font-mono text-[12px] leading-4 text-sand">
               {isSoldOut ? 'Edição esgotada.' : `${available} disponível(is) nesta edição.`}
             </p>
           </div>
 
           {/* Token Info */}
-          <div className="flex flex-col gap-1 font-mono text-[13px] leading-4 text-[#B39463]">
+          <div className="flex flex-col gap-1 font-mono text-[13px] leading-4 text-sand">
             <p>ID do token: {formatTokenId(nft.id)}</p>
             <p>Coleção: {nft.collection}</p>
             <p>Atributos: {nft.attributes.join(', ')}</p>
@@ -336,24 +337,24 @@ function NftDetailPage() {
         </div>
 
         {/* Buy Bar (Docked at Bottom) */}
-        <div className="relative z-20 shrink-0 w-full border-t border-[#3F2319]/50 bg-[#241612] px-6 pt-3 pb-6 shadow-[0px_-4px_20px_rgba(10,6,4,0.45)]">
+        <div className="relative z-20 shrink-0 w-full border-t border-field/50 bg-surface-card px-6 pt-3 pb-6 shadow-[0px_-4px_20px_rgba(10,6,4,0.45)]">
           <div className="mx-auto flex max-w-[366px] flex-col gap-3">
             {/* Top Row: Quantity + Price */}
             <div className="flex items-center justify-between">
               {/* Quantity */}
               <div className="flex items-center gap-2 font-mono">
-                <span className="text-[14px] font-medium text-[#CFB28C]">Qtd.</span>
+                <span className="text-[14px] font-medium text-text-secondary">Qtd.</span>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     disabled={quantity <= 1 || isSoldOut}
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     aria-label="Diminuir quantidade"
-                    className="flex h-[28px] w-[24px] cursor-pointer items-center justify-center rounded-[20px] border border-[#140D0A] bg-[#D28A4C] text-black shadow-sm disabled:cursor-not-allowed disabled:opacity-40"
+                    className="flex h-[28px] w-[24px] cursor-pointer items-center justify-center rounded-[20px] border border-ink bg-primary text-black shadow-sm disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <Minus className="size-3.5 text-black" strokeWidth={3} />
                   </button>
-                  <span className="min-w-4 text-center font-mono text-[16px] font-medium text-[#F5F1EB]">
+                  <span className="min-w-4 text-center font-mono text-[16px] font-medium text-foreground">
                     {quantity}
                   </span>
                   <button
@@ -361,7 +362,7 @@ function NftDetailPage() {
                     disabled={quantity >= maxQuantity || isSoldOut}
                     onClick={() => setQuantity((q) => Math.min(maxQuantity, q + 1))}
                     aria-label="Aumentar quantidade"
-                    className="flex h-[28px] w-[24px] cursor-pointer items-center justify-center rounded-[20px] border border-[#140D0A] bg-[#D28A4C] text-black shadow-sm disabled:cursor-not-allowed disabled:opacity-40"
+                    className="flex h-[28px] w-[24px] cursor-pointer items-center justify-center rounded-[20px] border border-ink bg-primary text-black shadow-sm disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <Plus className="size-3.5 text-black" strokeWidth={3} />
                   </button>
@@ -369,7 +370,7 @@ function NftDetailPage() {
               </div>
 
               {/* Price */}
-              <div className="font-mono text-[18px] font-bold text-[#E89B55]">
+              <div className="font-mono text-[18px] font-bold text-highlight">
                 {formatEth(Big(nft.priceEth).times(quantity).toString())} ETH
               </div>
             </div>
@@ -380,10 +381,10 @@ function NftDetailPage() {
                 type="button"
                 disabled={isSoldOut}
                 onClick={() => addSelectedToCart(true)}
-                className="flex h-[52px] flex-1 cursor-pointer items-center justify-center rounded-[40px] font-mono text-[16px] font-bold text-[#140D0A] shadow-md transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-[52px] flex-1 cursor-pointer items-center justify-center rounded-[40px] font-mono text-[16px] font-bold text-ink shadow-md transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                 style={{
                   background:
-                    'linear-gradient(93.21deg, #D28A4C -3.96%, rgba(210, 138, 76, 0.8) 121.97%)',
+                    'linear-gradient(93.21deg, var(--color-primary) -3.96%, rgba(210, 138, 76, 0.8) 121.97%)',
                 }}
               >
                 {isSoldOut ? 'Esgotado' : 'Comprar NFT'}
@@ -394,7 +395,7 @@ function NftDetailPage() {
                 disabled={isSoldOut}
                 onClick={() => addSelectedToCart(false)}
                 aria-label="Adicionar ao carrinho"
-                className="flex size-[52px] shrink-0 cursor-pointer items-center justify-center rounded-[40px] border border-[#3F2319] bg-[#2F1D15] text-[#B39463] shadow-md transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex size-[52px] shrink-0 cursor-pointer items-center justify-center rounded-[40px] border border-field bg-surface-raised text-sand shadow-md transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <ShoppingCart className="size-5" />
               </button>
@@ -410,7 +411,7 @@ function NftDetailPage() {
           {/* Breadcrumb: Início / Mercado */}
           <nav
             aria-label="Breadcrumb"
-            className="flex h-4 items-center gap-2 font-mono text-[15px] leading-4 font-bold text-[#F5F1EB]"
+            className="flex h-4 items-center gap-2 font-mono text-[15px] leading-4 font-bold text-foreground"
           >
             <Link
               to="/"
@@ -419,7 +420,7 @@ function NftDetailPage() {
             >
               Início
             </Link>
-            <span className="text-[#F5F1EB]">/</span>
+            <span className="text-foreground">/</span>
             <Link
               to="/"
               search={DEFAULT_NFT_LIST_QUERY}
@@ -444,7 +445,7 @@ function NftDetailPage() {
                       onClick={() => setSelectedThumbnailIdx(idx)}
                       aria-label={`Visualizar miniatura ${idx + 1}`}
                       className={cn(
-                        'size-[100px] shrink-0 cursor-pointer overflow-hidden rounded-[8px] bg-[#241612] transition-all',
+                        'size-[100px] shrink-0 cursor-pointer overflow-hidden rounded-[8px] bg-surface-card transition-all',
                         active
                           ? 'border border-primary'
                           : 'border border-transparent hover:border-primary/50',
@@ -456,8 +457,8 @@ function NftDetailPage() {
                 })}
               </div>
 
-              {/* Main Image Box: 444px x 444px, bg #241612, inner image 404px x 404px rounded-[24px] */}
-              <div className="relative flex size-full max-w-[444px] items-center justify-center rounded-[6px] bg-[#241612] p-4 sm:size-[444px]">
+              {/* Main Image Box: 444px x 444px, bg var(--color-surface-card), inner image 404px x 404px rounded-[24px] */}
+              <div className="relative flex size-full max-w-[444px] items-center justify-center rounded-[6px] bg-surface-card p-4 sm:size-[444px]">
                 <img
                   src={selectedArtworkUrl}
                   alt={`Arte digital de ${nft.name}`}
@@ -469,7 +470,7 @@ function NftDetailPage() {
                   onClick={() => setIsZoomOpen(true)}
                   aria-label="Ampliar imagem da arte"
                   title="Ampliar arte"
-                  className="absolute top-[15px] right-[15px] flex size-[30px] cursor-pointer items-center justify-center rounded-full border border-[#3F2319] bg-[#2F1D15] text-[#F5F1EB] transition-colors hover:border-primary hover:text-highlight"
+                  className="absolute top-[15px] right-[15px] flex size-[30px] cursor-pointer items-center justify-center rounded-full border border-field bg-surface-raised text-foreground transition-colors hover:border-primary hover:text-highlight"
                 >
                   <Search aria-hidden="true" className="size-5" />
                 </button>
@@ -480,33 +481,33 @@ function NftDetailPage() {
             <div className="flex flex-1 flex-col justify-between gap-5 lg:min-h-[448px] lg:w-[595px]">
               {/* Title & Price / Star Rating */}
               <div className="flex flex-col gap-3">
-                <h1 className="font-mono text-[28px] leading-[37px] font-bold text-[#F5F1EB]">
+                <h1 className="font-mono text-[28px] leading-[37px] font-bold text-foreground">
                   {nft.name}
                 </h1>
 
                 <div className="flex flex-wrap items-center justify-between gap-4">
-                  <span className="font-mono text-[22px] leading-4 font-bold text-[#E89B55]">
+                  <span className="font-mono text-[22px] leading-4 font-bold text-highlight">
                     {formatEth(nft.priceEth)} ETH
                   </span>
 
                   {reviews && ratingAverage !== null && (
-                    <div className="flex items-center gap-1.5 font-mono text-[15px] leading-5 text-[#F5F1EB]">
+                    <div className="flex items-center gap-1.5 font-mono text-[15px] leading-5 text-foreground">
                       <StarRating rating={ratingAverage} />
                       <span>{reviews.count} avaliações de colecionadores</span>
                     </div>
                   )}
                 </div>
 
-                {/* Thin hairline divider: border 0.3px solid #D28A4C */}
-                <div className="w-full border-b border-[#D28A4C]/30 pt-1" />
+                {/* Thin hairline divider: border 0.3px solid var(--color-primary) */}
+                <div className="w-full border-b border-primary/30 pt-1" />
               </div>
 
               {/* Sobre este NFT: */}
               <div className="flex flex-col gap-3">
-                <h2 className="font-mono text-[15px] leading-4 font-bold text-[#F5F1EB]">
+                <h2 className="font-mono text-[15px] leading-4 font-bold text-foreground">
                   Sobre este NFT:
                 </h2>
-                <p className="font-mono text-[14px] leading-6 font-normal text-[#CFB28C]">
+                <p className="font-mono text-[14px] leading-6 font-normal text-text-secondary">
                   {nft.description}
                 </p>
               </div>
@@ -515,7 +516,7 @@ function NftDetailPage() {
               <div className="flex flex-col gap-3">
                 <span
                   id="desktop-edition-label"
-                  className="font-mono text-[15px] leading-4 font-bold text-[#F5F1EB]"
+                  className="font-mono text-[15px] leading-4 font-bold text-foreground"
                 >
                   Edição:
                 </span>
@@ -539,8 +540,8 @@ function NftDetailPage() {
                         className={cn(
                           'flex h-[28px] min-w-[36px] cursor-pointer items-center justify-center rounded-full px-2 font-mono text-[14px] leading-4 transition-colors disabled:cursor-not-allowed disabled:line-through disabled:opacity-50',
                           active
-                            ? 'border border-primary font-medium text-[#E89B55]'
-                            : 'border border-[#3F2319] font-normal text-[#CFB28C] hover:border-primary/50',
+                            ? 'border border-primary font-medium text-highlight'
+                            : 'border border-field font-normal text-text-secondary hover:border-primary/50',
                         )}
                       >
                         {item.name}
@@ -548,7 +549,7 @@ function NftDetailPage() {
                     )
                   })}
                 </div>
-                <p aria-live="polite" className="font-mono text-[13px] leading-4 text-[#B39463]">
+                <p aria-live="polite" className="font-mono text-[13px] leading-4 text-sand">
                   {isSoldOut
                     ? 'Edição esgotada: escolha outra edição.'
                     : `${available} disponível(is) nesta edição. Máximo por compra: ${maxQuantity}.`}
@@ -564,11 +565,11 @@ function NftDetailPage() {
                     aria-label="Diminuir quantidade"
                     disabled={quantity <= 1}
                     onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                    className="flex h-[49.5px] w-[33px] cursor-pointer items-center justify-center rounded-[33px] border border-[#140D0A] bg-primary text-[#000000] shadow-[0px_6.6px_19.8px_-3.3px_rgba(20,13,10,0.15)] transition-colors hover:bg-highlight disabled:cursor-not-allowed disabled:opacity-40"
+                    className="flex h-[49.5px] w-[33px] cursor-pointer items-center justify-center rounded-[33px] border border-ink bg-primary text-black shadow-[0px_6.6px_19.8px_-3.3px_rgba(20,13,10,0.15)] transition-colors hover:bg-highlight disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <Minus aria-hidden="true" className="size-4 stroke-[2.5]" />
                   </button>
-                  <span className="min-w-[13px] text-center font-mono text-[20px] leading-7 font-normal text-[#F5F1EB]">
+                  <span className="min-w-[13px] text-center font-mono text-[20px] leading-7 font-normal text-foreground">
                     {quantity}
                   </span>
                   <button
@@ -576,7 +577,7 @@ function NftDetailPage() {
                     aria-label="Aumentar quantidade"
                     disabled={quantity >= maxQuantity || isSoldOut}
                     onClick={() => setQuantity((prev) => Math.min(maxQuantity, prev + 1))}
-                    className="flex h-[49.5px] w-[33px] cursor-pointer items-center justify-center rounded-[33px] border border-[#140D0A] bg-primary text-[#000000] shadow-[0px_6.6px_19.8px_-3.3px_rgba(20,13,10,0.15)] transition-colors hover:bg-highlight disabled:cursor-not-allowed disabled:opacity-40"
+                    className="flex h-[49.5px] w-[33px] cursor-pointer items-center justify-center rounded-[33px] border border-ink bg-primary text-black shadow-[0px_6.6px_19.8px_-3.3px_rgba(20,13,10,0.15)] transition-colors hover:bg-highlight disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <Plus aria-hidden="true" className="size-4 stroke-[2.5]" />
                   </button>
@@ -588,7 +589,7 @@ function NftDetailPage() {
                     type="button"
                     disabled={isSoldOut || !edition || addToCart.isPending}
                     onClick={() => addSelectedToCart(true)}
-                    className="flex h-[40px] w-[130px] cursor-pointer items-center justify-center rounded-[6px] bg-primary font-mono text-[14px] leading-5 font-bold text-[#140D0A] transition-colors hover:bg-highlight disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex h-[40px] w-[130px] cursor-pointer items-center justify-center rounded-[6px] bg-primary font-mono text-[14px] leading-5 font-bold text-ink transition-colors hover:bg-highlight disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     COMPRAR
                   </button>
@@ -621,20 +622,20 @@ function NftDetailPage() {
 
               {/* Token Metadata & Social Share */}
               <div className="flex flex-col gap-3 pt-2">
-                <div className="flex flex-col gap-3 font-mono text-[15px] leading-5 text-[#B39463]">
+                <div className="flex flex-col gap-3 font-mono text-[15px] leading-5 text-sand">
                   <p>ID do token: {formatTokenId(nft.id)}</p>
                   <p>Coleção: {nft.collection}</p>
                   <p>Atributos: {nft.attributes.join(', ')}</p>
                 </div>
 
-                <div className="flex items-center gap-2 pt-1 font-mono text-[15px] text-[#F5F1EB]">
+                <div className="flex items-center gap-2 pt-1 font-mono text-[15px] text-foreground">
                   <span className="font-bold">Compartilhar este NFT:</span>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => handleShare('linkedin')}
                       aria-label="Compartilhar no LinkedIn"
-                      className="p-1 text-[#F5F1EB] transition-colors hover:text-primary"
+                      className="p-1 text-foreground transition-colors hover:text-primary"
                     >
                       <Linkedin aria-hidden="true" className="size-[15px]" />
                     </button>
@@ -642,7 +643,7 @@ function NftDetailPage() {
                       type="button"
                       onClick={() => handleShare('email')}
                       aria-label="Compartilhar por E-mail"
-                      className="p-1 text-[#F5F1EB] transition-colors hover:text-primary"
+                      className="p-1 text-foreground transition-colors hover:text-primary"
                     >
                       <Mail aria-hidden="true" className="size-[18px]" />
                     </button>
@@ -650,7 +651,7 @@ function NftDetailPage() {
                       type="button"
                       onClick={() => handleShare('twitter')}
                       aria-label="Compartilhar no Twitter"
-                      className="p-1 text-[#F5F1EB] transition-colors hover:text-primary"
+                      className="p-1 text-foreground transition-colors hover:text-primary"
                     >
                       <Twitter aria-hidden="true" className="size-4" />
                     </button>
@@ -665,7 +666,7 @@ function NftDetailPage() {
                       }}
                       aria-label="Copiar link"
                       title={copiedLink ? 'Link copiado!' : 'Copiar link'}
-                      className="p-1 text-[#F5F1EB] transition-colors hover:text-primary"
+                      className="p-1 text-foreground transition-colors hover:text-primary"
                     >
                       {copiedLink ? (
                         <Check aria-hidden="true" className="size-4 text-emerald-400" />
@@ -695,7 +696,7 @@ function NftDetailPage() {
             </TabsList>
 
             <TabsContent value="detalhes">
-              <div className="flex flex-col gap-6 font-mono text-[14px] leading-6 text-[#CFB28C]">
+              <div className="flex flex-col gap-6 font-mono text-[14px] leading-6 text-text-secondary">
                 <p>
                   {nft.name} é uma obra digital da coleção {nft.collection}. Cada atributo fica
                   armazenado nos metadados do token e verificado na {nft.network}.
@@ -703,21 +704,21 @@ function NftDetailPage() {
 
                 <div className="flex flex-col gap-3 font-mono text-[14px] leading-6">
                   <div>
-                    <p className="font-bold text-[#F5F1EB]">Rede:</p>
-                    <p className="text-[#CFB28C]">
+                    <p className="font-bold text-foreground">Rede:</p>
+                    <p className="text-text-secondary">
                       Cunhado na {nft.network} com procedência imutável e metadados armazenados no
                       IPFS.
                     </p>
                   </div>
                   <div>
-                    <p className="font-bold text-[#F5F1EB]">Contrato:</p>
-                    <p className="text-[#CFB28C]">
+                    <p className="font-bold text-foreground">Contrato:</p>
+                    <p className="text-text-secondary">
                       {nft.contractAddress} • Contrato inteligente ERC-721 (simulado).
                     </p>
                   </div>
                   <div>
-                    <p className="font-bold text-[#F5F1EB]">Criador:</p>
-                    <p className="text-[#CFB28C]">
+                    <p className="font-bold text-foreground">Criador:</p>
+                    <p className="text-text-secondary">
                       {nft.creator.name} ({nft.creator.address})
                     </p>
                   </div>
@@ -735,7 +736,7 @@ function NftDetailPage() {
               ) : (
                 <div className="flex flex-col gap-4 font-mono">
                   <div className="mb-2 flex flex-wrap items-center gap-3">
-                    <span className="text-[20px] font-bold text-[#E89B55]">
+                    <span className="text-[20px] font-bold text-highlight">
                       {reviews.average} / 5.0
                     </span>
                     <StarRating rating={ratingAverage} starClassName="size-4" />
@@ -747,18 +748,20 @@ function NftDetailPage() {
                     {reviews.items.map((review) => (
                       <li
                         key={review.id}
-                        className="flex flex-col gap-2 rounded-[8px] border border-[#3F2319] bg-[#241612] p-4"
+                        className="flex flex-col gap-2 rounded-[8px] border border-field bg-surface-card p-4"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-[15px] font-bold text-[#F5F1EB]">
+                          <span className="text-[15px] font-bold text-foreground">
                             {review.author}
                           </span>
-                          <time dateTime={review.createdAt} className="text-xs text-[#CFB28C]">
+                          <time dateTime={review.createdAt} className="text-xs text-text-secondary">
                             {reviewDateFormat.format(new Date(review.createdAt))}
                           </time>
                         </div>
                         <StarRating rating={review.rating} starClassName="size-3.5" />
-                        <p className="text-[14px] leading-6 text-[#CFB28C]">{review.comment}</p>
+                        <p className="text-[14px] leading-6 text-text-secondary">
+                          {review.comment}
+                        </p>
                       </li>
                     ))}
                   </ul>
@@ -773,11 +776,11 @@ function NftDetailPage() {
           <div className="flex flex-col gap-3">
             <h2
               id="related-heading"
-              className="font-mono text-[17px] leading-4 font-bold text-[#E89B55]"
+              className="font-mono text-[17px] leading-4 font-bold text-highlight"
             >
               Mais desta coleção
             </h2>
-            <div className="w-full border-b border-[#D28A4C]/30" />
+            <div className="w-full border-b border-primary/30" />
           </div>
 
           {/* 5 Cards Row */}
@@ -789,7 +792,7 @@ function NftDetailPage() {
                 params={{ nftId: item.id }}
                 className="group flex flex-col gap-3 lg:w-[219px]"
               >
-                <div className="flex h-[255px] w-full items-center justify-center rounded-[13px] bg-[#241612] p-3 transition-transform group-hover:scale-[1.02]">
+                <div className="flex h-[255px] w-full items-center justify-center rounded-[13px] bg-surface-card p-3 transition-transform group-hover:scale-[1.02]">
                   <img
                     src={item.imageUrl}
                     alt={item.name}
@@ -799,10 +802,10 @@ function NftDetailPage() {
                   />
                 </div>
                 <div className="flex flex-col gap-1 font-mono">
-                  <p className="truncate text-[15px] leading-5 text-[#F5F1EB] transition-colors group-hover:text-primary">
+                  <p className="truncate text-[15px] leading-5 text-foreground transition-colors group-hover:text-primary">
                     {item.name}
                   </p>
-                  <p className="text-[16px] leading-4 font-bold text-[#E89B55]">
+                  <p className="text-[16px] leading-4 font-bold text-highlight">
                     {formatEth(item.priceEth)} ETH
                   </p>
                 </div>

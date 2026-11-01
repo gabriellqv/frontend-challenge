@@ -22,6 +22,7 @@ export const queryKeys = {
   },
   orders: {
     all: (ownerKey: string) => ['orders', ownerKey] as const,
+    pending: (ownerKey: string) => ['orders', ownerKey, 'pending'] as const,
     detail: (ownerKey: string, id: string) => ['orders', ownerKey, 'detail', id] as const,
   },
   profile: {

@@ -74,15 +74,15 @@ function HomePage() {
       {/* Mobile Search Bar: 366px x 45px (Figma Mobile / Início) */}
       <div className="mx-auto flex w-full max-w-[366px] items-center gap-2 lg:hidden">
         {/* Frame 404: Search Input */}
-        <div className="flex h-[45px] flex-1 items-center gap-2 rounded-[10px] bg-[#241612] px-3.5">
-          <Search className="size-[18px] shrink-0 text-[#B39463]" strokeWidth={2.5} />
+        <div className="flex h-[45px] flex-1 items-center gap-2 rounded-[10px] bg-surface-card px-3.5">
+          <Search className="size-[18px] shrink-0 text-sand" strokeWidth={2.5} />
           <input
             type="search"
             value={search.q ?? ''}
             onChange={(e) => updateSearch({ q: e.target.value })}
             placeholder="Explorar coleções"
             aria-label="Explorar coleções"
-            className="w-full bg-transparent font-mono text-[14px] font-bold leading-4 text-[#F5F1EB] placeholder:text-[#B39463] focus:outline-none"
+            className="w-full bg-transparent font-mono text-[14px] font-bold leading-4 text-foreground placeholder:text-sand focus:outline-none"
           />
         </div>
 
@@ -93,10 +93,11 @@ function HomePage() {
           aria-label="Abrir filtros"
           className="flex size-[45px] shrink-0 cursor-pointer items-center justify-center rounded-[14px] shadow-sm transition-transform active:scale-95"
           style={{
-            background: 'linear-gradient(137.05deg, rgba(210, 138, 76, 0.45) -24.6%, #D28A4C 100%)',
+            background:
+              'linear-gradient(137.05deg, rgba(210, 138, 76, 0.45) -24.6%, var(--color-primary) 100%)',
           }}
         >
-          <SlidersHorizontal className="size-5 text-[#140D0A]" strokeWidth={2.5} />
+          <SlidersHorizontal className="size-5 text-ink" strokeWidth={2.5} />
         </button>
       </div>
 
@@ -110,20 +111,18 @@ function HomePage() {
           onClick={() => updateSearch({ sort: undefined })}
           className={cn(
             'relative cursor-pointer py-1 whitespace-nowrap transition-colors',
-            !search.sort ? 'font-bold text-[#E89B55]' : 'font-normal text-[#F5F1EB]',
+            !search.sort ? 'font-bold text-highlight' : 'font-normal text-foreground',
           )}
         >
           Todos os NFTs
-          {!search.sort && (
-            <span className="absolute bottom-0 left-0 h-[2px] w-full bg-[#D28A4C]" />
-          )}
+          {!search.sort && <span className="absolute bottom-0 left-0 h-[2px] w-full bg-primary" />}
         </button>
         <button
           type="button"
           onClick={() => updateSearch({ sort: 'newest' })}
           className={cn(
             'cursor-pointer py-1 whitespace-nowrap transition-colors',
-            search.sort === 'newest' ? 'font-bold text-[#E89B55]' : 'font-normal text-[#F5F1EB]',
+            search.sort === 'newest' ? 'font-bold text-highlight' : 'font-normal text-foreground',
           )}
         >
           Novos lançamentos
@@ -134,8 +133,8 @@ function HomePage() {
           className={cn(
             'cursor-pointer py-1 whitespace-nowrap transition-colors',
             search.sort === 'price_desc'
-              ? 'font-bold text-[#E89B55]'
-              : 'font-normal text-[#F5F1EB]',
+              ? 'font-bold text-highlight'
+              : 'font-normal text-foreground',
           )}
         >
           Em alta
@@ -149,15 +148,15 @@ function HomePage() {
           role="dialog"
           aria-modal="true"
           aria-label="Filtros de coleções e redes"
-          className="fixed inset-0 z-50 flex flex-col justify-between overflow-y-auto overscroll-contain bg-[#140D0A]/95 p-6 backdrop-blur-md lg:hidden"
+          className="fixed inset-0 z-50 flex flex-col justify-between overflow-y-auto overscroll-contain bg-ink/95 p-6 backdrop-blur-md lg:hidden"
         >
           <div>
-            <div className="flex items-center justify-between border-b border-[#3F2319] pb-4">
-              <h3 className="font-mono text-lg font-bold text-[#F5F1EB]">Filtros</h3>
+            <div className="flex items-center justify-between border-b border-field pb-4">
+              <h3 className="font-mono text-lg font-bold text-foreground">Filtros</h3>
               <button
                 type="button"
                 onClick={() => setIsMobileFiltersOpen(false)}
-                className="flex size-8 cursor-pointer items-center justify-center rounded-full bg-[#241612] text-[#F5F1EB]"
+                className="flex size-8 cursor-pointer items-center justify-center rounded-full bg-surface-card text-foreground"
                 aria-label="Fechar filtros"
               >
                 <X className="size-5" />
@@ -181,7 +180,7 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="sticky bottom-0 -mx-6 -mb-6 mt-6 border-t border-[#3F2319] bg-[#140D0A]/95 p-4 backdrop-blur-md">
+          <div className="sticky bottom-0 -mx-6 -mb-6 mt-6 border-t border-field bg-ink/95 p-4 backdrop-blur-md">
             <button
               type="button"
               onClick={() => setIsMobileFiltersOpen(false)}

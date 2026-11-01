@@ -2,7 +2,7 @@ import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query
 
 import { ApiError, getJson, postJson } from '@/shared/api/http-client'
 import { queryKeys } from '@/shared/api/query-keys'
-import { type CreateOrderRequest, orderSchema } from '@/shared/contracts'
+import { type CreateOrderRequest, orderSchema, pendingOrdersSchema } from '@/shared/contracts'
 import { getOwnerKey } from '@/shared/session'
 
 /**
@@ -15,6 +15,18 @@ export function orderQueryOptions(id: string) {
   return queryOptions({
     queryKey: queryKeys.orders.detail(getOwnerKey(), id),
     queryFn: () => getJson(orderSchema, `/orders/${id}`),
+    // Fallback do Socket.IO: um pedido pendente não fica travado se o evento se perder.
+    refetchInterval: (query) => (query.state.data?.status === 'pending' ? 3000 : false),
+  })
+}
+
+/** Pedido pendente do usuário atual, se houver. */
+export function pendingOrdersQueryOptions() {
+  return queryOptions({
+    queryKey: queryKeys.orders.pending(getOwnerKey()),
+    queryFn: () => getJson(pendingOrdersSchema, '/orders?status=pending'),
+    // Só continua consultando se já existe um pedido pendente.
+    refetchInterval: (query) => (query.state.data?.items.length ? 3000 : false),
   })
 }
 
@@ -39,7 +51,9 @@ export function useCreateOrder() {
     retryDelay: ORDER_RETRY_DELAY_MS,
     // Semeia o cache: o `order.updated` deste pedido já é reconhecido como da sessão.
     onSuccess: (order) => {
-      queryClient.setQueryData(queryKeys.orders.detail(getOwnerKey(), order.id), order)
+      const ownerKey = getOwnerKey()
+      queryClient.setQueryData(queryKeys.orders.detail(ownerKey, order.id), order)
+      void queryClient.invalidateQueries({ queryKey: queryKeys.orders.pending(ownerKey) })
     },
   })
 }

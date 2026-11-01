@@ -105,10 +105,10 @@ export function Hero() {
       {/* Mobile Hero Banner: 366px x 190px (Figma Mobile / Início) */}
       <section
         aria-labelledby="mobile-hero-title"
-        className="relative mx-auto flex h-[190px] w-full max-w-[366px] flex-col justify-between overflow-hidden rounded-[30px] border border-[#D28A4C]/20 p-4 shadow-[0px_4px_24px_rgba(10,6,4,0.6)] md:hidden"
+        className="relative mx-auto flex h-[190px] w-full max-w-[366px] flex-col justify-between overflow-hidden rounded-[30px] border border-primary/20 p-4 shadow-[0px_4px_24px_rgba(10,6,4,0.6)] md:hidden"
         style={{
           background:
-            'linear-gradient(104.74deg, rgba(210, 138, 76, 0.22) 1.08%, rgba(210, 138, 76, 0.08) 99.23%), #18100C',
+            'linear-gradient(104.74deg, rgba(210, 138, 76, 0.22) 1.08%, rgba(210, 138, 76, 0.08) 99.23%), var(--color-surface-deep)',
         }}
       >
         {/* Glow Ellipses */}
@@ -133,22 +133,22 @@ export function Hero() {
         <div className="relative z-10 flex items-start justify-between gap-2">
           {/* Frame 405 */}
           <div className="flex w-[190px] shrink-0 flex-col gap-1 transition-opacity duration-200">
-            <span className="font-mono text-[12px] leading-4 font-medium text-[#F5F1EB]">
+            <span className="font-mono text-[12px] leading-4 font-medium text-foreground">
               {slide.mobileTag}
             </span>
             <h1
               id="mobile-hero-title"
-              className="font-mono text-[18px] leading-[22px] font-bold tracking-tight text-[#F5F1EB]"
+              className="font-mono text-[18px] leading-[22px] font-bold tracking-tight text-foreground"
             >
               {slide.mobileTitle}
             </h1>
-            <p className="mt-0.5 font-mono text-[12px] leading-[15px] font-normal text-[#CFB28C]">
+            <p className="mt-0.5 font-mono text-[12px] leading-[15px] font-normal text-text-secondary">
               {slide.mobileDescription}
             </p>
             <button
               type="button"
               onClick={scrollToCatalog}
-              className="mt-1 flex items-center gap-1 font-mono text-[12px] leading-[14px] font-bold text-[#E89B55] transition-opacity hover:opacity-85"
+              className="mt-1 flex items-center gap-1 font-mono text-[12px] leading-[14px] font-bold text-highlight transition-opacity hover:opacity-85"
             >
               EXPLORAR
               <ArrowRight className="size-3.5" strokeWidth={2.5} />
@@ -162,14 +162,14 @@ export function Hero() {
               alt={slide.mobileMainAlt}
               width={134}
               height={134}
-              className="size-[134px] rounded-[16px] border border-[#D28A4C]/30 object-cover shadow-md transition-all duration-300"
+              className="size-[134px] rounded-[16px] border border-primary/30 object-cover shadow-md transition-all duration-300"
             />
             <img
               src={slide.mobileSecondaryImage}
               alt={slide.mobileSecondaryAlt}
               width={58}
               height={58}
-              className="absolute -bottom-1 -left-2 size-[58px] rounded-[16px] border-2 border-[#140D0A] object-cover shadow-xl transition-all duration-300"
+              className="absolute -bottom-1 -left-2 size-[58px] rounded-[16px] border-2 border-ink object-cover shadow-xl transition-all duration-300"
             />
           </div>
         </div>
@@ -179,7 +179,7 @@ export function Hero() {
           role="tablist"
           aria-label="Carrossel de criadores em destaque"
           onKeyDown={handleKeyDown}
-          className="relative z-10 flex items-center justify-center gap-1.5 pt-2"
+          className="relative z-10 flex items-center justify-center gap-0 pt-2"
         >
           {HERO_SLIDES.map((item, idx) => {
             const isActive = currentSlide === idx
@@ -191,11 +191,16 @@ export function Hero() {
                 aria-selected={isActive}
                 aria-label={`Slide ${idx + 1} de ${HERO_SLIDES.length}: ${item.mobileTag}`}
                 onClick={() => setCurrentSlide(idx)}
-                className={cn(
-                  'size-[7px] cursor-pointer rounded-full transition-all duration-200 focus:outline-none',
-                  isActive ? 'bg-[#D28A4C]' : 'bg-[#D28A4C]/40 hover:bg-[#D28A4C]/80',
-                )}
-              />
+                className="flex size-6 cursor-pointer items-center justify-center rounded-full transition-colors focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'size-[7px] rounded-full transition-colors duration-200',
+                    isActive ? 'bg-primary' : 'bg-primary/40 hover:bg-primary/80',
+                  )}
+                />
+              </button>
             )
           })}
         </div>
@@ -244,7 +249,7 @@ export function Hero() {
             role="tablist"
             aria-label="Carrossel de criadores em destaque"
             onKeyDown={handleKeyDown}
-            className="flex w-10 gap-2 self-end"
+            className="flex gap-0 self-end"
           >
             {HERO_SLIDES.map((item, idx) => {
               const isActive = currentSlide === idx
@@ -256,11 +261,16 @@ export function Hero() {
                   aria-selected={isActive}
                   aria-label={`Slide ${idx + 1} de ${HERO_SLIDES.length}: ${item.tag}`}
                   onClick={() => setCurrentSlide(idx)}
-                  className={cn(
-                    'size-2 cursor-pointer rounded-full transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-                    isActive ? 'bg-primary' : 'bg-primary/60 hover:bg-primary/90',
-                  )}
-                />
+                  className="flex size-6 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'size-2 rounded-full transition-colors duration-200',
+                      isActive ? 'bg-primary' : 'bg-primary/60 hover:bg-primary/90',
+                    )}
+                  />
+                </button>
               )
             })}
           </div>

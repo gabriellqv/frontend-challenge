@@ -4,10 +4,12 @@ import { ws } from 'msw/core/ws'
 import type { NftUpdatedEvent, OrderStatus, OrderUpdatedEvent } from '@/shared/contracts'
 import { REALTIME_URL } from '@/shared/realtime/url'
 
+import { getDb } from './db'
+
 const realtime = ws.link(REALTIME_URL)
 
 type SocketClient = ReturnType<typeof toSocketIo>['client']
-type Connected = { client: SocketClient; close: () => void }
+type Connected = { client: SocketClient; close: () => void; userId: string | null }
 
 const ENGINE_IO_PING = '2'
 const PING_MS = 25_000
@@ -16,6 +18,12 @@ let clients: Connected[] = []
 
 function broadcast(event: string, payload: unknown): void {
   clients.forEach((c) => c.client.emit(event, payload))
+}
+
+function userFromToken(token: string | null): string | null {
+  if (!token) return null
+  const session = getDb().sessions[token]
+  return session && Date.parse(session.expiresAt) > Date.now() ? session.userId : null
 }
 
 /**
@@ -32,10 +40,20 @@ function eventIdFor(resource: string, id: string, version: number): string {
  * @param event - Recurso e versão; `eventId` é derivado quando omitido.
  */
 export function emitNftUpdated(
-  event: Omit<NftUpdatedEvent, 'eventId'> & { eventId?: string },
+  event: Omit<NftUpdatedEvent, 'eventId' | 'available' | 'editions'> & {
+    eventId?: string
+    available?: number
+    editions?: NftUpdatedEvent['editions']
+  },
 ): void {
+  const nft = getDb().nfts.find((item) => item.id === event.nftId)
   const payload: NftUpdatedEvent = {
     ...event,
+    available:
+      event.available ??
+      nft?.editions.reduce((total, edition) => total + edition.available, 0) ??
+      0,
+    editions: event.editions ?? nft?.editions.map(({ id, available }) => ({ id, available })) ?? [],
     eventId: event.eventId ?? eventIdFor('nft', event.nftId, event.version),
   }
   broadcast('nft.updated', payload)
@@ -48,6 +66,7 @@ export function emitNftUpdated(
  */
 export function emitOrderUpdated(event: {
   orderId: string
+  userId: string
   status: OrderStatus
   version: number
   eventId?: string
@@ -56,7 +75,10 @@ export function emitOrderUpdated(event: {
     ...event,
     eventId: event.eventId ?? eventIdFor('order', event.orderId, event.version),
   }
-  broadcast('order.updated', payload)
+  // Eventos de pedido são privados: só a conexão autenticada do dono recebe.
+  clients
+    .filter((client) => client.userId === event.userId)
+    .forEach((client) => client.client.emit('order.updated', payload))
 }
 
 /**
@@ -69,7 +91,12 @@ export function dropRealtimeConnections(): void {
 
 export const realtimeHandler = realtime.addEventListener('connection', (connection) => {
   const { client } = toSocketIo(connection)
-  const connected: Connected = { client, close: () => connection.client.close() }
+  const token = connection.client.url.searchParams.get('token')
+  const connected: Connected = {
+    client,
+    close: () => connection.client.close(),
+    userId: userFromToken(token),
+  }
   clients.push(connected)
 
   const pingTimer = window.setInterval(() => connection.client.send(ENGINE_IO_PING), PING_MS)

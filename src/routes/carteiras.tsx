@@ -25,6 +25,7 @@ function CarteirasPage() {
   const profileQuery = useQuery(profileQueryOptions())
   const updateWallet = useUpdateWallet()
   const [target, setTarget] = useState<EditTarget>({ kind: 'primary', isNew: false })
+  const [savedMessage, setSavedMessage] = useState<string | null>(null)
 
   const wallets = walletsQuery.data ?? []
   const primary = wallets.find((w) => w.isPrimary) ?? null
@@ -78,12 +79,19 @@ function CarteirasPage() {
             </p>
           )}
 
+          {savedMessage && (
+            <p role="status" className="font-mono text-sm text-success">
+              {savedMessage}
+            </p>
+          )}
+
           {!walletsQuery.isLoading && (
             <WalletForm
               key={`${target.kind}-${target.isNew}-${formWallet?.id ?? 'nova'}`}
               wallet={formWallet}
               makePrimary={makePrimary}
               profile={profileQuery.data}
+              onSaved={setSavedMessage}
             />
           )}
 

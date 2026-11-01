@@ -104,7 +104,7 @@ export function Header({ cartItemCount }: HeaderProps) {
       <div
         className={cn(
           'mx-auto flex h-[45px] w-full max-w-[1200px] items-start justify-between px-4 sm:px-6 xl:px-0',
-          showDivider && 'border-b border-[#D28A4C]/30',
+          showDivider && 'border-b border-primary/30',
         )}
       >
         <div className="flex h-[45px] w-auto items-start pt-[8px] lg:w-[160px]">

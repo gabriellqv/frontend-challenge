@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { ethSchema, idSchema } from './common'
+import { ethSchema, idSchema, isoDateSchema } from './common'
 
 export const cartItemSchema = z.object({
   id: idSchema,
@@ -58,7 +58,10 @@ export const quoteRequestSchema = z.object({
 export type QuoteRequest = z.infer<typeof quoteRequestSchema>
 
 export const quoteSchema = cartSummarySchema.extend({
+  /** Identidade da cotação revisada; o pedido só pode usar esta versão. */
+  quoteId: idSchema,
   version: z.number().int().min(0),
+  expiresAt: isoDateSchema,
 })
 export type Quote = z.infer<typeof quoteSchema>
 

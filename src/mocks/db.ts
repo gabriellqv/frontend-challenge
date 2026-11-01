@@ -1,4 +1,4 @@
-import type { Cart, Nft, Order, Wallet } from '@/shared/contracts'
+import type { Cart, Nft, Order, Quote, Wallet } from '@/shared/contracts'
 
 import { createNfts, createUserRecords, seedWallets } from './fixtures'
 
@@ -13,9 +13,12 @@ const LEGACY_ARTWORK_URL = /\/images\/(Frame-136|NFT-Artwork-\d+)\.png/g
 export type UserRecord = {
   id: string
   name: string
+  username: string
   email: string
   passwordHash: string
   avatarUrl: string | null
+  ensName: string | null
+  walletNickname: string | null
 }
 
 export type SessionRecord = {
@@ -24,9 +27,17 @@ export type SessionRecord = {
   expiresAt: string
 }
 
+export type QuoteRecord = Quote & {
+  ownerKey: string
+  items: Array<{ nftId: string; editionId: string; quantity: number }>
+  couponCode: string | null
+}
+
 export type Db = {
   nfts: Nft[]
   users: UserRecord[]
+  /** quoteId -> cotação revisada (snapshot para validar o pedido). */
+  quotes: Record<string, QuoteRecord>
   /** userId -> lista de nftIds favoritados. */
   favorites: Record<string, string[]>
   /** ownerKey -> carrinho. */
@@ -57,11 +68,22 @@ export type OrderOwner = {
   paymentOutcome?: 'confirmed' | 'declined'
 }
 
-type StoredDb = Omit<Db, 'idempotencyFingerprints' | 'orderOwners'> &
-  Partial<Pick<Db, 'idempotencyFingerprints' | 'orderOwners'>>
+type StoredDb = Omit<Db, 'idempotencyFingerprints' | 'orderOwners' | 'quotes'> &
+  Partial<Pick<Db, 'idempotencyFingerprints' | 'orderOwners' | 'quotes'>>
 
 /** Completa bancos salvos por versões anteriores do mock (campos criados depois). */
 function upgrade(stored: StoredDb): Db {
+  for (const user of stored.users) {
+    if (!user.username) {
+      user.username = user.email
+        .split('@')[0]!
+        .toLowerCase()
+        .replace(/[^a-z0-9._]/g, '')
+        .slice(0, 20)
+    }
+    if (user.ensName === undefined) user.ensName = null
+    if (user.walletNickname === undefined) user.walletNickname = null
+  }
   for (const wallets of Object.values(stored.wallets)) {
     for (const wallet of wallets) {
       if (wallet.provider === undefined) wallet.provider = null
@@ -85,6 +107,7 @@ function upgrade(stored: StoredDb): Db {
     nfts: isCatalogOutdated ? createNfts() : stored.nfts,
     idempotencyFingerprints: stored.idempotencyFingerprints ?? {},
     orderOwners: stored.orderOwners ?? {},
+    quotes: stored.quotes ?? {},
   }
 }
 
@@ -105,6 +128,7 @@ function seed(): Db {
   return {
     nfts: createNfts(),
     users: createUserRecords(),
+    quotes: {},
     favorites: {},
     carts: {},
     orders: {},

@@ -54,21 +54,30 @@ app após o worker subir.
   (ex.: carrinho vazio) vira estado vazio, nunca um exemplo inventado.
 - **Tempo real global**: uma conexão Socket.IO por sessão, no layout raiz, com
   descarte de duplicatas/eventos antigos e reconciliação via REST ao reconectar.
-- **Checkout com cotação revisada**: mudança de preço, estoque ou taxa exige
-  aceite explícito; a API confere o total esperado. Idempotência com conflito
-  para conteúdo diferente e reenvio seguro em timeout.
+  O evento de pedido carrega `userId` e o mock só entrega ao dono.
+- **Checkout com cotação versionada**: `POST /quote` devolve `quoteId` e
+  `expiresAt`; o pedido usa esse snapshot. Mudança de preço, estoque, cupom ou
+  taxa exige aceite explícito e a API responde `STALE_QUOTE`.
+- **Pedido pendente**: `GET /orders?status=pending`, polling de 3 s e bloqueio
+  `ORDER_PENDING` impedem uma segunda compra enquanto a primeira não termina.
+- **Rascunho**: campos e preferências do checkout são persistidos por dono em
+  `sessionStorage`; a tentativa idempotente guarda `{ key, body }`.
 - **Carteira simulada de verdade**: só carteiras cadastradas, com conexão,
   recusa e desconexão; o pedido guarda a carteira usada.
 - **Edições reais**: cada NFT oferece 1/1, 1/10, 1/50 e ABERTA com estoque
   próprio (inclusive esgotadas), em vez de pílulas fixas na tela.
 - **shadcn/ui tematizado**: Button, Input, Select, Dialog e Tabs com os tokens
   do design system, usados nos formulários, diálogos e abas.
+- **Perfil completo**: nome de exibição, username, e-mail, ENS, apelido da
+  carteira, avatar (data URL até 256 KB) e senha, com conflito de username/e-mail.
 
 ## Escopo consciente
 
 - Sem integração real com blockchain, carteiras ou gateway de pagamento (dados
   simulados, conforme o enunciado).
-- Sem upload real de avatar (URL).
+- O avatar vira data URL no `localStorage` do mock; não há upload para servidor.
+- Sessão entre abas não é sincronizada em tempo real; a compra concorrente é
+  bloqueada no servidor e a outra aba reconcilia no próximo refetch/foco.
 - Páginas editoriais/suporte/atividade/ofertas ficaram fora (links “em breve”,
   sem aparentar sucesso funcional).
 
@@ -77,7 +86,8 @@ app após o worker subir.
 - **Unit (Vitest)**: precisão de ETH, cupons e helpers.
 - **E2E (Playwright)**: catálogo (busca/filtros/paginação/histórico), detalhe/404,
   carrinho, login/logout, merge do carrinho, compra completa, carregamento lento
-  (skeleton), falha + retry e pagamento recusado.
+  (skeleton), falha + retry e pagamento recusado. Inclui mobile completo, tablet
+  768, axe `serious`/`critical`, reflow 320 px, pedido pendente e rascunho.
 
 ## Uso de IA
 

@@ -13,16 +13,22 @@ export function createUserRecords(): UserRecord[] {
     {
       id: 'u-nova',
       name: 'Nova Sato',
+      username: 'nova.sato',
       email: 'nova@kurio.test',
       passwordHash: pass,
       avatarUrl: null,
+      ensName: 'nova.eth',
+      walletNickname: 'Principal',
     },
     {
       id: 'u-bruno',
       name: 'Bruno Lima',
+      username: 'bruno.lima',
       email: 'bruno@kurio.test',
       passwordHash: pass,
       avatarUrl: null,
+      ensName: null,
+      walletNickname: null,
     },
   ]
 }

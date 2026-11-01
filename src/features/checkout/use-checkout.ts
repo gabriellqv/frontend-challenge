@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
+
+import { z } from 'zod'
 
 import {
   profileQueryOptions,
@@ -11,7 +13,7 @@ import {
 } from '@/features/account/api'
 import { cartQueryOptions, quoteQueryOptions } from '@/features/cart/api'
 import { readStoredCoupon, storeCoupon } from '@/features/cart/coupon-storage'
-import { useCreateOrder } from '@/features/orders/api'
+import { pendingOrdersQueryOptions, useCreateOrder } from '@/features/orders/api'
 import { ApiError } from '@/shared/api/http-client'
 import { queryKeys } from '@/shared/api/query-keys'
 import {
@@ -20,23 +22,47 @@ import {
   type WalletConnection,
   type WalletProvider,
   networkSchema,
+  walletProviderSchema,
 } from '@/shared/contracts'
 import { createIdempotencyKey } from '@/shared/lib/hash'
 import { getOwnerKey } from '@/shared/session'
 
-const IDEMPOTENCY_STORAGE_KEY = 'kurio:checkout-idempotency'
+import {
+  clearCheckoutDraft,
+  clearCheckoutPrefs,
+  readCheckoutPrefs,
+  writeCheckoutPrefs,
+} from './draft'
 
-/** Chave estável por tentativa: sobrevive a refresh e timeout, evitando compra dupla. */
-function readOrCreateIdempotencyKey(): string {
-  const stored = sessionStorage.getItem(IDEMPOTENCY_STORAGE_KEY)
-  if (stored) return stored
-  return renewIdempotencyKey()
+const attemptSchema = z.object({ key: z.string().min(1), body: z.unknown() })
+type Attempt = z.infer<typeof attemptSchema>
+
+/** Compara a intenção de compra sem a identidade efêmera da cotação. */
+function comparableBody(body: unknown): unknown {
+  if (typeof body !== 'object' || body === null) return body
+  const copy = { ...(body as Record<string, unknown>) }
+  delete copy.quoteId
+  return copy
 }
 
-function renewIdempotencyKey(): string {
-  const created = createIdempotencyKey()
-  sessionStorage.setItem(IDEMPOTENCY_STORAGE_KEY, created)
-  return created
+function attemptKey(ownerKey: string): string {
+  return `kurio:checkout-attempt:${ownerKey}`
+}
+
+function readAttempt(ownerKey: string): Attempt | null {
+  try {
+    const raw = sessionStorage.getItem(attemptKey(ownerKey))
+    if (!raw) return null
+    const parsed = attemptSchema.safeParse(JSON.parse(raw))
+    return parsed.success ? parsed.data : null
+  } catch {
+    return null
+  }
+}
+
+function writeAttempt(ownerKey: string, attempt: Attempt | null): void {
+  if (attempt) sessionStorage.setItem(attemptKey(ownerKey), JSON.stringify(attempt))
+  else sessionStorage.removeItem(attemptKey(ownerKey))
 }
 
 function toNetwork(value: string | undefined): Network {
@@ -67,22 +93,35 @@ const ORDER_ERROR_MESSAGES: Partial<Record<string, string>> = {
 export function useCheckout() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const ownerKey = getOwnerKey()
+  const prefs = readCheckoutPrefs(ownerKey)
 
   const cartQuery = useQuery(cartQueryOptions())
   const walletsQuery = useQuery(walletsQueryOptions())
   const profileQuery = useQuery(profileQueryOptions())
+  const pendingOrders = useQuery(pendingOrdersQueryOptions())
   const createOrder = useCreateOrder()
   const connectWallet = useConnectWallet()
   const disconnectWallet = useDisconnectWallet()
 
-  const [idempotencyKey, setIdempotencyKey] = useState(readOrCreateIdempotencyKey)
-  const [chosenWalletId, setChosenWalletId] = useState<string | null>(null)
-  const [chosenNetwork, setChosenNetwork] = useState<Network | null>(null)
-  const [provider, setProvider] = useState<WalletProvider>('coinbase')
+  const [chosenWalletId, setChosenWalletId] = useState<string | null>(prefs.walletId ?? null)
+  const [chosenNetwork, setChosenNetwork] = useState<Network | null>(
+    prefs.network ? toNetwork(prefs.network) : null,
+  )
+  const [provider, setProvider] = useState<WalletProvider>(() => {
+    const parsed = walletProviderSchema.safeParse(prefs.provider)
+    return parsed.success ? parsed.data : 'coinbase'
+  })
   const [connection, setConnection] = useState<WalletConnection | null>(null)
   const [appliedCoupon, setAppliedCoupon] = useState(readStoredCoupon)
   const [acceptedTotal, setAcceptedTotal] = useState<string | null>(null)
   const [isReviewOpen, setIsReviewOpen] = useState(false)
+
+  const pendingOrder = pendingOrders.data?.items[0] ?? null
+
+  useEffect(() => {
+    writeCheckoutPrefs(ownerKey, { walletId: chosenWalletId, network: chosenNetwork, provider })
+  }, [ownerKey, chosenWalletId, chosenNetwork, provider])
 
   const items = cartQuery.data?.items ?? []
   const wallets: Wallet[] = walletsQuery.data ?? []
@@ -130,6 +169,7 @@ export function useCheckout() {
         : 'idle'
 
   const blockers: string[] = []
+  if (pendingOrder) blockers.push('Você já tem uma compra em andamento.')
   // Em erro, o TanStack Query mantém a cotação anterior: ela não pode valer para confirmar.
   if (quoteError) blockers.push(quoteError.message)
   else if (!quote.data) blockers.push('Calculando o total…')
@@ -201,24 +241,44 @@ export function useCheckout() {
   }
 
   function submitOrder() {
-    if (!selectedWallet || !activeConnection || acceptedTotal === null || isQuoteChanged) return
+    if (
+      !selectedWallet ||
+      !activeConnection ||
+      acceptedTotal === null ||
+      isQuoteChanged ||
+      !quote.data ||
+      pendingOrder
+    ) {
+      return
+    }
+    const body = {
+      quoteId: quote.data.quoteId,
+      items: items.map(({ nftId, editionId, quantity }) => ({ nftId, editionId, quantity })),
+      ...(appliedCoupon ? { couponCode: appliedCoupon } : {}),
+      walletId: selectedWallet.id,
+      connectionId: activeConnection.connectionId,
+      network,
+      expectedTotalEth: acceptedTotal,
+    }
+    const stored = readAttempt(ownerKey)
+    const sameAttempt =
+      stored !== null &&
+      JSON.stringify(comparableBody(stored.body)) === JSON.stringify(comparableBody(body))
+    const nextAttempt: Attempt = sameAttempt ? stored : { key: createIdempotencyKey(), body }
+    writeAttempt(ownerKey, nextAttempt)
+
     createOrder.mutate(
-      {
-        body: {
-          items: items.map(({ nftId, editionId, quantity }) => ({ nftId, editionId, quantity })),
-          ...(appliedCoupon ? { couponCode: appliedCoupon } : {}),
-          walletId: selectedWallet.id,
-          connectionId: activeConnection.connectionId,
-          network,
-          expectedTotalEth: acceptedTotal,
-        },
-        idempotencyKey,
-      },
+      { body, idempotencyKey: nextAttempt.key },
       {
         onSuccess: (order) => {
-          sessionStorage.removeItem(IDEMPOTENCY_STORAGE_KEY)
+          writeAttempt(ownerKey, null)
+          clearCheckoutDraft(ownerKey)
+          clearCheckoutPrefs(ownerKey)
           storeCoupon(undefined)
           setIsReviewOpen(false)
+          void queryClient.invalidateQueries({
+            queryKey: queryKeys.orders.pending(ownerKey),
+          })
           void navigate({ to: '/pedido/$orderId', params: { orderId: order.id } })
         },
         onError: (error) => {
@@ -226,11 +286,20 @@ export function useCheckout() {
           if (!(error instanceof ApiError)) return
           if (error.code === 'STALE_QUOTE' || error.code === 'AVAILABILITY_CONFLICT') {
             void queryClient.invalidateQueries({ queryKey: queryKeys.quote.all })
-            void queryClient.invalidateQueries({ queryKey: queryKeys.cart.all(getOwnerKey()) })
+            void queryClient.invalidateQueries({ queryKey: queryKeys.cart.all(ownerKey) })
           }
           if (error.code === 'WALLET_DISCONNECTED') setConnection(null)
+          if (error.code === 'ORDER_PENDING') {
+            void queryClient.invalidateQueries({ queryKey: queryKeys.orders.pending(ownerKey) })
+            const orderId = error.fields?.orderId
+            if (orderId) {
+              void navigate({ to: '/pedido/$orderId', params: { orderId } })
+            }
+          }
           // A tentativa anterior já virou pedido com outros dados: esta é uma nova compra.
-          if (error.code === 'IDEMPOTENCY_CONFLICT') setIdempotencyKey(renewIdempotencyKey())
+          if (error.code === 'IDEMPOTENCY_CONFLICT') {
+            writeAttempt(ownerKey, null)
+          }
         },
       },
     )
@@ -239,6 +308,8 @@ export function useCheckout() {
   return {
     cartQuery,
     items,
+    pendingOrder,
+    pendingOrdersQuery: pendingOrders,
     profile: profileQuery.data,
     isProfileLoading: profileQuery.isLoading,
     walletsQuery,

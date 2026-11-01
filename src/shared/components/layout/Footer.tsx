@@ -27,8 +27,8 @@ const FOOTER_COLLECTIONS = ['Arte digital', 'Fotografia', 'Música', 'Arte 3D', 
 /**
  * Rodapé global completo do Kurio, conforme o Figma:
  * - Bloco superior: 3 medalhões (W, C, D) com divisórias verticais + Newsletter
- * - Faixa institucional com slogan, e-mail e telefone (#38220F)
- * - 4 colunas de navegação (#241612) com redes sociais e carteiras compatíveis
+ * - Faixa institucional com slogan, e-mail e telefone (var(--color-surface-dark))
+ * - 4 colunas de navegação (var(--color-surface-card)) com redes sociais e carteiras compatíveis
  * - Copyright final centralizado
  */
 export function Footer() {
@@ -99,7 +99,7 @@ export function Footer() {
       )}
     >
       <div className="mx-auto flex w-full max-w-[1200px] flex-col">
-        {/* Frame 122: Medalhões (W, C, D) + Newsletter (1200px x 250px, bg: #241612, p: 32px) */}
+        {/* Frame 122: Medalhões (W, C, D) + Newsletter (1200px x 250px, bg: var(--color-surface-card), p: 32px) */}
         <div className="flex w-full max-w-[1200px] flex-col items-start bg-card p-6 sm:p-8 lg:p-[32px] xl:h-[250px] xl:w-[1200px]">
           {/* Frame 100: 1154px x 202px */}
           <div className="mx-auto grid w-full grid-cols-1 justify-between gap-6 md:grid-cols-2 lg:flex lg:flex-row lg:items-start lg:gap-0 xl:h-[202px] xl:w-[1154px]">
@@ -119,7 +119,7 @@ export function Footer() {
               </div>
             </div>
 
-            {/* Rectangle 36: Divisória vertical 1 (1px x 202px, #D28A4C) */}
+            {/* Rectangle 36: Divisória vertical 1 (1px x 202px, var(--color-primary)) */}
             <div
               aria-hidden="true"
               className="hidden w-[1px] shrink-0 self-stretch bg-primary lg:block xl:h-[202px]"
@@ -141,7 +141,7 @@ export function Footer() {
               </div>
             </div>
 
-            {/* Rectangle 38: Divisória vertical 2 (1px x 202px, #D28A4C) */}
+            {/* Rectangle 38: Divisória vertical 2 (1px x 202px, var(--color-primary)) */}
             <div
               aria-hidden="true"
               className="hidden w-[1px] shrink-0 self-stretch bg-primary lg:block xl:h-[202px]"
@@ -164,7 +164,7 @@ export function Footer() {
               </div>
             </div>
 
-            {/* Rectangle 39: Divisória vertical 3 (1px x 202px, #D28A4C) */}
+            {/* Rectangle 39: Divisória vertical 3 (1px x 202px, var(--color-primary)) */}
             <div
               aria-hidden="true"
               className="hidden w-[1px] shrink-0 self-stretch bg-primary lg:block xl:h-[202px]"
@@ -249,7 +249,7 @@ export function Footer() {
 
         {/* Frame 121: 1200px x 360px */}
         <div className="flex w-full max-w-[1200px] flex-col items-start xl:h-[360px] xl:w-[1200px]">
-          {/* Frame 120: Faixa institucional (1200px x 88px, padding: 32px, bg: #38220F) */}
+          {/* Frame 120: Faixa institucional (1200px x 88px, padding: 32px, bg: var(--color-surface-dark)) */}
           <div className="flex w-full flex-col justify-center bg-surface-dark p-6 sm:p-8 lg:h-[88px] lg:p-[32px] xl:w-[1200px]">
             {/* Frame 119: 1136px x 24px, gap: 92px */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center lg:h-[24px] lg:gap-8 xl:w-[1136px] xl:gap-[92px]">
@@ -301,7 +301,7 @@ export function Footer() {
 
           {/* Frame 118: 1200px x 272px, gap: 6px */}
           <div className="flex w-full flex-col items-center gap-[6px] xl:h-[272px] xl:w-[1200px]">
-            {/* Frame 117: 1200px x 236px, padding: 32px, bg: #241612 */}
+            {/* Frame 117: 1200px x 236px, padding: 32px, bg: var(--color-surface-card) */}
             <div className="flex w-full flex-col items-start bg-card p-6 sm:p-8 lg:p-[32px] xl:h-[236px] xl:w-[1200px]">
               {/* Frame 116: 1136px x 174px, gap: 124px */}
               <div className="flex w-full flex-col justify-between gap-8 sm:flex-row sm:flex-wrap lg:flex-nowrap lg:gap-12 xl:h-[174px] xl:w-[1136px] xl:gap-[124px]">
@@ -488,7 +488,7 @@ export function Footer() {
                       Carteiras compatíveis
                     </h5>
                     {/* Frame 106: 228px x 26px */}
-                    <div className="flex h-[26px] w-[228px] items-center justify-center rounded-[6px] border border-[#55321F] bg-surface-dark px-2 font-mono text-[9px] leading-[12px] font-bold tracking-[0.1px] text-highlight">
+                    <div className="flex h-[26px] w-[228px] items-center justify-center rounded-[6px] border border-muted-strong bg-surface-dark px-2 font-mono text-[9px] leading-[12px] font-bold tracking-[0.1px] text-highlight">
                       METAMASK • WALLETCONNECT • COINBASE
                     </div>
                   </div>

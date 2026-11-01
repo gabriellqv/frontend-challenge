@@ -36,6 +36,34 @@ function mergeVisitorCart(request: Request, userId: string): void {
   persist()
 }
 
+function sessionUser(user: UserRecord): Session['user'] {
+  return {
+    id: user.id,
+    name: user.name,
+    username: user.username,
+    email: user.email,
+    ensName: user.ensName,
+    walletNickname: user.walletNickname,
+    avatarUrl: user.avatarUrl,
+  }
+}
+
+function uniqueUsername(email: string): string {
+  const base =
+    email
+      .split('@')[0]!
+      .toLowerCase()
+      .replace(/[^a-z0-9._]/g, '')
+      .slice(0, 16) || 'colecionador'
+  const taken = new Set(getDb().users.map((u) => u.username))
+  if (!taken.has(base)) return base
+  for (let i = 2; i < 1000; i++) {
+    const candidate = `${base.slice(0, 20 - String(i).length)}${i}`
+    if (!taken.has(candidate)) return candidate
+  }
+  return `user${crypto.randomUUID().slice(0, 8)}`
+}
+
 function buildSession(user: UserRecord): Session {
   const token = crypto.randomUUID()
   const expiresAt = new Date(Date.now() + SESSION_TTL_MS).toISOString()
@@ -43,7 +71,7 @@ function buildSession(user: UserRecord): Session {
   persist()
   return {
     token,
-    user: { id: user.id, name: user.name, email: user.email, avatarUrl: user.avatarUrl },
+    user: sessionUser(user),
     expiresAt,
   }
 }
@@ -62,9 +90,12 @@ export const authHandlers = [
     const user: UserRecord = {
       id: `u-${crypto.randomUUID()}`,
       name: body.name,
+      username: uniqueUsername(body.email),
       email: body.email,
       passwordHash: hashPassword(body.password),
       avatarUrl: null,
+      ensName: null,
+      walletNickname: null,
     }
     db.users.push(user)
     persist()
@@ -95,7 +126,7 @@ export const authHandlers = [
     const session = getDb().sessions[token]!
     return json({
       token,
-      user: { id: user.id, name: user.name, email: user.email, avatarUrl: user.avatarUrl },
+      user: sessionUser(user),
       expiresAt: session.expiresAt,
     } satisfies Session)
   }),

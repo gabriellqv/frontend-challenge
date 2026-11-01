@@ -70,7 +70,7 @@ export function Pagination({ pagination, onChange }: PaginationProps) {
           title="Anterior"
           className={cn(
             buttonBaseClass,
-            'border border-[#3F2319] text-foreground hover:border-primary hover:text-highlight hover:bg-[#3F2319]/30',
+            'border border-field text-foreground hover:border-primary hover:text-highlight hover:bg-field/30',
           )}
         >
           <svg
@@ -101,7 +101,7 @@ export function Pagination({ pagination, onChange }: PaginationProps) {
                   buttonBaseClass,
                   token === page
                     ? 'bg-primary font-bold text-ink hover:bg-highlight'
-                    : 'border border-[#3F2319] font-normal text-foreground hover:border-primary hover:text-highlight hover:bg-[#3F2319]/30',
+                    : 'border border-field font-normal text-foreground hover:border-primary hover:text-highlight hover:bg-field/30',
                 )}
               >
                 {token}
@@ -127,8 +127,8 @@ export function Pagination({ pagination, onChange }: PaginationProps) {
         title="Próxima"
         className={cn(
           buttonBaseClass,
-          'border border-[#3F2319] text-foreground hover:border-primary hover:text-highlight hover:bg-[#3F2319]/30',
-          'disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#3F2319] disabled:hover:text-foreground disabled:hover:bg-transparent',
+          'border border-field text-foreground hover:border-primary hover:text-highlight hover:bg-field/30',
+          'disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-field disabled:hover:text-foreground disabled:hover:bg-transparent',
         )}
       >
         <svg

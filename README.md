@@ -81,6 +81,7 @@ se acumulam).
 | `session_expired`     | expira as sessões ativas                                                    |
 | `order_timeout`       | o pedido é criado, mas a resposta chega depois do timeout do cliente        |
 | `payment_declined`    | o próximo pedido é recusado                                                 |
+| `payment_pending`     | o pedido permanece pendente por 60 s (bloqueio de compra concorrente)       |
 | `favorite_error`      | incluir/remover favorito falha (503)                                        |
 | `wallet_rejected`     | a carteira recusa a conexão                                                 |
 | `wallet_disconnected` | encerra as conexões de carteira ativas                                      |
@@ -103,12 +104,12 @@ npm run lighthouse   # build + Lighthouse mobile e desktop (3 execuções) + res
 
 ## Testes e qualidade
 
-- **49 testes unitários** com Vitest: dinheiro em ETH, cupons, filtros de eventos, redirect e helpers.
-- **106 testes E2E** com Playwright: **103 aprovados**, **3 skips intencionais** (abas do detalhe, modal de login desktop e formulário do colecionador no checkout).
-- Os 12 grupos do enunciado rodam em Chromium desktop e mobile.
+- **50 testes unitários** com Vitest: dinheiro em ETH, cupons, filtros de eventos, redirect e helpers.
+- **147 casos E2E** com Playwright em desktop, mobile e **tablet 768 px**: 142 aprovados, 5 skips intencionais.
+- Os 12 grupos do enunciado rodam em Chromium desktop e mobile; o tablet cobre catálogo, checkout, axe e reflow.
 - Regressão visual de início, detalhe, carrinho e pagamento com baselines versionadas.
 - Relatório HTML e trace de falhas configurados no Playwright.
-- Axe sem violações críticas nas páginas verificadas; foco preso em diálogos, erros associados aos campos e navegação por teclado cobertos.
+- Axe sem violações `serious`/`critical` nas páginas verificadas; foco preso em diálogos, erros associados aos campos e navegação por teclado cobertos.
 - `typecheck`, `lint`, `format:check` e build passando.
 
 ## Como reproduzir as falhas
@@ -148,13 +149,14 @@ headless, Node 22, Linux; mobile com throttling simulado: 150 ms RTT,
 
 | Perfil  | Página       | Performance | Accessibility | Best Practices | SEO |    LCP | CLS |    TBT |
 | ------- | ------------ | ----------: | ------------: | -------------: | --: | -----: | --: | -----: |
-| mobile  | `/`          |          92 |            97 |            100 |  92 | 3,08 s |   0 | 103 ms |
-| mobile  | `/nft/nft-1` |      **90** |           100 |            100 |  92 | 3,30 s |   0 |  99 ms |
-| desktop | `/`          |         100 |            97 |            100 |  92 | 0,75 s |   0 |   0 ms |
-| desktop | `/nft/nft-1` |          99 |           100 |            100 |  92 | 0,91 s |   0 |   0 ms |
+| mobile  | `/`          |          91 |           100 |            100 | 100 | 3,09 s |   0 | 129 ms |
+| mobile  | `/nft/nft-1` |      **90** |           100 |            100 | 100 | 3,31 s |   0 | 137 ms |
+| desktop | `/`          |         100 |           100 |            100 | 100 | 0,78 s |   0 |   0 ms |
+| desktop | `/nft/nft-1` |          99 |           100 |            100 | 100 | 0,92 s |   0 |   0 ms |
 
-**Metas atendidas:** Performance mobile em 90 no detalhe e 92 no início;
-desktop em 100 e 99. O backend é o próprio navegador, então o app ainda baixa e
+**Todas as metas atendidas:** Performance mobile em 90 no detalhe e 91 no início;
+desktop em 100 e 99; acessibilidade, boas práticas e SEO em 100 nas quatro
+combinações. O backend é o próprio navegador, então o app ainda baixa e
 inicia o MSW (~164 KB gzip, Service Worker e interceptadores) antes da primeira
 requisição. Foram aplicados: artes em WebP (−94% de bytes), split por rota, zod
 fora do chunk de entrada, prioridade na imagem de LCP, cache imutável dos

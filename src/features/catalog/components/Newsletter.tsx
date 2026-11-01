@@ -83,7 +83,7 @@ export function Newsletter() {
           </div>
         </div>
 
-        {/* Rectangle 36: Divisória vertical 1 (1px x 202px, #D28A4C) */}
+        {/* Rectangle 36: Divisória vertical 1 (1px x 202px, var(--color-primary)) */}
         <div aria-hidden="true" className="hidden h-[202px] w-[1px] shrink-0 bg-primary lg:block" />
 
         {/* Coluna C (Frame 21: 264.67px x 202px, px: 16px) */}
@@ -102,7 +102,7 @@ export function Newsletter() {
           </div>
         </div>
 
-        {/* Rectangle 38: Divisória vertical 2 (1px x 202px, #D28A4C) */}
+        {/* Rectangle 38: Divisória vertical 2 (1px x 202px, var(--color-primary)) */}
         <div aria-hidden="true" className="hidden h-[202px] w-[1px] shrink-0 bg-primary lg:block" />
 
         {/* Coluna D (Frame 20: 264.67px x 202px, px: 16px) */}
@@ -121,7 +121,7 @@ export function Newsletter() {
           </div>
         </div>
 
-        {/* Rectangle 39: Divisória vertical 3 (1px x 202px, #D28A4C) */}
+        {/* Rectangle 39: Divisória vertical 3 (1px x 202px, var(--color-primary)) */}
         <div aria-hidden="true" className="hidden h-[202px] w-[1px] shrink-0 bg-primary lg:block" />
 
         {/* Coluna Newsletter (Frame 99: 357px x 202px, px: 16px) */}

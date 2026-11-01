@@ -49,6 +49,22 @@ export function CheckoutMobile({ checkout }: CheckoutMobileProps) {
             </h1>
           </div>
 
+          {checkout.pendingOrder && (
+            <div
+              role="alert"
+              className="flex flex-col gap-2 rounded-[10px] border border-primary/40 bg-surface-card p-3 font-mono text-[13px] text-foreground"
+            >
+              <span>Você já tem uma compra em andamento.</span>
+              <Link
+                to="/pedido/$orderId"
+                params={{ orderId: checkout.pendingOrder.id }}
+                className="font-bold text-highlight underline"
+              >
+                Acompanhar pedido
+              </Link>
+            </div>
+          )}
+
           <div className="flex h-4 w-full items-center justify-between pt-1">
             <h2
               id="wallets-heading"

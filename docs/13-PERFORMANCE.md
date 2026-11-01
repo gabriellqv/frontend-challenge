@@ -118,10 +118,10 @@ carregamento tardio do `socket.io-client`:
 
 | Perfil | Página | Performance | Accessibility | Best Practices | SEO | LCP | CLS | TBT |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| mobile | `/` | 92 | 97 | 100 | 92 | 3,08 s | 0 | 103 ms |
-| mobile | `/nft/nft-1` | **90** | 100 | 100 | 92 | 3,30 s | 0 | 99 ms |
-| desktop | `/` | 100 | 97 | 100 | 92 | 0,75 s | 0 | 0 ms |
-| desktop | `/nft/nft-1` | 99 | 100 | 100 | 92 | 0,91 s | 0 | 0 ms |
+| mobile | `/` | 91 | 100 | 100 | 100 | 3,09 s | 0 | 129 ms |
+| mobile | `/nft/nft-1` | **90** | 100 | 100 | 100 | 3,31 s | 0 | 137 ms |
+| desktop | `/` | 100 | 100 | 100 | 100 | 0,78 s | 0 | 0 ms |
+| desktop | `/nft/nft-1` | 99 | 100 | 100 | 100 | 0,92 s | 0 | 0 ms |
 
 Todas as metas do desafio foram atingidas. A margem mobile do detalhe é
 pequena, então qualquer novo código no caminho crítico deve ser medido com três

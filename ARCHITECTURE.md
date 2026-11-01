@@ -64,7 +64,7 @@ Erros sempre no envelope `{ error: { code, message, fields?, retryable? } }`.
 | Carrinho  | `GET /cart`, `POST /cart/items`, `PATCH /cart/items/:itemId`, `DELETE /cart/items/:itemId`                            |
 | Cotação   | `POST /quote` (mesmo cálculo da criação do pedido)                                                                    |
 | Pedidos   | `POST /orders` (header `Idempotency-Key`), `GET /orders/:id` (só o dono)                                              |
-| Perfil    | `GET /profile`, `PATCH /profile`, `POST /profile/password`                                                            |
+| Perfil    | `GET /profile`, `PATCH /profile` (nome, username, e-mail, ENS, apelido e avatar), `POST /profile/password`            |
 | Carteiras | `GET /wallets`, `POST /wallets`, `PATCH /wallets/:id`, `POST /wallets/:id/connect`, `DELETE /wallets/connections/:id` |
 
 Pontos relevantes do contrato:
@@ -88,10 +88,10 @@ Códigos: `VALIDATION_ERROR` (422, com `fields`), `SESSION_INVALID`,
 
 ## 4. Eventos Socket.IO e reconciliação
 
-| Evento          | Payload                                 | Efeito no cliente                                                               |
-| --------------- | --------------------------------------- | ------------------------------------------------------------------------------- |
-| `nft.updated`   | `{ eventId, nftId, version, priceEth }` | revalida catálogo, detalhe, carrinho e cotação; avisa se o NFT está no carrinho |
-| `order.updated` | `{ eventId, orderId, status, version }` | revalida o pedido (só se for desta sessão); confirmado → revalida o carrinho    |
+| Evento          | Payload                                                        | Efeito no cliente                                                               |
+| --------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `nft.updated`   | `{ eventId, nftId, version, priceEth, available, editions[] }` | revalida catálogo, detalhe, carrinho e cotação; avisa se o NFT está no carrinho |
+| `order.updated` | `{ eventId, orderId, userId, status, version }`                | revalida o pedido do dono; confirmado → revalida o carrinho                     |
 
 - **Transporte**: `@mswjs/socket.io-binding` sobre o `ws.link` do MSW, com
   `socket.io-client` real (transporte `websocket`). Nenhum evento é simulado
@@ -145,14 +145,22 @@ Códigos: `VALIDATION_ERROR` (422, com `fields`), `SESSION_INVALID`,
   Mudar carteira, rede ou provedor invalida a conexão.
 - **Validação** dos campos do layout (React Hook Form + zod) e **revisão** em
   diálogo antes do envio.
-- **Cotação revisada**: o primeiro total exibido é o revisado. Se mudar (evento
-  de preço/estoque, taxa), um alerta bloqueia a confirmação até o aceite
-  explícito. A API também confere `expectedTotalEth` e responde `STALE_QUOTE`.
-- **Idempotência**: chave por tentativa em `sessionStorage` (sobrevive a
-  refresh). Mesma chave + mesmo conteúdo = mesmo pedido; conteúdo diferente =
-  `IDEMPOTENCY_CONFLICT` (o cliente gera uma nova tentativa). Em timeout ou
-  falha de rede, a mutation **reenvia a mesma tentativa** e recebe o mesmo
-  pedido — sem compra dupla.
+- **Cotação revisada**: `POST /quote` devolve `quoteId`, `version` e
+  `expiresAt`; o pedido envia o `quoteId` revisado. O servidor compara itens,
+  cupom, estoque e todos os totais com esse snapshot e responde `STALE_QUOTE`
+  se algo mudou. `expectedTotalEth` continua como checagem redundante.
+- **Idempotência**: a tentativa é persistida como `{ key, body }` por
+  dono em `sessionStorage` **antes** do primeiro POST. Mesma chave + mesmo
+  conteúdo = mesmo pedido; conteúdo diferente = `IDEMPOTENCY_CONFLICT`. Em
+  timeout ou falha de rede, a mutation reenvia a mesma tentativa e recebe o
+  mesmo pedido — sem compra dupla.
+- **Pedido pendente**: `GET /orders?status=pending` lista o pedido em
+  andamento. O checkout bloqueia uma segunda compra (`ORDER_PENDING`), a página
+  do pedido faz polling de 3 s como fallback do Socket.IO e o servidor também
+  recusa uma nova criação enquanto o anterior não for terminal.
+- **Rascunho**: os campos do colecionador e as preferências de carteira/rede/
+  provedor são persistidos por dono em `sessionStorage`, sobrevivendo a refresh
+  e expiração de sessão. São limpos após a compra.
 - **Estados**: o pedido nasce `pending`; o pagamento se resolve em ~2 s
   (`confirmed` ou `declined`, terminais) com `order.updated`. O instante e o
   resultado ficam persistidos no banco simulado, então recarregar a página com
@@ -186,6 +194,8 @@ Códigos: `VALIDATION_ERROR` (422, com `fields`), `SESSION_INVALID`,
   `prefers-reduced-motion`.
 - Feedback acessível: avisos de mutations e de tempo real via `sonner`
   (`aria-live`), erros associados aos campos (`aria-invalid` + `aria-describedby`).
+- Perfil com nome de exibição, username, e-mail, ENS, apelido da carteira e
+  upload de avatar (PNG/JPEG/WebP, até 256 KB).
 - Responsivo de 320 a 1920 px (detalhes em `docs/12-RESPONSIVIDADE.md`).
 
 Desvios conscientes:
@@ -205,19 +215,27 @@ Desvios conscientes:
 ## 10. Limitações
 
 - Banco simulado em memória + `localStorage`; o reset restaura o seed.
-- `@mswjs/socket.io-binding` não implementa salas/namespaces: os eventos são
-  enviados a todas as conexões e o cliente filtra pelo que conhece.
+- `@mswjs/socket.io-binding` não implementa salas/namespaces: `nft.updated` é
+  broadcast e `order.updated` é filtrado por usuário no servidor mock (token da
+  query da conexão), com checagem redundante no cliente.
 - Conexões de carteira vivem só em memória: recarregar exige reconectar.
+- No mock, o token da sessão viaja na query da URL do Socket.IO porque o
+  `socket.io-binding` não expõe o payload de `auth` do CONNECT. Num backend real
+  o token deve ir em `auth` (ou cookie HttpOnly), nunca na URL.
 - O timeout do cliente HTTP (10 s) é nativo do XHR, então o teste de timeout
   usa o relógio real.
-- Sem upload real de avatar (URL).
+- O avatar é convertido em data URL e guardado no `localStorage` do mock; não
+  há upload para um servidor real.
+- O banco do mock não sincroniza duas abas em tempo real: a compra concorrente
+  é bloqueada pelo servidor, mas a sessão da outra aba só é atualizada no
+  próximo refetch/foco.
 
 ## 11. Testes
 
 - **Unit (Vitest)**: ETH com `big.js`, cotação/cupons, filtro de eventos,
   redirect seguro, helpers.
-- **E2E (Playwright, Chromium desktop + Pixel 7)** — cada teste parte de um
-  contexto novo (estado isolado):
+- **E2E (Playwright, Chromium desktop + Pixel 7 + tablet 768 px)** — cada teste
+  parte de um contexto novo (estado isolado) e roda contra o build de produção:
   1. busca, filtros combinados, ordenação, paginação e histórico (+ 404);
   2. detalhe por acesso direto, NFT inexistente, edição esgotada;
   3. cadastro (com conflito), login inválido, sessão expirada (navegação e
@@ -226,12 +244,14 @@ Desvios conscientes:
   5. carrinho: quantidades/limite, remoção, cupons, refresh e login;
   6. compra completa até o recibo, removendo só o comprado;
   7. pagamento recusado, cliques repetidos e timeout com o mesmo pedido;
-  8. perfil, avatar, senha e carteiras com erros locais e da API;
+  8. perfil completo (username, e-mail, ENS, apelido e upload de avatar), senha e carteiras;
   9. preço/estoque via Socket.IO durante o checkout e no carrinho;
   10. eventos duplicados/antigos, queda de conexão e refresh com pedido pendente;
-  11. teclado (skip link, foco do diálogo, abas) e axe sem violações críticas;
+  11. teclado, reflow a 320 px e axe sem violações `serious`/`critical`;
   12. skeleton em carregamento lento, latência variável, falha 5xx/offline e
       nova tentativa.
 - Regressão visual de início, detalhe, carrinho e pagamento (baselines
   versionadas), relatório HTML e trace de toda falha.
+- A suíte roda com 2 workers para evitar disputa de CPU; o build de preview é o
+  mesmo servido no deploy.
 - Lighthouse: ver seção de performance no README.

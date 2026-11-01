@@ -113,7 +113,7 @@ export function SortSelect({ value, onChange }: SortSelectProps) {
         <div
           role="listbox"
           aria-label="Opções de ordenação"
-          className="absolute top-full right-0 z-50 mt-2 min-w-[210px] overflow-hidden rounded-[8px] border border-[#38220F] bg-card p-1.5 shadow-[0_12px_32px_rgba(0,0,0,0.85)] animate-in fade-in-0 zoom-in-95 duration-150"
+          className="absolute top-full right-0 z-50 mt-2 min-w-[210px] overflow-hidden rounded-[8px] border border-surface-dark bg-card p-1.5 shadow-[0_12px_32px_rgba(0,0,0,0.85)] animate-in fade-in-0 zoom-in-95 duration-150"
         >
           {SORT_OPTIONS.map((option) => {
             const isSelected = option.value === (value ?? 'newest')
