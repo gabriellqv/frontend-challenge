@@ -56,7 +56,7 @@ export function NftGrid({ nfts, favoriteIds, onToggleFavorite }: NftGridProps) {
       </div>
 
       {/* Desktop Grid */}
-      <ul className="hidden sm:grid sm:grid-cols-2 sm:gap-6 lg:w-[842px] lg:grid-cols-3 lg:gap-x-[34px] lg:gap-y-[72px]">
+      <ul className="hidden w-full sm:grid sm:grid-cols-2 sm:gap-6 lg:gap-x-[34px] lg:gap-y-[72px] xl:w-[842px] xl:grid-cols-3">
         {nfts.map((nft) => (
           <li key={nft.id} className="flex justify-center">
             <NftCard

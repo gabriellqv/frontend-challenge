@@ -204,10 +204,10 @@ export function Hero() {
       {/* Desktop Hero: 1200px width */}
       <section
         aria-labelledby="hero-title"
-        className="mt-8 hidden h-[450px] w-full items-center justify-between gap-[110px] pl-0 md:flex lg:pl-10"
+        className="mt-8 hidden h-[450px] w-full items-center justify-between gap-10 pl-0 md:flex lg:pl-10 xl:gap-[110px]"
       >
         {/* Frame 135: 600px width, 44px gap */}
-        <div className="flex w-full max-w-[600px] flex-col gap-[44px] lg:w-[600px]">
+        <div className="flex w-full max-w-[600px] flex-col gap-[44px] xl:w-[600px]">
           {/* Frame 134: 32px gap */}
           <div className="flex w-full flex-col gap-8">
             {/* Frame 133: 4px gap */}
@@ -272,7 +272,7 @@ export function Hero() {
           alt={slide.desktopAlt}
           width={450}
           height={450}
-          className="hidden size-[450px] shrink-0 rounded-[24px] object-cover transition-all duration-300 lg:block"
+          className="hidden size-[280px] shrink-0 rounded-[24px] object-cover transition-all duration-300 md:block lg:size-[400px] xl:size-[450px]"
         />
       </section>
     </>

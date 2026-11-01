@@ -39,7 +39,7 @@ export function Promos() {
       {PROMOS.map((promo) => (
         <article
           key={promo.title}
-          className="relative flex h-[250px] w-full overflow-hidden rounded-[8px] bg-card lg:w-[586px]"
+          className="relative flex h-[250px] w-full overflow-hidden rounded-[8px] bg-card lg:min-w-0 lg:flex-1 xl:w-[586px] xl:flex-none"
         >
           {/* Decorative Ellipses (Ellipse 7 & Ellipse 8) */}
           <div

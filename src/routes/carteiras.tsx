@@ -349,7 +349,7 @@ function CarteirasPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1440px] flex-col px-4 py-8 pb-24 sm:px-6 lg:px-[120px]">
+    <div className="mx-auto flex w-full max-w-[1248px] flex-col px-4 py-8 pb-24 sm:px-6">
       <div className="mx-auto flex w-full max-w-[1200px] flex-col items-start gap-[28px] lg:flex-row">
         {/* Account Sidebar: 310px */}
         <aside
@@ -564,7 +564,7 @@ function CarteirasPage() {
         {/* Wallets Form: 862px */}
         <section
           aria-label="Carteiras do colecionador"
-          className="flex w-full flex-col gap-8 lg:w-[862px]"
+          className="flex w-full flex-col gap-8 lg:min-w-0 lg:flex-1"
         >
           {/* Section Heading: Carteira principal */}
           <div className="flex w-full flex-col gap-2">

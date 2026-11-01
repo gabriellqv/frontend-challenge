@@ -105,7 +105,7 @@ export function NftCard({ nft, isFavorite, onToggleFavorite, mobile }: NftCardPr
   }
 
   return (
-    <article className="relative flex w-full flex-col gap-3 lg:w-[258px]">
+    <article className="relative flex w-full flex-col gap-3 xl:w-[258px]">
       <button
         type="button"
         aria-pressed={isFavorite}
@@ -137,7 +137,7 @@ export function NftCard({ nft, isFavorite, onToggleFavorite, mobile }: NftCardPr
         className={cn('group flex flex-col gap-3 text-canvas cursor-pointer', focusRing)}
       >
         {/* Rectangle 6: 258px x 300px, background: #241612 */}
-        <div className="flex h-[300px] w-full items-center justify-center bg-card lg:w-[258px]">
+        <div className="flex h-[300px] w-full items-center justify-center bg-card xl:w-[258px]">
           <img
             src={nft.imageUrl}
             alt={`Arte do NFT ${nft.name}`}

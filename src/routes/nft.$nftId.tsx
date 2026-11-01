@@ -422,7 +422,7 @@ function NftDetailPage() {
       </div>
 
       {/* Desktop / Detalhes do NFT */}
-      <div className="mx-auto hidden w-full max-w-[1440px] flex-col gap-[96px] px-4 py-6 sm:px-6 md:flex lg:px-[120px]">
+      <div className="mx-auto hidden w-full max-w-[1248px] flex-col gap-[96px] px-4 py-6 sm:px-6 md:flex">
         {/* Top Section (Breadcrumb + Product Images & Details) */}
         <section aria-label="Detalhes principais do produto" className="flex w-full flex-col gap-8">
           {/* Breadcrumb: Início / Mercado */}

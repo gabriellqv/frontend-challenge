@@ -93,20 +93,20 @@ export function Footer() {
     >
       <div className="mx-auto flex w-full max-w-[1200px] flex-col">
         {/* Frame 122: Medalhões (W, C, D) + Newsletter (1200px x 250px, bg: #241612, p: 32px) */}
-        <div className="flex w-full max-w-[1200px] flex-col items-start bg-card p-6 sm:p-8 lg:h-[250px] lg:w-[1200px] lg:p-[32px]">
+        <div className="flex w-full max-w-[1200px] flex-col items-start bg-card p-6 sm:p-8 lg:p-[32px] xl:h-[250px] xl:w-[1200px]">
           {/* Frame 100: 1154px x 202px */}
-          <div className="mx-auto flex w-full flex-col justify-between gap-6 lg:h-[202px] lg:w-[1154px] lg:flex-row lg:items-start lg:gap-0">
+          <div className="mx-auto flex w-full flex-col justify-between gap-6 lg:flex-row lg:items-start lg:gap-0 xl:h-[202px] xl:w-[1154px]">
             {/* Coluna W (Frame 22: 264.67px x 202px, px: 16px) */}
-            <div className="flex flex-col items-start gap-[10px] lg:h-[202px] lg:w-[264.67px] lg:px-[16px]">
-              <div className="flex flex-col items-start gap-[12px] lg:h-[202px] lg:w-[232.67px]">
+            <div className="flex flex-col items-start gap-[10px] lg:min-w-0 lg:flex-1 lg:px-[16px] xl:h-[202px] xl:w-[264.67px] xl:flex-none">
+              <div className="flex flex-col items-start gap-[12px] xl:h-[202px] xl:w-[232.67px]">
                 {/* Frame 91: Círculo 74x74 com W */}
                 <div className="flex size-[74px] shrink-0 items-center justify-center rounded-[37px] bg-primary font-mono text-[24px] leading-[32px] font-bold text-ink">
                   W
                 </div>
-                <h3 className="h-[16px] font-mono text-[17px] leading-[16px] font-bold text-foreground">
+                <h3 className="min-h-[16px] font-mono text-[17px] leading-[16px] font-bold text-foreground">
                   Segurança da carteira
                 </h3>
-                <p className="w-[204px] font-mono text-[14px] leading-[22px] font-normal text-text-secondary">
+                <p className="w-full max-w-[204px] font-mono text-[14px] leading-[22px] font-normal text-text-secondary">
                   Proteja sua carteira e colecione arte digital verificada com confiança.
                 </p>
               </div>
@@ -115,20 +115,20 @@ export function Footer() {
             {/* Rectangle 36: Divisória vertical 1 (1px x 202px, #D28A4C) */}
             <div
               aria-hidden="true"
-              className="hidden h-[202px] w-[1px] shrink-0 bg-primary lg:block"
+              className="hidden w-[1px] shrink-0 self-stretch bg-primary lg:block xl:h-[202px]"
             />
 
             {/* Coluna C (Frame 21: 264.67px x 202px, px: 16px) */}
-            <div className="flex flex-col items-start gap-[10px] lg:h-[202px] lg:w-[264.67px] lg:px-[16px]">
-              <div className="flex flex-col items-start gap-[12px] lg:h-[202px] lg:w-[232.67px]">
+            <div className="flex flex-col items-start gap-[10px] lg:min-w-0 lg:flex-1 lg:px-[16px] xl:h-[202px] xl:w-[264.67px] xl:flex-none">
+              <div className="flex flex-col items-start gap-[12px] xl:h-[202px] xl:w-[232.67px]">
                 {/* Frame 93: Círculo 74x74 com C */}
                 <div className="flex size-[74px] shrink-0 items-center justify-center rounded-[37px] bg-primary font-mono text-[24px] leading-[32px] font-bold text-ink">
                   C
                 </div>
-                <h3 className="h-[16px] font-mono text-[17px] leading-[16px] font-bold text-foreground">
+                <h3 className="min-h-[16px] font-mono text-[17px] leading-[16px] font-bold text-foreground">
                   Criadores em destaque
                 </h3>
-                <p className="w-[204px] font-mono text-[14px] leading-[22px] font-normal text-text-secondary">
+                <p className="w-full max-w-[204px] font-mono text-[14px] leading-[22px] font-normal text-text-secondary">
                   Conheça artistas, estúdios e comunidades que moldam a cultura digital na rede.
                 </p>
               </div>
@@ -137,20 +137,20 @@ export function Footer() {
             {/* Rectangle 38: Divisória vertical 2 (1px x 202px, #D28A4C) */}
             <div
               aria-hidden="true"
-              className="hidden h-[202px] w-[1px] shrink-0 bg-primary lg:block"
+              className="hidden w-[1px] shrink-0 self-stretch bg-primary lg:block xl:h-[202px]"
             />
 
             {/* Coluna D (Frame 20: 264.67px x 202px, px: 16px) */}
-            <div className="flex flex-col items-start gap-[10px] lg:h-[202px] lg:w-[264.67px] lg:px-[16px]">
-              <div className="flex flex-col items-start gap-[12px] lg:h-[202px] lg:w-[232.67px]">
+            <div className="flex flex-col items-start gap-[10px] lg:min-w-0 lg:flex-1 lg:px-[16px] xl:h-[202px] xl:w-[264.67px] xl:flex-none">
+              <div className="flex flex-col items-start gap-[12px] xl:h-[202px] xl:w-[232.67px]">
                 {/* Frame 95: Círculo 74x74 com D */}
                 <div className="flex size-[74px] shrink-0 items-center justify-center rounded-[37px] bg-primary font-mono text-[24px] leading-[32px] font-bold text-ink">
                   D
                 </div>
-                <h3 className="h-[16px] font-mono text-[17px] leading-[16px] font-bold text-foreground">
+                <h3 className="min-h-[16px] font-mono text-[17px] leading-[16px] font-bold text-foreground">
                   Alertas de lançamentos
                 </h3>
-                <p className="w-[204px] font-mono text-[14px] leading-[22px] font-normal text-text-secondary">
+                <p className="w-full max-w-[204px] font-mono text-[14px] leading-[22px] font-normal text-text-secondary">
                   Receba calendários de cunhagem, novidades de listas de acesso e análises do
                   mercado.
                 </p>
@@ -160,11 +160,11 @@ export function Footer() {
             {/* Rectangle 39: Divisória vertical 3 (1px x 202px, #D28A4C) */}
             <div
               aria-hidden="true"
-              className="hidden h-[202px] w-[1px] shrink-0 bg-primary lg:block"
+              className="hidden w-[1px] shrink-0 self-stretch bg-primary lg:block xl:h-[202px]"
             />
 
             {/* Coluna Newsletter (Frame 99: 357px x 202px, px: 16px) */}
-            <div className="flex flex-col items-start gap-[12px] lg:h-[202px] lg:w-[357px] lg:px-[16px]">
+            <div className="flex flex-col items-start gap-[12px] lg:w-[357px] lg:shrink-0 lg:px-[16px] xl:h-[202px]">
               {/* Frame 102: 325px x 88px, gap: 16px */}
               <div className="flex flex-col items-start gap-[12px] lg:min-h-[88px] lg:w-[325px]">
                 <h3 className="whitespace-pre-line font-mono text-[18px] leading-[16px] font-bold text-foreground">
@@ -233,7 +233,7 @@ export function Footer() {
                   </p>
                 )}
               </div>
-              <p className="w-[325px] font-mono text-[13px] leading-[22px] font-normal text-text-secondary">
+              <p className="w-full max-w-[325px] font-mono text-[13px] leading-[22px] font-normal text-text-secondary">
                 Receba lançamentos selecionados, histórias de criadores e novidades do mercado.
               </p>
             </div>
@@ -241,11 +241,11 @@ export function Footer() {
         </div>
 
         {/* Frame 121: 1200px x 360px */}
-        <div className="flex w-full max-w-[1200px] flex-col items-start lg:h-[360px] lg:w-[1200px]">
+        <div className="flex w-full max-w-[1200px] flex-col items-start xl:h-[360px] xl:w-[1200px]">
           {/* Frame 120: Faixa institucional (1200px x 88px, padding: 32px, bg: #38220F) */}
-          <div className="flex w-full flex-col justify-center bg-surface-dark p-6 sm:p-8 lg:h-[88px] lg:w-[1200px] lg:p-[32px]">
+          <div className="flex w-full flex-col justify-center bg-surface-dark p-6 sm:p-8 lg:h-[88px] lg:p-[32px] xl:w-[1200px]">
             {/* Frame 119: 1136px x 24px, gap: 92px */}
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center lg:h-[24px] lg:w-[1136px] lg:gap-[92px]">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center lg:h-[24px] lg:gap-8 xl:w-[1136px] xl:gap-[92px]">
               {/* Logo: 210.67px x 34px, flex-grow: 1 */}
               <div className="flex items-center lg:h-[34px] lg:w-[210.67px] lg:flex-1">
                 <Link
@@ -293,11 +293,11 @@ export function Footer() {
           </div>
 
           {/* Frame 118: 1200px x 272px, gap: 6px */}
-          <div className="flex w-full flex-col items-center gap-[6px] lg:h-[272px] lg:w-[1200px]">
+          <div className="flex w-full flex-col items-center gap-[6px] xl:h-[272px] xl:w-[1200px]">
             {/* Frame 117: 1200px x 236px, padding: 32px, bg: #241612 */}
-            <div className="flex w-full flex-col items-start bg-card p-6 sm:p-8 lg:h-[236px] lg:w-[1200px] lg:p-[32px]">
+            <div className="flex w-full flex-col items-start bg-card p-6 sm:p-8 lg:p-[32px] xl:h-[236px] xl:w-[1200px]">
               {/* Frame 116: 1136px x 174px, gap: 124px */}
-              <div className="flex w-full flex-col justify-between gap-8 sm:flex-row sm:flex-wrap lg:h-[174px] lg:w-[1136px] lg:flex-nowrap lg:gap-[124px]">
+              <div className="flex w-full flex-col justify-between gap-8 sm:flex-row sm:flex-wrap lg:flex-nowrap lg:gap-12 xl:h-[174px] xl:w-[1136px] xl:gap-[124px]">
                 {/* Frame 103: Coluna 1: Meu perfil (178.67px x 174px, gap: 8px) */}
                 <div className="flex flex-col gap-[8px] lg:h-[174px] lg:w-[178.67px] lg:flex-1">
                   <h4 className="h-[16px] font-mono text-[18px] leading-[16px] font-bold text-foreground">

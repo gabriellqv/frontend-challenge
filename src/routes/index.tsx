@@ -57,7 +57,7 @@ function HomePage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-6 pt-10 pb-8 sm:px-6 md:gap-[96px] md:px-0 md:pt-0 md:pb-0">
+    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-6 pt-10 pb-8 sm:px-6 md:gap-[96px] md:px-6 md:pt-0 md:pb-0 xl:px-0">
       {/* Mobile Search Bar: 366px x 45px (Figma Mobile / Início) */}
       <div className="mx-auto flex w-full max-w-[366px] items-center gap-2 md:hidden">
         {/* Frame 404: Search Input */}
@@ -135,7 +135,7 @@ function HomePage() {
           role="dialog"
           aria-modal="true"
           aria-label="Filtros de coleções e redes"
-          className="fixed inset-0 z-50 flex flex-col justify-between overflow-y-auto overscroll-contain bg-[#140D0A]/95 p-6 backdrop-blur-md md:hidden"
+          className="fixed inset-0 z-50 flex flex-col justify-between overflow-y-auto overscroll-contain bg-[#140D0A]/95 p-6 backdrop-blur-md lg:hidden"
         >
           <div>
             <div className="flex items-center justify-between border-b border-[#3F2319] pb-4">
@@ -202,15 +202,15 @@ function HomePage() {
           </div>
 
           {/* Product Grid: 842px wide, gap: 88px to Pagination */}
-          <div className="flex w-full min-w-0 flex-1 flex-col items-end gap-8 sm:gap-12 lg:w-[842px] lg:shrink-0 lg:gap-[88px]">
+          <div className="flex w-full min-w-0 flex-1 flex-col items-end gap-8 sm:gap-12 lg:gap-[88px] xl:w-[842px] xl:shrink-0">
             {/* Frame 233: 842px wide, gap: 32px */}
             <div className="flex w-full flex-col items-start gap-8">
               {/* Desktop Toolbar: 842px x 18px */}
-              <div className="hidden w-full items-center justify-between gap-4 md:flex">
+              <div className="hidden w-full flex-wrap items-center justify-between gap-x-4 gap-y-5 md:flex">
                 {/* Tabs: 376px x 16px, gap: 20px */}
                 <nav
                   aria-label="Abas do catálogo"
-                  className="relative flex items-center gap-5 font-mono text-[15px] font-medium leading-4"
+                  className="relative flex items-center gap-5 font-mono text-[15px] font-medium leading-4 whitespace-nowrap"
                 >
                   <button
                     type="button"
@@ -236,8 +236,19 @@ function HomePage() {
                   </button>
                 </nav>
 
-                {/* Sort */}
-                <SortSelect value={search.sort} onChange={(sort) => updateSearch({ sort })} />
+                <div className="ml-auto flex items-center gap-4">
+                  {/* Entre md e lg a sidebar não cabe; os filtros abrem no mesmo modal do mobile. */}
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileFiltersOpen(true)}
+                    aria-haspopup="dialog"
+                    className="inline-flex h-[35px] cursor-pointer items-center gap-2 rounded-[6px] border border-primary px-3 font-mono text-[15px] leading-4 font-medium text-highlight transition-colors hover:bg-primary/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:hidden"
+                  >
+                    <SlidersHorizontal aria-hidden="true" className="size-4" strokeWidth={2.5} />
+                    Filtros
+                  </button>
+                  <SortSelect value={search.sort} onChange={(sort) => updateSearch({ sort })} />
+                </div>
               </div>
 
               {catalog.isLoading ? (

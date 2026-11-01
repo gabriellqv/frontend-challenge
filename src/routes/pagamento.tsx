@@ -181,7 +181,7 @@ function CheckoutPage() {
 
   if (cartQuery.isLoading) {
     return (
-      <div className="mx-auto w-full max-w-[1440px] px-4 py-8 sm:px-6 lg:px-[120px]">
+      <div className="mx-auto w-full max-w-[1248px] px-4 py-8 sm:px-6">
         <CartSummarySkeleton />
       </div>
     )
@@ -260,7 +260,7 @@ function CheckoutPage() {
   return (
     <>
       {/* Desktop / Pagamento (preserved 100% for desktop screens & visual tests) */}
-      <div className="mx-auto hidden w-full max-w-[1440px] flex-col gap-[96px] px-4 py-6 sm:px-6 md:flex lg:px-[120px]">
+      <div className="mx-auto hidden w-full max-w-[1248px] flex-col gap-[96px] px-4 py-6 sm:px-6 md:flex">
         {/* Checkout Page Content */}
         <section aria-label="Página de Pagamento" className="flex w-full flex-col gap-8">
           {/* Breadcrumb: Início / Mercado / Pagamento */}

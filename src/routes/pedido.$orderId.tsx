@@ -180,7 +180,7 @@ function OrderPage() {
 
   if (orderQuery.isLoading) {
     return (
-      <div className="mx-auto flex w-full max-w-[1440px] items-center justify-center px-4 py-24 sm:px-6 lg:px-[120px]">
+      <div className="mx-auto flex w-full max-w-[1248px] items-center justify-center px-4 py-24 sm:px-6">
         <div className="flex flex-col items-center gap-3 font-mono text-[#F5F1EB]">
           <Clock className="size-8 animate-spin text-primary" />
           <p className="text-sm">Carregando pedido…</p>
@@ -191,7 +191,7 @@ function OrderPage() {
 
   if (orderQuery.isError || !orderQuery.data) {
     return (
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col items-center justify-center px-4 py-24 text-center sm:px-6 lg:px-[120px]">
+      <div className="mx-auto flex w-full max-w-[1248px] flex-col items-center justify-center px-4 py-24 text-center sm:px-6">
         <h1 className="font-mono text-2xl font-bold text-[#F5F1EB]">Pedido não encontrado</h1>
         <p className="mt-2 font-mono text-sm text-[#CFB28C]">
           Não foi possível localizar as informações deste pedido.
@@ -235,7 +235,7 @@ function OrderPage() {
       {/* Background Checkout Screen (behind scrim per Figma spec) */}
       <div
         aria-hidden="true"
-        className="pointer-events-none mx-auto flex w-full max-w-[1440px] select-none flex-col gap-[96px] px-4 py-6 opacity-40 blur-[1px] sm:px-6 lg:px-[120px]"
+        className="pointer-events-none mx-auto flex w-full max-w-[1248px] select-none flex-col gap-[96px] px-4 py-6 opacity-40 blur-[1px] sm:px-6"
       >
         <div className="flex w-full flex-col gap-8">
           <nav className="flex h-4 items-center gap-2 font-mono text-[15px] font-bold text-[#F5F1EB]">

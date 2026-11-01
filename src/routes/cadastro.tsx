@@ -517,7 +517,7 @@ function RegisterPage() {
       <div className="flex min-h-screen w-full flex-col items-center bg-[#140D0A] px-[28px] pt-[80px] pb-[24px] md:hidden">
         <div className="flex w-full max-w-[358px] flex-col items-center gap-[40px]">
           {/* Logo (Frame: 358px x 136px) */}
-          <div className="flex h-[136px] w-[358px] shrink-0 items-center justify-center">
+          <div className="flex h-[136px] w-full items-center justify-center">
             <Link
               to="/"
               search={DEFAULT_NFT_LIST_QUERY}
@@ -528,7 +528,7 @@ function RegisterPage() {
           </div>
 
           {/* Title (358px x 16px) */}
-          <div className="flex h-4 w-[358px] shrink-0 items-start justify-center">
+          <div className="flex h-4 w-full items-start justify-center">
             <h1 className="text-center font-mono text-[18px] font-bold leading-4 text-[#F5F1EB]">
               Criar perfil de colecionador
             </h1>

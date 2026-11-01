@@ -92,7 +92,7 @@ export function SortSelect({ value, onChange }: SortSelectProps) {
           focusRing,
         )}
       >
-        <span>{currentOption.label}</span>
+        <span className="whitespace-nowrap">{currentOption.label}</span>
         <svg
           aria-hidden="true"
           viewBox="0 0 16 16"

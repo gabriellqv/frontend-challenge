@@ -119,7 +119,7 @@ function CartPage() {
   return (
     <>
       {/* Desktop / Carrinho (preserved 100% for desktop screens & visual tests) */}
-      <div className="mx-auto hidden w-full max-w-[1440px] flex-col gap-[96px] px-4 py-6 sm:px-6 md:flex lg:px-[120px]">
+      <div className="mx-auto hidden w-full max-w-[1248px] flex-col gap-[96px] px-4 py-6 sm:px-6 md:flex">
         {/* Top Section: Breadcrumb + Cart Body */}
         <section aria-label="Carrinho de NFTs" className="flex w-full flex-col gap-8">
           {items.length > 0 && <h1 className="sr-only">Carrinho de NFTs</h1>}
@@ -216,7 +216,7 @@ function CartPage() {
                         {/* Mobile Row with Price, Stepper, Total, Delete */}
                         <div className="mt-3 flex items-center justify-between sm:mt-0 sm:contents">
                           {/* 2. Unit Price */}
-                          <div className="font-mono text-[16px] leading-4 font-bold text-[#CFB28C] sm:w-[77px] sm:text-center">
+                          <div className="font-mono text-[16px] leading-4 font-bold whitespace-nowrap text-[#CFB28C] sm:w-[77px] sm:text-center">
                             {formatEth(item.priceEth)} ETH
                           </div>
 
@@ -255,7 +255,7 @@ function CartPage() {
                           </div>
 
                           {/* 4. Item Total */}
-                          <div className="font-mono text-[16px] leading-4 font-bold text-[#E89B55] sm:w-[87px] sm:text-center">
+                          <div className="font-mono text-[16px] leading-4 font-bold whitespace-nowrap text-[#E89B55] sm:w-[87px] sm:text-center">
                             {formatEth(itemTotalEth)} ETH
                           </div>
 

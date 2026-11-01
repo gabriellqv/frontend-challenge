@@ -107,7 +107,7 @@ export function Header({ cartItemCount }: HeaderProps) {
           showDivider && 'border-b border-[#D28A4C]/30',
         )}
       >
-        <div className="flex h-[45px] w-auto items-start pt-[8px] md:w-[160px]">
+        <div className="flex h-[45px] w-auto items-start pt-[8px] lg:w-[160px]">
           <Link
             to="/"
             search={DEFAULT_NFT_LIST_QUERY}
@@ -122,7 +122,7 @@ export function Header({ cartItemCount }: HeaderProps) {
         </div>
 
         <nav aria-label="Principal" className="hidden md:block">
-          <ul className="flex h-[45px] items-start gap-10">
+          <ul className="flex h-[45px] items-start gap-6 lg:gap-10">
             <li className="h-[45px]">
               <Link
                 to="/"
@@ -187,7 +187,7 @@ export function Header({ cartItemCount }: HeaderProps) {
           </ul>
         </nav>
 
-        <div className="flex h-[35px] items-center justify-end gap-2 md:w-[207px] md:gap-7">
+        <div className="flex h-[35px] items-center justify-end gap-2 md:gap-4 xl:w-[207px] xl:gap-7">
           <button
             type="button"
             aria-label="Buscar NFTs (em breve)"
