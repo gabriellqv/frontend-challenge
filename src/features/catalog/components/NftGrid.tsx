@@ -2,6 +2,9 @@ import type { Nft } from '@/shared/contracts'
 
 import { NftCard } from './NftCard'
 
+/** Cards na primeira linha da grade no maior layout (3 colunas em `xl`). */
+const DESKTOP_FIRST_ROW = 3
+
 /** Props de {@link NftGrid}. */
 interface NftGridProps {
   /** NFTs da página atual. */
@@ -30,26 +33,28 @@ export function NftGrid({ nfts, favoriteIds, onToggleFavorite }: NftGridProps) {
       <div className="mx-auto grid w-full max-w-[366px] grid-cols-2 gap-4 sm:hidden">
         {/* Column L (P-1, P-3, ...) */}
         <div className="flex w-full flex-col gap-6">
-          {leftColumnNfts.map((nft) => (
+          {leftColumnNfts.map((nft, idx) => (
             <NftCard
               key={nft.id}
               nft={nft}
               isFavorite={favoriteIds.has(nft.id)}
               onToggleFavorite={onToggleFavorite}
               mobile
+              isPriority={idx === 0}
             />
           ))}
         </div>
 
         {/* Column R (P-2, P-4, ... com offset de 32px) */}
         <div className="flex w-full flex-col gap-6 pt-8">
-          {rightColumnNfts.map((nft) => (
+          {rightColumnNfts.map((nft, idx) => (
             <NftCard
               key={nft.id}
               nft={nft}
               isFavorite={favoriteIds.has(nft.id)}
               onToggleFavorite={onToggleFavorite}
               mobile
+              isPriority={idx === 0}
             />
           ))}
         </div>
@@ -57,12 +62,13 @@ export function NftGrid({ nfts, favoriteIds, onToggleFavorite }: NftGridProps) {
 
       {/* Desktop Grid */}
       <ul className="hidden w-full sm:grid sm:grid-cols-2 sm:gap-6 lg:gap-x-[34px] lg:gap-y-[72px] xl:w-[842px] xl:grid-cols-3">
-        {nfts.map((nft) => (
+        {nfts.map((nft, idx) => (
           <li key={nft.id} className="flex justify-center">
             <NftCard
               nft={nft}
               isFavorite={favoriteIds.has(nft.id)}
               onToggleFavorite={onToggleFavorite}
+              isPriority={idx < DESKTOP_FIRST_ROW}
             />
           </li>
         ))}

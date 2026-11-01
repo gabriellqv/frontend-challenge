@@ -13,7 +13,8 @@ if (!parsed.success) {
   )
 }
 
+/**
+ * Variáveis de ambiente validadas. Importado por `mount.tsx` para falhar cedo
+ * com configuração inválida; a flag de mocks do boot vive em `mocks-flag.ts`.
+ */
 export const env = parsed.data
-
-/** Mocks (MSW) ativados por configuração — também no build de demonstração. */
-export const isMocksEnabled = env.VITE_ENABLE_MOCKS === 'true'

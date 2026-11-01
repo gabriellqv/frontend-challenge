@@ -7,7 +7,7 @@ const PROMOS = [
   {
     title: 'Lançamentos gênesis\nde edição limitada',
     description: 'Colecione edições escassas diretamente dos criadores antes da revelação pública.',
-    image: '/images/Frame-136.png',
+    image: '/images/Frame-136.webp',
     imageWidth: 292,
     imageRadius: 'rounded-[18px]',
   },
@@ -15,7 +15,7 @@ const PROMOS = [
     title: 'Arte digital curada\ne muito mais',
     description:
       'Explore novos artistas, coleções verificadas e obras digitais que definem a cultura.',
-    image: '/images/NFT-Artwork-05.png',
+    image: '/images/NFT-Artwork-05.webp',
     imageWidth: 287,
     imageRadius: 'rounded-[17px]',
   },

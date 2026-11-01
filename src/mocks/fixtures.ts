@@ -50,7 +50,7 @@ function nft(
   network: Nft['network'],
   priceEth: string,
   editions: Nft['editions'],
-  imageUrl = '/images/NFT-Artwork-05.png',
+  imageUrl = '/images/NFT-Artwork-05.webp',
 ): Nft {
   return {
     id,
@@ -82,7 +82,7 @@ export function createNfts(): Nft[] {
       'Polygon',
       '1.19',
       limited(1, 50, 18),
-      '/images/Frame-136.png',
+      '/images/Frame-136.webp',
     ),
     nft('nft-2', 'Genesis Drop #001', 'Genesis Drops', 'Ethereum', '4.2', limited(2, 10, 3)),
     nft('nft-3', 'Crimson Ape #007', 'Kurio Apes', 'Polygon', '0.85', limited(3, 50, 50)),
@@ -93,7 +93,7 @@ export function createNfts(): Nft[] {
       'Ethereum',
       '2.75',
       limited(4, 1, 1),
-      '/images/NFT-Artwork-09.png',
+      '/images/NFT-Artwork-09.webp',
     ),
     nft('nft-5', 'Neon Drift #12', 'Curated Art', 'Polygon', '0.49', open(5)),
     nft(
@@ -103,7 +103,7 @@ export function createNfts(): Nft[] {
       'Ethereum',
       '6.5',
       limited(6, 1, 0),
-      '/images/NFT-Artwork-18.png',
+      '/images/NFT-Artwork-18.webp',
     ),
     nft('nft-7', 'Golden Ape #003', 'Kurio Apes', 'Ethereum', '3.1', limited(7, 50, 27)),
     nft('nft-8', 'Genesis Drop #008', 'Genesis Drops', 'Polygon', '1.9', limited(8, 10, 8)),
@@ -120,7 +120,7 @@ export function createNfts(): Nft[] {
       'Ethereum',
       '8.0',
       limited(15, 1, 1),
-      '/images/NFT-Artwork-09.png',
+      '/images/NFT-Artwork-09.webp',
     ),
     nft('nft-16', 'Genesis Drop #021', 'Genesis Drops', 'Polygon', '0.75', limited(16, 10, 10)),
     nft(
@@ -130,7 +130,7 @@ export function createNfts(): Nft[] {
       'Polygon',
       '1.69',
       limited(17, 50, 12),
-      '/images/NFT-Artwork-09.png',
+      '/images/NFT-Artwork-09.webp',
     ),
     nft(
       'nft-18',
@@ -139,7 +139,7 @@ export function createNfts(): Nft[] {
       'Ethereum',
       '1.99',
       limited(18, 50, 25),
-      '/images/NFT-Artwork-18.png',
+      '/images/NFT-Artwork-18.webp',
     ),
     nft(
       'nft-19',
@@ -148,7 +148,7 @@ export function createNfts(): Nft[] {
       'Polygon',
       '1.29',
       limited(19, 50, 30),
-      '/images/NFT-Artwork-18.png',
+      '/images/NFT-Artwork-18.webp',
     ),
     nft(
       'nft-20',
@@ -157,7 +157,7 @@ export function createNfts(): Nft[] {
       'Ethereum',
       '1.39',
       limited(20, 50, 45),
-      '/images/NFT-Artwork-18.png',
+      '/images/NFT-Artwork-18.webp',
     ),
     nft(
       'nft-21',
@@ -166,7 +166,7 @@ export function createNfts(): Nft[] {
       'Polygon',
       '1.79',
       limited(21, 50, 8),
-      '/images/NFT-Artwork-05.png',
+      '/images/NFT-Artwork-05.webp',
     ),
     nft(
       'nft-22',
@@ -175,7 +175,7 @@ export function createNfts(): Nft[] {
       'Ethereum',
       '0.99',
       limited(22, 50, 19),
-      '/images/NFT-Artwork-09.png',
+      '/images/NFT-Artwork-09.webp',
     ),
     nft(
       'nft-23',
@@ -184,7 +184,7 @@ export function createNfts(): Nft[] {
       'Polygon',
       '0.39',
       limited(23, 50, 22),
-      '/images/NFT-Artwork-09.png',
+      '/images/NFT-Artwork-09.webp',
     ),
     nft('nft-24', 'Cyber Relic #004', 'Genesis Drops', 'Ethereum', '3.8', limited(24, 10, 2)),
     nft('nft-25', 'Astral Mirage #077', 'Kurio Apes', 'Polygon', '1.15', limited(25, 50, 14)),

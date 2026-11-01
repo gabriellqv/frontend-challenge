@@ -450,7 +450,7 @@ export function FilterSidebar({
 
             <div className="relative mx-auto h-[368px] w-full overflow-hidden rounded-[22px]">
               <img
-                src="/images/NFT-Artwork-18.png"
+                src="/images/NFT-Artwork-18.webp"
                 alt="NFT em destaque: Oferta Limitada"
                 width={310}
                 height={368}

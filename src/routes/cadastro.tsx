@@ -168,16 +168,16 @@ function RegisterPage() {
               {/* Products preview */}
               <div className="grid flex-1 grid-cols-3 gap-6">
                 {[
-                  { title: 'Emerald Ape #042', price: '1.19 ETH', image: '/images/Frame-136.png' },
+                  { title: 'Emerald Ape #042', price: '1.19 ETH', image: '/images/Frame-136.webp' },
                   {
                     title: 'Sage Nomad #009',
                     price: '1.69 ETH',
-                    image: '/images/NFT-Artwork-09.png',
+                    image: '/images/NFT-Artwork-09.webp',
                   },
                   {
                     title: 'Neon Vessel #552',
                     price: '1.99 ETH',
-                    image: '/images/NFT-Artwork-05.png',
+                    image: '/images/NFT-Artwork-05.webp',
                   },
                 ].map((item) => (
                   <div key={item.title} className="rounded-[8px] bg-card p-3">

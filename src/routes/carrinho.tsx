@@ -26,31 +26,31 @@ const RELATED_NFTS = [
     id: 'nft-19',
     name: 'Cosmic Bloom #118',
     priceEth: '1.29',
-    imageUrl: '/images/NFT-Artwork-18.png',
+    imageUrl: '/images/NFT-Artwork-18.webp',
   },
   {
     id: 'nft-20',
     name: 'Violet Nomad #314',
     priceEth: '1.39',
-    imageUrl: '/images/NFT-Artwork-18.png',
+    imageUrl: '/images/NFT-Artwork-18.webp',
   },
   {
     id: 'nft-21',
     name: 'Ivory Baron #088',
     priceEth: '1.79',
-    imageUrl: '/images/NFT-Artwork-05.png',
+    imageUrl: '/images/NFT-Artwork-05.webp',
   },
   {
     id: 'nft-22',
     name: 'Golden Beat #207',
     priceEth: '0.99',
-    imageUrl: '/images/NFT-Artwork-09.png',
+    imageUrl: '/images/NFT-Artwork-09.webp',
   },
   {
     id: 'nft-23',
     name: 'Golden Signal #160',
     priceEth: '0.39',
-    imageUrl: '/images/NFT-Artwork-09.png',
+    imageUrl: '/images/NFT-Artwork-09.webp',
   },
 ]
 
@@ -87,16 +87,16 @@ function CartPage() {
 
   function getItemImage(item: (typeof items)[number]) {
     if (item.nftId === 'nft-1' || item.name.includes('Emerald Ape')) {
-      return '/images/Frame-136.png'
+      return '/images/Frame-136.webp'
     }
     if (item.name.includes('Violet Nomad')) {
-      return '/images/NFT-Artwork-18.png'
+      return '/images/NFT-Artwork-18.webp'
     }
     if (item.name.includes('Ivory Baron')) {
-      return '/images/NFT-Artwork-05.png'
+      return '/images/NFT-Artwork-05.webp'
     }
     if (item.name.includes('Golden Beat')) {
-      return '/images/NFT-Artwork-09.png'
+      return '/images/NFT-Artwork-09.webp'
     }
     return item.imageUrl
   }

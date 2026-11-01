@@ -5,28 +5,28 @@ const POSTS = [
     readTime: 'Leitura de 6 min',
     title: 'Como funciona a propriedade de NFTs',
     description: 'Aprenda a colecionar, negociar e verificar ativos digitais.',
-    image: '/images/NFT-Artwork-05.png',
+    image: '/images/NFT-Artwork-05.webp',
   },
   {
     date: '13 de setembro',
     readTime: 'Leitura de 2 min',
     title: '10 artistas digitais para acompanhar',
     description: 'Conheça criadores que moldam a cultura digital.',
-    image: '/images/Frame-136.png',
+    image: '/images/Frame-136.webp',
   },
   {
     date: '15 de setembro',
     readTime: 'Leitura de 3 min',
     title: 'Raridade, atributos e procedência',
     description: 'Entenda raridade, procedência, direitos autorais e utilidade.',
-    image: '/images/NFT-Artwork-18.png',
+    image: '/images/NFT-Artwork-18.webp',
   },
   {
     date: '15 de setembro',
     readTime: 'Leitura de 2 min',
     title: 'Como proteger sua carteira',
     description: 'Proteja sua carteira, seus ativos e sua identidade.',
-    image: '/images/NFT-Artwork-09.png',
+    image: '/images/NFT-Artwork-09.webp',
   },
 ] as const
 

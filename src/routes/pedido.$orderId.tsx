@@ -60,10 +60,10 @@ function getItemTokenId(nftId: string) {
 }
 
 function getItemImage(nftId: string) {
-  if (nftId === 'nft-1') return '/images/Frame-136.png'
-  if (nftId === 'nft-20') return '/images/NFT-Artwork-18.png'
-  if (nftId === 'nft-21') return '/images/NFT-Artwork-05.png'
-  return '/images/NFT-Artwork-09.png'
+  if (nftId === 'nft-1') return '/images/Frame-136.webp'
+  if (nftId === 'nft-20') return '/images/NFT-Artwork-18.webp'
+  if (nftId === 'nft-21') return '/images/NFT-Artwork-05.webp'
+  return '/images/NFT-Artwork-09.webp'
 }
 
 const DEMO_ITEMS = [
@@ -71,7 +71,7 @@ const DEMO_ITEMS = [
     nftId: 'nft-1',
     editionId: 'ed-1',
     name: 'Emerald Ape #042',
-    imageUrl: '/images/Frame-136.png',
+    imageUrl: '/images/Frame-136.webp',
     quantity: 2,
     priceEth: '1.19',
     totalEth: '2.38 ETH',
@@ -81,7 +81,7 @@ const DEMO_ITEMS = [
     nftId: 'nft-20',
     editionId: 'ed-20',
     name: 'Violet Nomad #314',
-    imageUrl: '/images/NFT-Artwork-18.png',
+    imageUrl: '/images/NFT-Artwork-18.webp',
     quantity: 6,
     priceEth: '1.39',
     totalEth: '8.34 ETH',
@@ -91,7 +91,7 @@ const DEMO_ITEMS = [
     nftId: 'nft-21',
     editionId: 'ed-21',
     name: 'Ivory Baron #088',
-    imageUrl: '/images/NFT-Artwork-05.png',
+    imageUrl: '/images/NFT-Artwork-05.webp',
     quantity: 9,
     priceEth: '1.79',
     totalEth: '16.11 ETH',

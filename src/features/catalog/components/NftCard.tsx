@@ -19,6 +19,11 @@ interface NftCardProps {
   onToggleFavorite: (nftId: string, favorite: boolean) => void
   /** Renderiza no formato compacto de coluna móvel do Figma. */
   mobile?: boolean
+  /**
+   * Card acima da dobra: a arte carrega imediatamente e com prioridade alta,
+   * pois é candidata a LCP. Os demais seguem com `loading="lazy"`.
+   */
+  isPriority?: boolean
 }
 
 /**
@@ -28,7 +33,16 @@ interface NftCardProps {
  * @param props - {@link NftCardProps}
  * @returns Card de NFT.
  */
-export function NftCard({ nft, isFavorite, onToggleFavorite, mobile }: NftCardProps) {
+export function NftCard({
+  nft,
+  isFavorite,
+  onToggleFavorite,
+  mobile,
+  isPriority = false,
+}: NftCardProps) {
+  const loading = isPriority ? 'eager' : 'lazy'
+  const fetchPriority = isPriority ? 'high' : 'auto'
+
   const favoriteLabel = isFavorite
     ? `Remover ${nft.name} dos favoritos`
     : `Adicionar ${nft.name} aos favoritos`
@@ -84,7 +98,8 @@ export function NftCard({ nft, isFavorite, onToggleFavorite, mobile }: NftCardPr
             <img
               src={nft.imageUrl}
               alt={`Arte do NFT ${nft.name}`}
-              loading="lazy"
+              loading={loading}
+              fetchPriority={fetchPriority}
               decoding="async"
               className="size-[164px] rounded-[16px] object-cover"
             />
@@ -141,7 +156,8 @@ export function NftCard({ nft, isFavorite, onToggleFavorite, mobile }: NftCardPr
           <img
             src={nft.imageUrl}
             alt={`Arte do NFT ${nft.name}`}
-            loading="lazy"
+            loading={loading}
+            fetchPriority={fetchPriority}
             decoding="async"
             className="size-[250px] rounded-[15px] object-cover"
           />

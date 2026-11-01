@@ -38,31 +38,31 @@ const RELATED_NFTS = [
     id: 'nft-19',
     name: 'Cosmic Bloom #118',
     priceEth: '1.29',
-    imageUrl: '/images/NFT-Artwork-18.png',
+    imageUrl: '/images/NFT-Artwork-18.webp',
   },
   {
     id: 'nft-20',
     name: 'Violet Nomad #314',
     priceEth: '1.39',
-    imageUrl: '/images/NFT-Artwork-18.png',
+    imageUrl: '/images/NFT-Artwork-18.webp',
   },
   {
     id: 'nft-21',
     name: 'Ivory Baron #088',
     priceEth: '1.79',
-    imageUrl: '/images/NFT-Artwork-05.png',
+    imageUrl: '/images/NFT-Artwork-05.webp',
   },
   {
     id: 'nft-22',
     name: 'Golden Beat #207',
     priceEth: '0.99',
-    imageUrl: '/images/NFT-Artwork-09.png',
+    imageUrl: '/images/NFT-Artwork-09.webp',
   },
   {
     id: 'nft-23',
     name: 'Golden Signal #160',
     priceEth: '0.39',
-    imageUrl: '/images/NFT-Artwork-09.png',
+    imageUrl: '/images/NFT-Artwork-09.webp',
   },
 ]
 
@@ -156,7 +156,7 @@ function NftDetailPage() {
   const nft = nftQuery.data
   // Emerald Ape #042 uses Frame-136.png (green jacket, sunglasses, emerald pendant)
   const mainArtworkUrl =
-    nft.id === 'nft-1' || nft.name.includes('Emerald Ape') ? '/images/Frame-136.png' : nft.imageUrl
+    nft.id === 'nft-1' || nft.name.includes('Emerald Ape') ? '/images/Frame-136.webp' : nft.imageUrl
 
   const edition =
     nft.editions.find((item) => item.name === selectedEditionId || item.id === selectedEditionId) ??
@@ -255,6 +255,10 @@ function NftDetailPage() {
             <img
               src={mainArtworkUrl}
               alt={nft.name}
+              // Reserva o quadrado final antes do download (evita layout shift).
+              width={320}
+              height={320}
+              fetchPriority="high"
               className="max-h-full max-w-[280px] sm:max-w-[320px] aspect-square cursor-zoom-in rounded-[24px] border border-[#D28A4C]/15 object-cover shadow-2xl"
               onClick={() => setIsZoomOpen(true)}
             />
@@ -479,6 +483,7 @@ function NftDetailPage() {
                 <img
                   src={mainArtworkUrl}
                   alt={`Arte digital de ${nft.name}`}
+                  fetchPriority="high"
                   className="size-[404px] max-h-full max-w-full rounded-[24px] object-cover"
                 />
                 <button

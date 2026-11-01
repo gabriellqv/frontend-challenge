@@ -30,11 +30,11 @@ const HERO_SLIDES: readonly HeroSlide[] = [
     mobileTag: 'Bem-vindo à Kurio',
     mobileTitle: 'SEJA DONO DA\nCULTURA DIGITAL',
     mobileDescription: 'Descubra NFTs selecionados de criadores do mundo todo.',
-    desktopImage: '/images/Frame-136.png',
+    desktopImage: '/images/Frame-136.webp',
     desktopAlt: 'Obra digital em destaque da coleção Kurio: Emerald Ape #042 por Nova Sato',
-    mobileMainImage: '/images/Frame-136.png',
+    mobileMainImage: '/images/Frame-136.webp',
     mobileMainAlt: 'Emerald Ape #042 por Nova Sato',
-    mobileSecondaryImage: '/images/NFT-Artwork-18.png',
+    mobileSecondaryImage: '/images/NFT-Artwork-18.webp',
     mobileSecondaryAlt: 'Sage Nomad por Aisha Thorne',
   },
   {
@@ -46,11 +46,11 @@ const HERO_SLIDES: readonly HeroSlide[] = [
     mobileTag: 'Criadores em destaque',
     mobileTitle: 'CRIADORES EM\nDESTAQUE',
     mobileDescription: 'Conheça Aisha Thorne e criadores da cultura digital.',
-    desktopImage: '/images/NFT-Artwork-18.png',
+    desktopImage: '/images/NFT-Artwork-18.webp',
     desktopAlt: 'Obra digital em destaque da coleção Kurio: Sage Nomad por Aisha Thorne',
-    mobileMainImage: '/images/NFT-Artwork-18.png',
+    mobileMainImage: '/images/NFT-Artwork-18.webp',
     mobileMainAlt: 'Sage Nomad por Aisha Thorne',
-    mobileSecondaryImage: '/images/NFT-Artwork-09.png',
+    mobileSecondaryImage: '/images/NFT-Artwork-09.webp',
     mobileSecondaryAlt: 'Solace in Motion por Kaelen Voss',
   },
   {
@@ -62,11 +62,11 @@ const HERO_SLIDES: readonly HeroSlide[] = [
     mobileTag: 'Lançamentos selecionados',
     mobileTitle: 'EDIÇÕES RARAS\nVERIFICADAS',
     mobileDescription: 'Obras verificadas com procedência na rede Ethereum.',
-    desktopImage: '/images/NFT-Artwork-09.png',
+    desktopImage: '/images/NFT-Artwork-09.webp',
     desktopAlt: 'Obra digital em destaque da coleção Kurio: Solace in Motion por Kaelen Voss',
-    mobileMainImage: '/images/NFT-Artwork-09.png',
+    mobileMainImage: '/images/NFT-Artwork-09.webp',
     mobileMainAlt: 'Solace in Motion por Kaelen Voss',
-    mobileSecondaryImage: '/images/NFT-Artwork-05.png',
+    mobileSecondaryImage: '/images/NFT-Artwork-05.webp',
     mobileSecondaryAlt: 'Neon Drift por Marcus Vance',
   },
 ]
@@ -272,6 +272,7 @@ export function Hero() {
           alt={slide.desktopAlt}
           width={450}
           height={450}
+          fetchPriority="high"
           className="hidden size-[280px] shrink-0 rounded-[24px] object-cover transition-all duration-300 md:block lg:size-[400px] xl:size-[450px]"
         />
       </section>

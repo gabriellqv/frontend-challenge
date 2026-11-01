@@ -1,4 +1,4 @@
-import { isMocksEnabled } from './app/env'
+import { isMocksEnabled } from './app/mocks-flag'
 import './index.css'
 
 async function bootstrap() {
@@ -6,7 +6,8 @@ async function bootstrap() {
   // patcheado antes de o socket.io-client ser carregado.
   if (isMocksEnabled) {
     const { worker } = await import('./mocks/browser')
-    await worker.start({ onUnhandledRequest: 'bypass' })
+    // Em produção o log de cada requisição no console é só custo de CPU.
+    await worker.start({ onUnhandledRequest: 'bypass', quiet: import.meta.env.PROD })
     const { applyUrlControls, exposeControl } = await import('./mocks/scenarios')
     applyUrlControls()
     exposeControl()

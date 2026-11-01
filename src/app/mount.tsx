@@ -6,9 +6,12 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { createRoot } from 'react-dom/client'
 
 import { routeTree } from '../routeTree.gen'
+import './env'
 import { queryClient } from './query-client'
 
-const router = createRouter({ routeTree })
+// Com as rotas divididas em chunks, o chunk da rota é baixado ao passar o
+// mouse/focar no link, para a navegação não esperar a rede.
+const router = createRouter({ routeTree, defaultPreload: 'intent' })
 
 declare module '@tanstack/react-router' {
   interface Register {

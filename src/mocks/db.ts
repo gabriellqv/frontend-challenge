@@ -4,6 +4,12 @@ import { createNfts, createUserRecords, seedWallets } from './fixtures'
 
 const DB_KEY = 'kurio:mock-db'
 
+/**
+ * As artes passaram de PNG para WebP. Bancos salvos antes da troca guardam as
+ * URLs antigas em NFTs, carrinhos e pedidos — reescritas ao carregar.
+ */
+const LEGACY_ARTWORK_URL = /\/images\/(Frame-136|NFT-Artwork-\d+)\.png/g
+
 export type UserRecord = {
   id: string
   name: string
@@ -63,8 +69,9 @@ function seed(): Db {
 
 function load(): Db {
   try {
-    const raw = localStorage.getItem(DB_KEY)
-    if (raw) {
+    const stored = localStorage.getItem(DB_KEY)
+    if (stored) {
+      const raw = stored.replace(LEGACY_ARTWORK_URL, '/images/$1.webp')
       const parsed = JSON.parse(raw) as Db
       if (
         parsed &&
@@ -74,12 +81,12 @@ function load(): Db {
         typeof parsed.nfts[0]?.imageUrl === 'string'
       ) {
         const imageFixes: Record<string, string> = {
-          'nft-1': '/images/Frame-136.png',
-          'nft-19': '/images/NFT-Artwork-18.png',
-          'nft-20': '/images/NFT-Artwork-18.png',
-          'nft-21': '/images/NFT-Artwork-05.png',
-          'nft-22': '/images/NFT-Artwork-09.png',
-          'nft-23': '/images/NFT-Artwork-09.png',
+          'nft-1': '/images/Frame-136.webp',
+          'nft-19': '/images/NFT-Artwork-18.webp',
+          'nft-20': '/images/NFT-Artwork-18.webp',
+          'nft-21': '/images/NFT-Artwork-05.webp',
+          'nft-22': '/images/NFT-Artwork-09.webp',
+          'nft-23': '/images/NFT-Artwork-09.webp',
         }
         let changed = false
         for (const [id, url] of Object.entries(imageFixes)) {
@@ -89,7 +96,7 @@ function load(): Db {
             changed = true
           }
         }
-        if (changed) {
+        if (changed || raw !== stored) {
           persistRaw(parsed)
         }
         return parsed
