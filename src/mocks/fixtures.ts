@@ -32,12 +32,24 @@ export function seedWallets(): Record<string, Wallet[]> {
     'u-nova': [
       {
         id: 'w-1',
-        address: '0x7aB8…9f3D',
+        address: '0x7aB8c41E2d9F0b3A5c6D7e8F9a0B1c2D3e4F9f3D',
         network: 'Polygon',
         label: 'Principal',
         isPrimary: true,
+        provider: 'coinbase',
+        ensName: 'nova.eth',
+        referralCode: 'KURIO2026',
       },
-      { id: 'w-2', address: '0x3cA1…0eB4', network: 'Ethereum', label: null, isPrimary: false },
+      {
+        id: 'w-2',
+        address: '0x3cA1f09B8e7D6c5B4a3F2e1D0c9B8a7F6e5D0eB4',
+        network: 'Ethereum',
+        label: 'Reserva',
+        isPrimary: false,
+        provider: 'metamask',
+        ensName: null,
+        referralCode: null,
+      },
     ],
     'u-bruno': [],
   }

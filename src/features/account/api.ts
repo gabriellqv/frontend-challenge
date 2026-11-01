@@ -5,10 +5,12 @@ import { z } from 'zod'
 import { getJson, httpClient, patchJson, postJson } from '@/shared/api/http-client'
 import { queryKeys } from '@/shared/api/query-keys'
 import {
+  type ConnectWalletRequest,
   type CreateWalletRequest,
   type UpdateProfileRequest,
-  type Wallet,
+  type UpdateWalletRequest,
   profileSchema,
+  walletConnectionSchema,
   walletSchema,
 } from '@/shared/contracts'
 import { getOwnerKey, getToken } from '@/shared/session'
@@ -73,8 +75,28 @@ export function useCreateWallet() {
 export function useUpdateWallet() {
   const invalidate = useInvalidatePrivate()
   return useMutation({
-    mutationFn: ({ id, ...body }: Partial<Wallet> & { id: string }) =>
+    mutationFn: ({ id, ...body }: UpdateWalletRequest & { id: string }) =>
       patchJson(walletSchema, `/wallets/${id}`, body),
     onSuccess: () => invalidate(),
+  })
+}
+
+/**
+ * Conecta uma carteira cadastrada (simulação de extensão). Pode ser recusada
+ * pela "carteira" (`WALLET_REJECTED`).
+ *
+ * @returns Mutation que resolve com a conexão ativa.
+ */
+export function useConnectWallet() {
+  return useMutation({
+    mutationFn: ({ walletId, ...body }: ConnectWalletRequest & { walletId: string }) =>
+      postJson(walletConnectionSchema, `/wallets/${walletId}/connect`, body),
+  })
+}
+
+/** Encerra a conexão simulada de uma carteira. */
+export function useDisconnectWallet() {
+  return useMutation({
+    mutationFn: (connectionId: string) => httpClient.delete(`/wallets/connections/${connectionId}`),
   })
 }

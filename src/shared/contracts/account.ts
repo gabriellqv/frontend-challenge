@@ -22,31 +22,50 @@ export const changePasswordRequestSchema = z.object({
 })
 export type ChangePasswordRequest = z.infer<typeof changePasswordRequestSchema>
 
+/** Provedores de carteira (conexão simulada no checkout). */
+export const walletProviderSchema = z.enum(['walletconnect', 'metamask', 'coinbase'])
+export type WalletProvider = z.infer<typeof walletProviderSchema>
+
 export const walletSchema = z.object({
   id: idSchema,
   address: z.string().min(1),
   network: z.string().min(1),
   label: z.string().nullable(),
   isPrimary: z.boolean(),
+  /** Tipo de carteira escolhido no cadastro. */
+  provider: walletProviderSchema.nullable(),
+  /** Nome ENS completo (ex.: `nova.eth`). */
+  ensName: z.string().nullable(),
+  referralCode: z.string().nullable(),
 })
 export type Wallet = z.infer<typeof walletSchema>
 
+/** Endereço completo: `0x` + 40 hexadecimais. */
+export const walletAddressSchema = z
+  .string()
+  .trim()
+  .regex(/^0x[a-fA-F0-9]{40}$/, 'Informe um endereço 0x com 40 caracteres hexadecimais.')
+
 export const createWalletRequestSchema = z.object({
-  address: z.string().min(1),
+  address: walletAddressSchema,
   network: z.string().min(1),
-  label: z.string().nullable().optional(),
+  label: z.string().trim().min(2).nullable(),
+  provider: walletProviderSchema,
+  ensName: z.string().nullable(),
+  referralCode: z.string().nullable(),
+  /** Cadastrar já como principal (a anterior vira secundária). */
+  isPrimary: z.boolean().optional(),
 })
 export type CreateWalletRequest = z.infer<typeof createWalletRequestSchema>
+
+export const updateWalletRequestSchema = createWalletRequestSchema.partial()
+export type UpdateWalletRequest = z.infer<typeof updateWalletRequestSchema>
 
 export const favoriteSchema = z.object({
   nftId: idSchema,
   addedAt: isoDateSchema,
 })
 export type Favorite = z.infer<typeof favoriteSchema>
-
-/** Provedores de carteira oferecidos no checkout (conexão simulada). */
-export const walletProviderSchema = z.enum(['walletconnect', 'metamask', 'coinbase'])
-export type WalletProvider = z.infer<typeof walletProviderSchema>
 
 export const connectWalletRequestSchema = z.object({
   provider: walletProviderSchema,

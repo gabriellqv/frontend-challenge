@@ -1,8 +1,12 @@
+import { useEffect, useRef } from 'react'
+
 import { useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 
 import { AlertCircle, Clock, X } from 'lucide-react'
 
+import { WALLET_PROVIDER_LABELS } from '@/features/checkout/checkout-form'
+import { formatTokenId } from '@/features/checkout/format'
 import { orderQueryOptions } from '@/features/orders/api'
 import { DEFAULT_NFT_LIST_QUERY } from '@/shared/contracts'
 import { cn } from '@/shared/lib/cn'
@@ -17,86 +21,20 @@ export const Route = createFileRoute('/pedido/$orderId')({
   component: OrderPage,
 })
 
-function formatOrderDate(isoDate?: string): string {
-  if (!isoDate) return '29 Jul, 2026'
-  try {
-    const d = new Date(isoDate)
-    const months = [
-      'Jan',
-      'Fev',
-      'Mar',
-      'Abr',
-      'Mai',
-      'Jun',
-      'Jul',
-      'Ago',
-      'Set',
-      'Out',
-      'Nov',
-      'Dez',
-    ]
-    const day = d.getDate().toString().padStart(2, '0')
-    const month = months[d.getMonth()]
-    const year = d.getFullYear()
-    return `${day} ${month}, ${year}`
-  } catch {
-    return '29 Jul, 2026'
-  }
+const MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+
+function formatOrderDate(isoDate: string): string {
+  const date = new Date(isoDate)
+  const day = date.getDate().toString().padStart(2, '0')
+  return `${day} ${MONTHS[date.getMonth()]}, ${date.getFullYear()}`
 }
 
-function formatTxHash(hash?: string | null): string {
-  if (!hash) return '0xA91F…E82C'
+/** Encurta o hash da transação; sem hash, o pagamento ainda não foi confirmado. */
+function formatTxHash(hash: string | null): string {
+  if (!hash) return 'Aguardando'
   if (hash.length <= 12) return hash
   return `${hash.slice(0, 6)}…${hash.slice(-4)}`
 }
-
-function getItemTokenId(nftId: string) {
-  if (nftId === 'nft-1') return '#0042'
-  if (nftId === 'nft-20') return '#0314'
-  if (nftId === 'nft-21') return '#0088'
-  const num = nftId.replace(/\D/g, '').padStart(4, '0')
-  return `#${num}`
-}
-
-function getItemImage(nftId: string) {
-  if (nftId === 'nft-1') return '/images/Frame-136.webp'
-  if (nftId === 'nft-20') return '/images/NFT-Artwork-18.webp'
-  if (nftId === 'nft-21') return '/images/NFT-Artwork-05.webp'
-  return '/images/NFT-Artwork-09.webp'
-}
-
-const DEMO_ITEMS = [
-  {
-    nftId: 'nft-1',
-    editionId: 'ed-1',
-    name: 'Emerald Ape #042',
-    imageUrl: '/images/Frame-136.webp',
-    quantity: 2,
-    priceEth: '1.19',
-    totalEth: '2.38 ETH',
-    tokenId: '#0042',
-  },
-  {
-    nftId: 'nft-20',
-    editionId: 'ed-20',
-    name: 'Violet Nomad #314',
-    imageUrl: '/images/NFT-Artwork-18.webp',
-    quantity: 6,
-    priceEth: '1.39',
-    totalEth: '8.34 ETH',
-    tokenId: '#0314',
-  },
-  {
-    nftId: 'nft-21',
-    editionId: 'ed-21',
-    name: 'Ivory Baron #088',
-    imageUrl: '/images/NFT-Artwork-05.webp',
-    quantity: 9,
-    priceEth: '1.79',
-    totalEth: '16.11 ETH',
-    tokenId: '#0088',
-  },
-]
 
 function ThankYouIcon({ className }: { className?: string }) {
   return (
@@ -175,6 +113,13 @@ function OrderPage() {
   const { orderId } = Route.useParams()
   const navigate = useNavigate()
   const orderQuery = useQuery(orderQueryOptions(orderId))
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const hasOrder = Boolean(orderQuery.data)
+
+  // O recibo abre como diálogo: o foco vai para ele, como num modal.
+  useEffect(() => {
+    if (hasOrder) dialogRef.current?.focus()
+  }, [hasOrder])
 
   if (orderQuery.isLoading) {
     return (
@@ -209,20 +154,14 @@ function OrderPage() {
   const isDeclined = order.status === 'declined'
   const isPending = order.status === 'pending'
 
-  const displayItems =
-    order.items.length > 0
-      ? order.items.map((item) => ({
-          nftId: item.nftId,
-          editionId: item.editionId,
-          name: item.name,
-          imageUrl: getItemImage(item.nftId),
-          quantity: item.quantity,
-          priceEth: item.priceEth,
-          totalEth: `${formatEth(mul(item.priceEth, item.quantity.toString()))} ETH`,
-          tokenId: getItemTokenId(item.nftId),
-        }))
-      : DEMO_ITEMS
-
+  const displayItems = order.items.map((item) => ({
+    ...item,
+    totalEth: `${formatEth(mul(item.priceEth, item.quantity.toString()))} ETH`,
+    tokenId: formatTokenId(item.nftId),
+  }))
+  const walletLabel = order.payment ? WALLET_PROVIDER_LABELS[order.payment.provider] : '—'
+  const networkLabel = order.payment?.network ?? 'rede'
+  const hasDiscount = order.discountEth !== '0'
   const txRefFormatted = formatTxHash(order.transactionRef)
   const orderDateFormatted = formatOrderDate(order.createdAt)
   const totalEthFormatted = `${formatEth(order.totalEth)} ETH`
@@ -267,10 +206,12 @@ function OrderPage() {
       {/* Order Confirmation Modal Container */}
       <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4 sm:p-6">
         <div
+          ref={dialogRef}
+          tabIndex={-1}
           role="dialog"
           aria-modal="true"
           aria-labelledby="order-modal-title"
-          className="relative my-auto flex w-full max-w-[578px] flex-col rounded-[0px] bg-[#241612] shadow-2xl transition-all"
+          className="relative my-auto outline-none flex w-full max-w-[578px] flex-col rounded-[0px] bg-[#241612] shadow-2xl transition-all"
         >
           {/* Close Button X */}
           <button
@@ -297,6 +238,7 @@ function OrderPage() {
 
               <h1
                 id="order-modal-title"
+                aria-live="polite"
                 className={cn(
                   'font-mono text-[16px] leading-4 font-bold',
                   isDeclined ? 'text-[#F0805F]' : 'text-[#CFB28C]',
@@ -358,7 +300,9 @@ function OrderPage() {
             {/* Column 4: Carteira */}
             <div className="flex flex-col items-start">
               <span className="text-[14px] leading-4 font-bold text-[#CFB28C]">Carteira</span>
-              <span className="text-[15px] leading-5 font-normal text-[#CFB28C]">MetaMask</span>
+              <span className="text-[15px] leading-5 font-normal text-[#CFB28C]">
+                {walletLabel}
+              </span>
             </div>
           </div>
 
@@ -424,6 +368,14 @@ function OrderPage() {
 
             {/* Totals Breakdown */}
             <div className="flex flex-col gap-3 pt-2 font-mono">
+              {hasDiscount && (
+                <div className="flex w-full items-center justify-between">
+                  <span className="text-[15px] leading-5 font-normal text-[#F5F1EB]">Desconto</span>
+                  <span className="text-right text-[18px] leading-4 font-normal text-[#F5F1EB]">
+                    (-) {formatEth(order.discountEth)} ETH
+                  </span>
+                </div>
+              )}
               <div className="flex w-full items-center justify-between">
                 <span className="text-[15px] leading-5 font-normal text-[#F5F1EB]">
                   Taxa de rede
@@ -448,8 +400,10 @@ function OrderPage() {
             <div className="flex flex-col items-center gap-6 pt-2 text-center">
               <p className="max-w-[490px] font-mono text-[14px] leading-[22px] font-normal text-[#CFB28C]">
                 {isDeclined
-                  ? 'A transação não foi aprovada na rede. Verifique seu saldo ou conecte outra carteira para tentar novamente.'
-                  : 'Transação confirmada na Ethereum. A propriedade foi transferida para sua carteira conectada e registrada na rede.'}
+                  ? 'A transação não foi aprovada na rede. Seus itens continuam no carrinho: verifique o saldo ou use outra carteira para tentar novamente.'
+                  : isPending
+                    ? `Aguardando a confirmação na ${networkLabel}. Esta página atualiza sozinha; você pode recarregar sem criar outra compra.`
+                    : `Transação confirmada na ${networkLabel}. A propriedade foi transferida para sua carteira conectada e registrada na rede.`}
               </p>
 
               {isDeclined ? (
@@ -460,14 +414,14 @@ function OrderPage() {
                   Tentar novamente
                 </Link>
               ) : (
-                <a
-                  href={`https://etherscan.io/tx/${order.transactionRef ?? '0x'}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex h-[48px] w-[186px] cursor-pointer items-center justify-center rounded-[5px] bg-[#D28A4C] font-mono text-[16px] leading-4 font-bold text-[#140D0A] transition-colors hover:bg-[#E89B55]"
+                // Referências de transação são simuladas: o explorador não é aberto.
+                <span
+                  aria-disabled="true"
+                  title="Explorador simulado: indisponível na demonstração"
+                  className="flex h-[48px] min-w-[186px] cursor-not-allowed items-center justify-center rounded-[5px] border border-[#D28A4C] px-4 font-mono text-[14px] leading-4 font-bold text-[#E89B55] opacity-80"
                 >
-                  Ver no Etherscan
-                </a>
+                  Ver no explorador (simulado)
+                </span>
               )}
             </div>
           </div>

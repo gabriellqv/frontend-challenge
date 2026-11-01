@@ -39,6 +39,53 @@ export type Db = {
   sessions: Record<string, SessionRecord>
   /** idempotencyKey -> orderId (recuperação de pedido idempotente). */
   idempotency: Record<string, string>
+  /** idempotencyKey -> impressão digital do corpo (detecta reuso com conteúdo diferente). */
+  idempotencyFingerprints: Record<string, string>
+  /** orderId -> dono do pedido (autorização e limpeza do carrinho certo). */
+  orderOwners: Record<string, OrderOwner>
+}
+
+export type OrderOwner = {
+  userId: string
+  /** Chave do carrinho de onde o pedido saiu. */
+  ownerKey: string
+  /**
+   * Quando e como o pagamento simulado se resolve. Persistido porque os timers
+   * do mock vivem na página: recarregar não pode deixar o pedido pendente para sempre.
+   */
+  paymentResolvesAt?: number
+  paymentOutcome?: 'confirmed' | 'declined'
+}
+
+type StoredDb = Omit<Db, 'idempotencyFingerprints' | 'orderOwners'> &
+  Partial<Pick<Db, 'idempotencyFingerprints' | 'orderOwners'>>
+
+/** Completa bancos salvos por versões anteriores do mock (campos criados depois). */
+function upgrade(stored: StoredDb): Db {
+  for (const wallets of Object.values(stored.wallets)) {
+    for (const wallet of wallets) {
+      if (wallet.provider === undefined) wallet.provider = null
+      if (wallet.ensName === undefined) wallet.ensName = null
+      if (wallet.referralCode === undefined) wallet.referralCode = null
+    }
+  }
+  for (const order of Object.values(stored.orders)) {
+    if (order.payment === undefined) order.payment = null
+    for (const item of order.items) {
+      if (!item.imageUrl) {
+        item.imageUrl = stored.nfts.find((n) => n.id === item.nftId)?.imageUrl ?? ''
+      }
+    }
+  }
+  // Catálogo salvo antes de atributos/edições por faixa: o seed atual o substitui
+  // (ids de NFT e da edição principal se mantêm, então carrinhos seguem válidos).
+  const isCatalogOutdated = stored.nfts.some((nft) => !Array.isArray(nft.attributes))
+  return {
+    ...stored,
+    nfts: isCatalogOutdated ? createNfts() : stored.nfts,
+    idempotencyFingerprints: stored.idempotencyFingerprints ?? {},
+    orderOwners: stored.orderOwners ?? {},
+  }
 }
 
 /**
@@ -64,6 +111,8 @@ function seed(): Db {
     wallets: seedWallets(),
     sessions: {},
     idempotency: {},
+    idempotencyFingerprints: {},
+    orderOwners: {},
   }
 }
 
@@ -72,7 +121,7 @@ function load(): Db {
     const stored = localStorage.getItem(DB_KEY)
     if (stored) {
       const raw = stored.replace(LEGACY_ARTWORK_URL, '/images/$1.webp')
-      const parsed = JSON.parse(raw) as Db
+      const parsed = JSON.parse(raw) as StoredDb
       if (
         parsed &&
         Array.isArray(parsed.nfts) &&
@@ -96,14 +145,11 @@ function load(): Db {
             changed = true
           }
         }
-        // Catálogo salvo antes de atributos/edições por faixa: o seed atual o
-        // substitui (ids de NFT e da edição principal se mantêm).
-        const isCatalogOutdated = parsed.nfts.some((nft) => !Array.isArray(nft.attributes))
-        if (isCatalogOutdated) parsed.nfts = createNfts()
-        if (changed || raw !== stored || isCatalogOutdated) {
-          persistRaw(parsed)
+        const upgraded = upgrade(parsed)
+        if (changed || raw !== stored) {
+          persistRaw(upgraded)
         }
-        return parsed
+        return upgraded
       }
     }
   } catch {

@@ -13,6 +13,8 @@ import {
   updateProfileRequestSchema,
 } from '@/shared/contracts'
 import { getToken } from '@/shared/session'
+import { Button } from '@/shared/ui/button'
+import { Input } from '@/shared/ui/input'
 
 export const Route = createFileRoute('/perfil')({
   beforeLoad: () => {
@@ -20,9 +22,6 @@ export const Route = createFileRoute('/perfil')({
   },
   component: ProfilePage,
 })
-
-const fieldClass =
-  'mt-1 w-full rounded-[6px] border border-surface-dark bg-surface-card px-3 py-2 text-canvas aria-[invalid=true]:border-error'
 
 function ProfilePage() {
   const profileQuery = useQuery(profileQueryOptions())
@@ -77,9 +76,8 @@ function ProfilePage() {
                 <label htmlFor="avatarUrl" className="text-sm text-text-secondary">
                   URL do avatar
                 </label>
-                <input
+                <Input
                   id="avatarUrl"
-                  className={fieldClass}
                   placeholder="https://…"
                   {...profileForm.register('avatarUrl')}
                 />
@@ -90,11 +88,10 @@ function ProfilePage() {
               <label htmlFor="name" className="text-sm text-text-secondary">
                 Nome
               </label>
-              <input
+              <Input
                 id="name"
                 aria-invalid={Boolean(profileForm.formState.errors.name)}
                 aria-describedby="name-error"
-                className={fieldClass}
                 {...profileForm.register('name')}
               />
               {profileForm.formState.errors.name && (
@@ -110,13 +107,14 @@ function ProfilePage() {
               </p>
             )}
 
-            <button
+            <Button
               type="submit"
+              size="sm"
+              className="self-start"
               disabled={updateProfile.isPending}
-              className="self-start rounded-[5px] bg-primary px-4 py-2 text-sm font-bold text-ink disabled:opacity-50"
             >
               {updateProfile.isPending ? 'Salvando…' : 'Salvar'}
-            </button>
+            </Button>
             {updateProfile.isSuccess && (
               <p role="status" className="text-sm text-success">
                 Dados atualizados.
@@ -139,11 +137,10 @@ function ProfilePage() {
               <label htmlFor="currentPassword" className="text-sm text-text-secondary">
                 Senha atual
               </label>
-              <input
+              <Input
                 id="currentPassword"
                 type="password"
                 autoComplete="current-password"
-                className={fieldClass}
                 {...passwordForm.register('currentPassword')}
               />
             </div>
@@ -151,13 +148,12 @@ function ProfilePage() {
               <label htmlFor="newPassword" className="text-sm text-text-secondary">
                 Nova senha
               </label>
-              <input
+              <Input
                 id="newPassword"
                 type="password"
                 autoComplete="new-password"
                 aria-invalid={Boolean(passwordForm.formState.errors.newPassword)}
                 aria-describedby="new-password-error"
-                className={fieldClass}
                 {...passwordForm.register('newPassword')}
               />
               {passwordForm.formState.errors.newPassword && (
@@ -173,13 +169,14 @@ function ProfilePage() {
               </p>
             )}
 
-            <button
+            <Button
               type="submit"
+              size="sm"
+              className="self-start"
               disabled={changePassword.isPending}
-              className="self-start rounded-[5px] bg-primary px-4 py-2 text-sm font-bold text-ink disabled:opacity-50"
             >
               {changePassword.isPending ? 'Alterando…' : 'Alterar senha'}
-            </button>
+            </Button>
             {changePassword.isSuccess && (
               <p role="status" className="text-sm text-success">
                 Senha alterada.
