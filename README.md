@@ -162,4 +162,9 @@ imagem de LCP e cache imutável dos assets. Detalhes e medições em
 
 ## Deploy
 
-> Preencha com a URL pública (Vercel) após o deploy.
+- **Produção:** https://frontend-challenge-beta.vercel.app
+- **Repositório:** https://github.com/gabriellqv/frontend-challenge
+- **Plataforma:** Vercel (build Vite), com MSW e tempo real ativos no build publicado.
+
+Validado em produção: acesso direto às rotas, refresh, 404, login, carrinho,
+evento `nft.updated` e compra completa até o recibo confirmado.
